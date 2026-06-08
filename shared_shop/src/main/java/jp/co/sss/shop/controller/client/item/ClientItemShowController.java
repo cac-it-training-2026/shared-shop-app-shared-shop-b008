@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import jp.co.sss.shop.bean.ItemBean;
 import jp.co.sss.shop.entity.Item;
@@ -34,6 +35,7 @@ public class ClientItemShowController {
 	@Autowired
 	BeanTools beanTools;
 
+	// ===== 担当: 切通 隆晟 / トップ画面（売れ筋順改修） =====
 	/**
 	 * トップ画面 表示処理
 	 *
@@ -56,6 +58,33 @@ public class ClientItemShowController {
 		model.addAttribute("items", itemBeanList);
 
 		return "index";
+	}
+
+	// ===== 担当: 切通 隆晟 / 商品一覧（新着） =====
+	// ===== 担当: シュエ ジーハン / 商品一覧（売れ筋） =====
+	// ===== 担当: コグレ / 商品検索（カテゴリ） =====
+	/**
+	 * 商品一覧画面を表示します。
+	 *
+	 * @param sortType 表示順種別(1:新着順、2:売れ筋順)
+	 * @param categoryId カテゴリID
+	 * @param model Viewとの値受渡し
+	 * @return "client/item/list" 商品一覧画面
+	 */
+	@RequestMapping(path = "/client/item/list/{sortType}", method = { RequestMethod.GET, RequestMethod.POST })
+	public String showItemList(
+			@PathVariable Integer sortType,
+			@RequestParam(required = false) Integer categoryId,
+			Model model) {
+
+		// TODO 切通 隆晟担当: sortType=1の場合、新着順の商品一覧を取得して画面へ渡す。
+		// TODO シュエ ジーハン担当: sortType=2の場合、売れ筋順の商品一覧を取得して画面へ渡す。
+		// TODO コグレ担当: categoryIdが指定された場合、カテゴリ条件を加えて商品一覧を取得する。
+
+		model.addAttribute("sortType", sortType);
+		model.addAttribute("categoryId", categoryId);
+
+		return "client/item/list";
 	}
 
 	/**
