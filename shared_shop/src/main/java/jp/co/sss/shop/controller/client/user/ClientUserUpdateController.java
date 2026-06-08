@@ -1,8 +1,5 @@
 package jp.co.sss.shop.controller.client.user;
 
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +8,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import jp.co.sss.shop.form.UserForm;
 import jp.co.sss.shop.repository.UserRepository;
 
@@ -43,6 +42,7 @@ public class ClientUserUpdateController {
 	@RequestMapping(path = "/client/user/update/input", method = RequestMethod.POST)
 	public String updateInputInit() {
 		// TODO 金宮 永茉担当: セッションのログイン会員IDを条件に会員情報を取得し、UserFormをセッションへ保存する。
+		//User user = userRepository.getReferenceById();
 		return "redirect:/client/user/update/input";
 	}
 
@@ -56,6 +56,7 @@ public class ClientUserUpdateController {
 	@RequestMapping(path = "/client/user/update/input", method = RequestMethod.GET)
 	public String updateInput(Model model) {
 		// TODO 金宮 永茉担当: セッションのUserFormと入力エラー情報を画面へ渡す。
+
 		return "client/user/update_input";
 	}
 
