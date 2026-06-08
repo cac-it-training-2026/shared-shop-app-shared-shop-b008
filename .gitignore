@@ -5,6 +5,7 @@ src/main/resources/application.properties
 RDD.md
 Codex実装用_詳細設計書抽出.md
 [PRGDE004]08_HTMLモック_2.1.3/
+shared_shop_answer/
 
 #doc and docx files
 *.doc
