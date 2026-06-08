@@ -1,5 +1,5 @@
 #Spring
-src/main/resources/application.properties
+shared_shop/src/main/resources/application.properties
 
 #local documents for learning
 RDD.md
