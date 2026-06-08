@@ -1,8 +1,4 @@
 package jp.co.sss.shop.controller.client.user;
-
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +7,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import jp.co.sss.shop.form.UserForm;
 import jp.co.sss.shop.repository.UserRepository;
 
@@ -19,6 +17,7 @@ import jp.co.sss.shop.repository.UserRepository;
  *
  * @author SystemShared
  */
+//@Controller
 @Controller
 public class ClientUserRegistController {
 
@@ -43,6 +42,13 @@ public class ClientUserRegistController {
 	@RequestMapping(path = "/client/user/regist/input/init", method = RequestMethod.GET)
 	public String registInputInit() {
 		// TODO コグレ担当: 新規UserFormを作成し、セッションへ保存する。
+		System.out.println("qwertyu");
+		
+		session.setAttribute("userForm",new UserForm());
+		
+	// 新規登録の初期化なので、前回の残ったエラー情報があれば削除しておく
+		session.removeAttribute("result");
+		
 		return "redirect:/client/user/regist/input";
 	}
 
@@ -70,7 +76,7 @@ public class ClientUserRegistController {
 		// TODO コグレ担当: セッションのUserFormと入力エラー情報を画面へ渡す。
 		return "client/user/regist_input";
 	}
-
+//今日は天気が悪いです
 	// ===== 担当: コグレ / 登録確認 =====
 	/**
 	 * 登録入力値をチェックし、登録確認画面へ遷移します。
@@ -122,3 +128,4 @@ public class ClientUserRegistController {
 		return "client/user/regist_complete";
 	}
 }
+
