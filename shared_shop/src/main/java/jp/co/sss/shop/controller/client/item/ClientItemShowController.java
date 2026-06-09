@@ -63,53 +63,57 @@ public class ClientItemShowController {
 	// ===== 担当: 切通 隆晟 / 商品一覧（新着） =====
 	// ===== 担当: シュエ ジーハン / 商品一覧（売れ筋） =====
 	// ===== 担当: コグレ / 商品検索（カテゴリ） =====
-	/**
-	 * 商品一覧画面を表示します。
-	 *
-	 * @param sortType 表示順種別(1:新着順、2:売れ筋順)
-	 * @param categoryId カテゴリID
-	 * @param model Viewとの値受渡し
-	 * @return "client/item/list" 商品一覧画面
-	 */
-	@RequestMapping(path = "/client/item/list/{sortType}", method = { RequestMethod.GET, RequestMethod.POST })
-	public String showItemList(
-			@PathVariable Integer sortType,
-			@RequestParam(required = false) Integer categoryId,
-			Model model) {
+	// ===== 担当: 切通 隆晟 / 商品一覧（新着） =====
+		// ===== 担当: シュエ ジーハン / 商品一覧（売れ筋） =====
+		// ===== 担当: コグレ / 商品検索（カテゴリ） =====
+		/**
+		 * 商品一覧画面を表示します。
+		 *
+		 * @param sortType 表示順種別(1:新着順、2:売れ筋順)
+		 * @param categoryId カテゴリID
+		 * @param model Viewとの値受渡し
+		 * @return "client/item/list" 商品一覧画面
+		 */
+		@RequestMapping(path = "/client/item/list/{sortType}", method = { RequestMethod.GET, RequestMethod.POST })
+		public String showItemList(
+				@PathVariable Integer sortType,
+				@RequestParam(required = false) Integer categoryId,
+				Model model) {
 
-		// TODO 切通 隆晟担当: sortType=1の場合、新着順の商品一覧を取得して画面へ渡す。
-		// TODO シュエ ジーハン担当: sortType=2の場合、売れ筋順の商品一覧を取得して画面へ渡す。
-		// TODO コグレ担当: categoryIdが指定された場合、カテゴリ条件を加えて商品一覧を取得する。
+			// 表示順とカテゴリ条件に応じて商品情報を取得する。
+			List<Item> itemList = findItems(sortType, categoryId);
 
-		model.addAttribute("sortType", sortType);
-		model.addAttribute("categoryId", categoryId);
+			// 商品情報を画面表示用Beanにコピーする。
+			List<ItemBean> itemBeanList = beanTools.copyEntityListToItemBeanList(itemList);
 
-		return "client/item/list";
-	}
+			model.addAttribute("items", itemBeanList);
+			model.addAttribute("sortType", sortType);
+			model.addAttribute("categoryId", categoryId);
 
-	/**
-	 * 詳細表示処理
-	 *
-	 * @param id      表示対象ID
-	 * @param model   Viewとの値受渡し
-	 * @return "client/item/detail" 詳細画面 表示
-	 */
-	@RequestMapping(path = "/client/item/detail/{id}")
-	public String showItem(@PathVariable int id, Model model) {
-
-		// 商品IDに該当する商品情報を取得する
-		Item item = itemRepository.findByIdAndDeleteFlag(id, Constant.NOT_DELETED);
-		if (item == null) {
-			return "redirect:/syserror";
+			return "client/item/list";
 		}
 
-		// Itemエンティティの各フィールドの値をItemBeanにコピー
-		ItemBean itemBean = beanTools.copyEntityToItemBean(item);
+		/**
+		 * 表示順とカテゴリ条件に応じた商品一覧を取得します。
+		 *
+		 * @param sortType 表示順種別
+		 * @param categoryId カテゴリID
+		 * @return 商品エンティティのリスト
+		 */
+		private List<Item> findItems(Integer sortType, Integer categoryId) {
+			boolean hasCategory = categoryId != null && categoryId != 0;
 
-		// 商品情報をViewへ渡す
-		model.addAttribute("item", itemBean);
+			if (sortType != null && sortType ==2) {
+				// 売れ筋順の場合は注文商品情報をもとに並び替える。
+				if (hasCategory) {
+					return itemRepository.findHotSellItemsByCategoryId(categoryId, Constant.NOT_DELETED);
+				}
+				return itemRepository.findHotSellItems(Constant.NOT_DELETED);
+			}
 
-		return "client/item/detail";
-	}
-
-}
+			// 新着順の場合は商品登録日の降順で取得する。
+			if (hasCategory) {
+				return itemRepository.findByCategoryIdAndDeleteFlagOrderByInsertDateDesc(categoryId, Constant.NOT_DELETED);
+			}
+			return itemRepository.findByDeleteFlagOrderByInsertDateDesc(Constant.NOT_DELETED);
+		}}
