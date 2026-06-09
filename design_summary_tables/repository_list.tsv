@@ -1,0 +1,23 @@
+No	リポジトリ名	対象Entity	戻り値	メソッド名	引数	JPQL	備考
+1.0	CategoryRepository	Category	Category	findByNameAndDeleteFlag	String name, int deleteFlag	Spring Data JPA自動生成	カテゴリ名重複チェックで利用
+1.1	CategoryRepository	Category	Category	findByIdAndDeleteFlag	Integer id, int deleteFlag	Spring Data JPA自動生成	カテゴリ詳細/変更/削除で利用
+1.2	CategoryRepository	Category	List<Category>	findByDeleteFlagOrderByInsertDateDescIdDesc	int deleteFlag	Spring Data JPA自動生成	カテゴリ一覧、商品検索カテゴリ表示で利用
+1.3	CategoryRepository	Category	Page<Category>	findByDeleteFlagOrderByInsertDateDescIdDescPage	int deleteFlag, Pageable pageable	SELECT c FROM Category c WHERE c.deleteFlag =:deleteFlag ORDER BY c.insertDate DESC,c.id DESC	管理者カテゴリ一覧で利用
+2.0	ItemRepository	Item	Page<Item>	findByDeleteFlagOrderByInsertDateDescPage	int deleteFlag, Pageable pageable	SELECT i FROM Item i INNER JOIN i.category c WHERE i.deleteFlag =:deleteFlag ORDER BY i.insertDate DESC,i.id DESC	管理者商品一覧で利用
+2.1	ItemRepository	Item	List<Item>	findByDeleteFlagOrderByInsertDateDesc	int deleteFlag	SELECT i FROM Item i INNER JOIN i.category c WHERE i.deleteFlag =:deleteFlag ORDER BY i.insertDate DESC,i.id DESC	商品一覧（新着）/売れ筋なし時の代替表示で利用
+2.2	ItemRepository	Item	List<Item>	findByCategoryIdAndDeleteFlagOrderByInsertDateDesc	Integer categoryId, int deleteFlag	SELECT i FROM Item i INNER JOIN i.category c WHERE c.id =:categoryId AND i.deleteFlag =:deleteFlag ORDER BY i.insertDate DESC,i.id DESC	カテゴリ別商品検索（新着順）で利用
+2.3	ItemRepository	Item	List<Item>	findHotSellItems	int deleteFlag	SELECT i FROM Item i INNER JOIN i.category c INNER JOIN i.orderItemList oi WHERE i.deleteFlag =:deleteFlag GROUP BY i ORDER BY SUM(oi.quantity) DESC,i.id ASC	商品一覧（売れ筋）/トップ画面改修で利用
+2.4	ItemRepository	Item	List<Item>	findHotSellItemsByCategoryId	Integer categoryId, int deleteFlag	SELECT i FROM Item i INNER JOIN i.category c INNER JOIN i.orderItemList oi WHERE c.id =:categoryId AND i.deleteFlag =:deleteFlag GROUP BY i ORDER BY SUM(oi.quantity) DESC,i.id ASC	カテゴリ別商品検索（売れ筋順）で利用
+2.5	ItemRepository	Item	Item	findByIdAndDeleteFlag	Integer id, int deleteFlag	Spring Data JPA自動生成	商品詳細、買い物かご、注文在庫確認で利用
+2.6	ItemRepository	Item	Item	findByNameAndDeleteFlag	String name, int notDeleted	Spring Data JPA自動生成	商品名重複チェックで利用
+2.7	ItemRepository	Item	Item	save	Item item	JpaRepository標準	注文確定時の在庫更新、管理者商品登録/変更/削除で利用
+3.0	OrderRepository	Order	Page<Order>	findAllOrderByInsertdateDescIdDesc	Pageable pageable	SELECT o FROM Order o ORDER BY o.insertDate DESC,o.id DESC	管理者注文一覧で利用
+3.1	OrderRepository	Order	Page<Order>	findByUserIdOrderByInsertDateDescIdDesc	Integer userId, Pageable pageable	SELECT o FROM Order o WHERE o.user.id =:userId ORDER BY o.insertDate DESC,o.id DESC	会員注文一覧で利用
+3.2	OrderRepository	Order	Order	findByIdAndUserId	Integer id, Integer userId	SELECT o FROM Order o WHERE o.id =:id AND o.user.id =:userId	会員注文詳細で利用
+3.3	OrderRepository	Order	Order	save	Order order	JpaRepository標準	注文確定時の注文登録で利用
+4.0	OrderItemRepository	OrderItem	OrderItem	save	OrderItem orderItem	JpaRepository標準	注文確定時の注文商品登録で利用
+5.0	UserRepository	User	User	findByEmail	String email	Spring Data JPA自動生成	メールアドレス重複チェックで利用
+5.1	UserRepository	User	User	findByEmailAndDeleteFlag	String email, int deleteFlag	Spring Data JPA自動生成	ログイン認証で利用
+5.2	UserRepository	User	Page<User>	findUsersListOrderByInsertDate	int deleteFlag, int authority, Pageable pageable	SELECT u FROM User u WHERE u.deleteFlag =:deleteFlag AND u.authority >= :authority ORDER BY u.insertDate DESC,u.id DESC	管理者会員一覧で利用
+5.3	UserRepository	User	User	findByIdAndDeleteFlag	Integer id, int deleteFlg	Spring Data JPA自動生成	会員詳細/変更/削除/注文入力初期表示で利用
+5.4	UserRepository	User	User	save	User user	JpaRepository標準	会員登録/変更/削除で利用
