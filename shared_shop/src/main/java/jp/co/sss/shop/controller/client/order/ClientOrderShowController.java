@@ -16,7 +16,6 @@ import jakarta.servlet.http.HttpSession;
 import jp.co.sss.shop.bean.OrderBean;
 import jp.co.sss.shop.bean.UserBean;
 import jp.co.sss.shop.entity.Order;
-import jp.co.sss.shop.entity.OrderItem;
 import jp.co.sss.shop.repository.OrderRepository;
 import jp.co.sss.shop.service.BeanTools;
 import jp.co.sss.shop.service.PriceCalc;
@@ -69,26 +68,19 @@ public class ClientOrderShowController {
 		UserBean user = (UserBean) session.getAttribute("user");
 		// 注文情報を注文日時の新しい順に取得
 	    Page<Order> orders = orderRepository.findByUserIdOrderByInsertDateDescIdDesc(user.getId(), pageable);
-	    // Beanクラスにデータ代入
+	    // Entityから画面表示用のBeanリストへ変換
 	    List<OrderBean> orderBeans = new ArrayList<>();
-
 	    for (Order order : orders.getContent()) {
+	    	OrderBean bean = new OrderBean();
+	 		// BeanTools共通クラスを使って一括コピー
+			beanTools.copyEntityToOrderBean(order);
 
-	        OrderBean bean = new OrderBean();
+			// PriceCalc共通クラスを使って合計金額を計算する
+			int total = priceCalc.orderItemPriceTotal(order.getOrderItemsList());
+			bean.setTotal(total);
 
-	        bean.setId(order.getId());
-	        // entityクラスのDate型をString型に変更
-	        bean.setInsertDate(order.getInsertDate().toString());
-	        bean.setPayMethod(order.getPayMethod());
-	        // 合計金額の計算
-	        int total = 0;
-	        for (OrderItem orderItem : order.getOrderItemsList()) {
-	            total += orderItem.getPrice() * orderItem.getQuantity();
-	        }
-	        bean.setTotal(total);
-
-	        orderBeans.add(bean);
-	    }
+			orderBeans.add(bean);
+		}
 	    // リクエストスコープに保存
 	    model.addAttribute("orders", orderBeans);
 		return "client/order/list";
