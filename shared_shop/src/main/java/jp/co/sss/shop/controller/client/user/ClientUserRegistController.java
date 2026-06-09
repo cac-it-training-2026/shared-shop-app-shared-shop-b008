@@ -76,7 +76,7 @@ public class ClientUserRegistController {
 		// TODO コグレ担当: セッションのUserFormと入力エラー情報を画面へ渡す。
 		return "client/user/regist_input";
 	}
-//今日は天気が悪いです
+
 	// ===== 担当: コグレ / 登録確認 =====
 	/**
 	 * 登録入力値をチェックし、登録確認画面へ遷移します。
