@@ -2,6 +2,10 @@ package jp.co.sss.shop.controller.client.user;
 
 import jakarta.servlet.http.HttpSession;
 
+import jp.co.sss.shop.bean.UserBean;
+import jp.co.sss.shop.entity.User;
+import jp.co.sss.shop.util.Constant;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,7 +43,24 @@ public class ClientUserShowController {
 	 */
 	@RequestMapping(path = "/client/user/detail", method = { RequestMethod.GET, RequestMethod.POST })
 	public String showUser(Model model) {
-		// TODO シュエ ジーハン担当: セッションのログイン会員IDを条件に会員情報を取得し、userBeanとして画面へ渡す。
+		UserBean loginUser = (UserBean) session.getAttribute("user");
+		if (loginUser == null) {
+			return "redirect:/login";
+		}
+
+		// ログイン会員IDを条件に最新の会員情報を取得する。
+		User user = userRepository.findByIdAndDeleteFlag(loginUser.getId(), Constant.NOT_DELETED);
+		if (user == null) {
+			return "redirect:/syserror";
+		}
+
+		UserBean userBean = new UserBean();
+		BeanUtils.copyProperties(user, userBean);
+		model.addAttribute("userBean", userBean);
+
+		// 詳細画面表示時に会員変更・退会用フォームを初期化する。
+		session.removeAttribute("userForm");
+
 		return "client/user/detail";
 	}
 }

@@ -169,6 +169,7 @@ public class ClientOrderRegistController {
 	@RequestMapping(path = "/client/order/complete", method = RequestMethod.POST)
 	public String orderComplete() {
 		// TODO シュエ ジーハン担当: 注文確定直前の在庫確認、注文/注文商品登録、セッション情報削除を行う。
+		// TODO 注意: OrderFormのidは会員IDのため、Orderエンティティのidへコピーしないこと。
 		return "redirect:/client/order/complete";
 	}
 
