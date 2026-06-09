@@ -38,7 +38,7 @@ public class ClientOrderShowController {
 	/**
 	 * Entity、Form、Bean間のデータコピーサービス
 	 */
-	@Autowired
+	@Autowired 
 	BeanTools beanTools;
 
 	/**

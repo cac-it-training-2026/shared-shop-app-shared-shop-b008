@@ -1,8 +1,5 @@
 package jp.co.sss.shop.controller.client.user;
 
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,8 +8,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+import jp.co.sss.shop.bean.UserBean;
+import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.form.UserForm;
 import jp.co.sss.shop.repository.UserRepository;
+import jp.co.sss.shop.service.BeanTools;
 
 /**
  * 会員登録機能(一般会員用)のコントローラクラスです。
@@ -29,6 +31,12 @@ public class ClientUserRegistController {
 	UserRepository userRepository;
 
 	/**
+	 * Entity、Form、Bean間のデータコピーサービス
+	 */
+	@Autowired
+	BeanTools beanTools;
+
+	/**
 	 * セッション
 	 */
 	@Autowired
@@ -42,7 +50,13 @@ public class ClientUserRegistController {
 	 */
 	@RequestMapping(path = "/client/user/regist/input/init", method = RequestMethod.GET)
 	public String registInputInit() {
-		// TODO コグレ担当: 新規UserFormを作成し、セッションへ保存する。
+
+		// 新規UserFormを作成し、セッションへ保存する
+		session.setAttribute("userForm", new UserForm());
+
+		// 前回の残ったエラー情報があればクリアする
+		session.removeAttribute("result");
+
 		return "redirect:/client/user/regist/input";
 	}
 
@@ -54,7 +68,6 @@ public class ClientUserRegistController {
 	 */
 	@RequestMapping(path = "/client/user/regist/input", method = RequestMethod.POST)
 	public String registInputBack() {
-		// TODO コグレ担当: セッションの登録フォームを維持し、登録入力画面へ戻す。
 		return "redirect:/client/user/regist/input";
 	}
 
@@ -67,7 +80,16 @@ public class ClientUserRegistController {
 	 */
 	@RequestMapping(path = "/client/user/regist/input", method = RequestMethod.GET)
 	public String registInput(Model model) {
-		// TODO コグレ担当: セッションのUserFormと入力エラー情報を画面へ渡す。
+
+		// セッションからUserFormを取得しモデルに設定
+		UserForm userForm = (UserForm) session.getAttribute("userForm");
+		model.addAttribute("userForm", userForm);
+
+		// セッションに入力エラー情報（BindingResult）があればモデルに設定
+		if (session.getAttribute("result") != null) {
+			model.addAttribute("org.springframework.validation.BindingResult.userForm", session.getAttribute("result"));
+		}
+
 		return "client/user/regist_input";
 	}
 
@@ -81,7 +103,18 @@ public class ClientUserRegistController {
 	 */
 	@RequestMapping(path = "/client/user/regist/check", method = RequestMethod.POST)
 	public String registInputCheck(@Valid @ModelAttribute UserForm form, BindingResult result) {
-		// TODO コグレ担当: 入力フォームと入力チェック結果をセッションへ保存し、遷移先を判定する。
+
+		// 入力フォームとエラーチェック結果をセッションに保存
+		session.setAttribute("userForm", form);
+
+		if (result.hasErrors()) {
+			session.setAttribute("result", result);
+			return "redirect:/client/user/regist/input";
+		}
+
+		// エラーがない場合はセッションのエラー情報をクリア
+		session.removeAttribute("result");
+
 		return "redirect:/client/user/regist/check";
 	}
 
@@ -94,7 +127,11 @@ public class ClientUserRegistController {
 	 */
 	@RequestMapping(path = "/client/user/regist/check", method = RequestMethod.GET)
 	public String registCheck(Model model) {
-		// TODO コグレ担当: セッションのUserFormを画面へ渡す。
+
+		// セッションのUserFormを画面へ渡す
+		UserForm userForm = (UserForm) session.getAttribute("userForm");
+		model.addAttribute("userForm", userForm);
+
 		return "client/user/regist_check";
 	}
 
@@ -106,7 +143,26 @@ public class ClientUserRegistController {
 	 */
 	@RequestMapping(path = "/client/user/regist/complete", method = RequestMethod.POST)
 	public String registComplete() {
-		// TODO コグレ担当: UserFormからUserエンティティを作成し、DB登録とログイン状態の設定を行う。
+
+		// セッションから入力フォームを取得
+		UserForm userForm = (UserForm) session.getAttribute("userForm");
+
+		// Userエンティティを作成し、フォームのデータをコピーしてDBに保存
+		User user = new User();
+		//beanTools.copyProperties(user, userBean);
+		
+		// 権限などの初期設定が必要であればここで設定（一般会員: 2など）
+		user.setAuthority(2); 
+		userRepository.save(user);
+
+		// 登録したユーザー情報で自動ログイン状態（セッションにUserBeanを保存）にする
+		UserBean userBean = new UserBean();
+		//beanTools.copyProperties(user, userBean);
+		session.setAttribute("user", userBean);
+
+		// 使い終わった登録用フォームのセッション情報をクリア
+		session.removeAttribute("userForm");
+
 		return "redirect:/client/user/regist/complete";
 	}
 
@@ -118,7 +174,6 @@ public class ClientUserRegistController {
 	 */
 	@RequestMapping(path = "/client/user/regist/complete", method = RequestMethod.GET)
 	public String registCompleteFinish() {
-		// TODO コグレ担当: 登録完了画面を表示するための後処理が必要な場合はここに実装する。
 		return "client/user/regist_complete";
 	}
 }
