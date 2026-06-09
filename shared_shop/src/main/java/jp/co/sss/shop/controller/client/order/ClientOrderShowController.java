@@ -63,7 +63,6 @@ public class ClientOrderShowController {
 	@RequestMapping(path = "/client/order/list", method = { RequestMethod.GET, RequestMethod.POST })
 	public String showOrderList(Model model, Pageable pageable) {
 		// TODO 秋葉 真穂担当: ログイン会員IDを条件に注文一覧を取得し、注文Beanリストを画面へ渡す。
-		System.out.println("★★★ showOrderList開始 ★★★");
 		// ログイン会員取得
 		UserBean user = (UserBean) session.getAttribute("user");
 		// 注文情報を注文日時の新しい順に取得
@@ -71,13 +70,11 @@ public class ClientOrderShowController {
 	    // Entityから画面表示用のBeanリストへ変換
 	    List<OrderBean> orderBeans = new ArrayList<>();
 	    for (Order order : orders.getContent()) {
-	    	OrderBean bean = new OrderBean();
 	 		// BeanTools共通クラスを使って一括コピー
-			beanTools.copyEntityToOrderBean(order);
-
+			OrderBean bean = beanTools.copyEntityToOrderBean(order);
 			// PriceCalc共通クラスを使って合計金額を計算する
 			int total = priceCalc.orderItemPriceTotal(order.getOrderItemsList());
-			bean.setTotal(total);
+		    bean.setTotal(total);
 
 			orderBeans.add(bean);
 		}
