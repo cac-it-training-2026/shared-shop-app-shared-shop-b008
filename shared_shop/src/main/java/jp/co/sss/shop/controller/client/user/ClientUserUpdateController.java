@@ -66,7 +66,6 @@ public class ClientUserUpdateController {
 	@RequestMapping(path = "/client/user/update/input", method = RequestMethod.GET)
 	public String updateInput(Model model) {
 		// TODO 金宮 永茉担当: セッションのUserFormと入力エラー情報を画面へ渡す。
-		//aaaa
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
 		model.addAttribute("userForm", userForm);
 		if (session.getAttribute("errors") != null) {
