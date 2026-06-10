@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.servlet.http.HttpSession;
 import jp.co.sss.shop.bean.OrderBean;
+import jp.co.sss.shop.bean.OrderItemBean;
 import jp.co.sss.shop.bean.UserBean;
 import jp.co.sss.shop.entity.Order;
 import jp.co.sss.shop.repository.OrderRepository;
@@ -52,7 +53,6 @@ public class ClientOrderShowController {
 	@Autowired
 	HttpSession session;
 
-	// ===== 担当: 秋葉 真穂 / 注文一覧 =====
 	/**
 	 * ログイン会員の注文一覧画面を表示します。
 	 *
@@ -62,7 +62,7 @@ public class ClientOrderShowController {
 	 */
 	@RequestMapping(path = "/client/order/list", method = { RequestMethod.GET, RequestMethod.POST })
 	public String showOrderList(Model model, Pageable pageable) {
-		// TODO 秋葉 真穂担当: ログイン会員IDを条件に注文一覧を取得し、注文Beanリストを画面へ渡す。
+		// ログイン会員IDを条件に注文一覧を取得し、注文Beanリストを画面へ渡す。
 		// ログイン会員取得
 		UserBean user = (UserBean) session.getAttribute("user");
 		// 注文情報を注文日時の新しい順に取得
@@ -83,7 +83,6 @@ public class ClientOrderShowController {
 		return "client/order/list";
 	}
 
-	// ===== 担当: 秋葉 真穂 / 注文詳細 =====
 	/**
 	 * ログイン会員の注文詳細画面を表示します。
 	 *
@@ -93,7 +92,23 @@ public class ClientOrderShowController {
 	 */
 	@RequestMapping(path = "/client/order/detail/{id}", method = { RequestMethod.GET, RequestMethod.POST })
 	public String showOrder(@PathVariable Integer id, Model model) {
-		// TODO 秋葉 真穂担当: ログイン会員の注文であることを確認し、注文詳細と注文商品Beanリストを画面へ渡す。
+		// ログイン会員の注文であることを確認し、注文詳細と注文商品Beanリストを画面へ渡す。
+		// ログイン会員取得
+		UserBean user = (UserBean) session.getAttribute("user");
+		// 該当する注文情報の詳細を取得
+		Order order = orderRepository.findByIdAndUserId(id, user.getId());
+		// BeanTools共通クラスを使って一括コピー
+		OrderBean bean = beanTools.copyEntityToOrderBean(order);
+		// 該当する注文商品Beanリストを取得
+		List<OrderItemBean> orderItemBeans = beanTools.generateOrderItemBeanList(order.getOrderItemsList());
+		// 注文時の商品単価から合計金額を算出し表示
+		// PriceCalc共通クラスを使って合計金額を計算する
+		int total = priceCalc.orderItemBeanPriceTotalUseSubtotal(orderItemBeans);
+		bean.setTotal(total);
+		// リクエストスコープに保存
+	    model.addAttribute("order", bean);
+	    model.addAttribute("orderItemBeans", orderItemBeans);
+	    model.addAttribute("total", total);
 		return "client/order/detail";
 	}
 }
