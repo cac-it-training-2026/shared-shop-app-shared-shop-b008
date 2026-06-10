@@ -32,6 +32,7 @@ import jp.co.sss.shop.service.BeanTools;
 import jp.co.sss.shop.service.PriceCalc;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -53,6 +54,10 @@ public class ClientOrderRegistController {
 	 * 注文入力フォームのセッション属性名
 	 */
 	private static final String ORDER_FORM = "orderForm";
+
+	private static final String[] ORDER_FORM_FIELD_ORDER = {
+			"postalCode", "address", "name", "phoneNumber"
+	};
 
 	/**
 	 * 在庫不足商品名リストの属性名
@@ -422,7 +427,9 @@ public class ClientOrderRegistController {
 
 	private BindingResult createClearedRejectedValueResult(OrderForm form, BindingResult result) {
 		BindingResult clearedResult = new BeanPropertyBindingResult(form, result.getObjectName());
-		for (ObjectError error : result.getAllErrors()) {
+		List<ObjectError> errors = new ArrayList<ObjectError>(result.getAllErrors());
+		errors.sort(Comparator.comparingInt(this::orderFormFieldOrder));
+		for (ObjectError error : errors) {
 			if (error instanceof FieldError fieldError) {
 				clearedResult.addError(new FieldError(
 						fieldError.getObjectName(),
@@ -437,6 +444,18 @@ public class ClientOrderRegistController {
 			}
 		}
 		return clearedResult;
+	}
+
+	private int orderFormFieldOrder(ObjectError error) {
+		if (!(error instanceof FieldError fieldError)) {
+			return ORDER_FORM_FIELD_ORDER.length;
+		}
+		for (int i = 0; i < ORDER_FORM_FIELD_ORDER.length; i++) {
+			if (ORDER_FORM_FIELD_ORDER[i].equals(fieldError.getField())) {
+				return i;
+			}
+		}
+		return ORDER_FORM_FIELD_ORDER.length;
 	}
 
 	/**
