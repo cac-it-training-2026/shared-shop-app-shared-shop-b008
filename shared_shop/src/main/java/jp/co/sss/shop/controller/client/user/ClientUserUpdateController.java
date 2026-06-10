@@ -86,6 +86,11 @@ public class ClientUserUpdateController {
 	@RequestMapping(path = "/client/user/update/check", method = RequestMethod.POST)
 	public String updateInputCheck(@Valid @ModelAttribute UserForm form, BindingResult result) {
 		// TODO 金宮 永茉担当: 入力フォームと入力チェック結果をセッションへ保存し、遷移先を判定する。
+		session.setAttribute("userForm", form);
+		if (result.hasErrors()) {
+			session.setAttribute("errors", result);
+			return "redirect:/client/user/update/input";
+		}
 		return "redirect:/client/user/update/check";
 	}
 
@@ -99,6 +104,8 @@ public class ClientUserUpdateController {
 	@RequestMapping(path = "/client/user/update/check", method = RequestMethod.GET)
 	public String updateCheck(Model model) {
 		// TODO 金宮 永茉担当: セッションのUserFormを画面へ渡す。
+		UserForm userForm = (UserForm) session.getAttribute("userForm");
+		model.addAttribute("userForm", userForm);
 		return "client/user/update_check";
 	}
 
