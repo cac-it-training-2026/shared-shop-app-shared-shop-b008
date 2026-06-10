@@ -53,6 +53,7 @@ public class ClientOrderShowController {
 	@Autowired
 	HttpSession session;
 
+	// ===== 担当: 秋葉 真穂 / 注文一覧 =====
 	/**
 	 * ログイン会員の注文一覧画面を表示します。
 	 *
@@ -83,6 +84,7 @@ public class ClientOrderShowController {
 		return "client/order/list";
 	}
 
+	// ===== 担当: 秋葉 真穂 / 注文詳細 =====
 	/**
 	 * ログイン会員の注文詳細画面を表示します。
 	 *
@@ -92,6 +94,7 @@ public class ClientOrderShowController {
 	 */
 	@RequestMapping(path = "/client/order/detail/{id}", method = { RequestMethod.GET, RequestMethod.POST })
 	public String showOrder(@PathVariable Integer id, Model model) {
+		// 秋葉 真穂担当: ログイン会員の注文であることを確認し、注文詳細と注文商品Beanリストを画面へ渡す。
 		// ログイン会員の注文であることを確認し、注文詳細と注文商品Beanリストを画面へ渡す。
 		// ログイン会員取得
 		UserBean user = (UserBean) session.getAttribute("user");
