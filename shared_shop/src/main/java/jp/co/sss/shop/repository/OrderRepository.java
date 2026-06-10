@@ -28,7 +28,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 
 	/**
 	 * 会員IDを条件に注文日付降順で注文情報を検索します。
-	 * 秋葉 真穂担当: 注文一覧で利用します。
+	 * 注文一覧で利用
 	 * @param userId 会員ID
 	 * @param pageable ページング情報
 	 * @return 注文エンティティのページオブジェクト
@@ -39,7 +39,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 
 	/**
 	 * 注文IDと会員IDを条件に注文情報を検索します。
-	 * 秋葉 真穂担当: 注文詳細で利用します。
+	 * 注文詳細で利用
 	 * @param id 注文ID
 	 * @param userId 会員ID
 	 * @return 注文エンティティ
