@@ -157,7 +157,18 @@ public class ClientBasketController {
 		List<BasketBean> basketBeans = getBasketBeans();
 		if (basketBeans != null) {
 			// 指定された商品IDの買い物かご情報を削除する。
-			basketBeans.removeIf(basketBean -> basketBean.getId().equals(id));
+			Iterator<BasketBean> iterator = basketBeans.iterator();
+			while (iterator.hasNext()) {
+				BasketBean basketBean = iterator.next();
+				if (basketBean.getId().equals(id)) {
+					if (basketBean.getOrderNum() != null && basketBean.getOrderNum() > 1) {
+						basketBean.setOrderNum(basketBean.getOrderNum() - 1);
+					} else {
+						iterator.remove();
+					}
+					break;
+				}
+			}
 			saveBasketBeans(basketBeans);
 		}
 		return "redirect:/client/basket/list";
@@ -226,4 +237,10 @@ public class ClientBasketController {
 		}
 		return itemNameList;
 	}
+
+	//テスト
+	//「{商品名}は、は、在庫切れです。他の商品を選択してください。」
+	// 買い物かごを表示した時点で、在庫数切れの場合に表示する
+	//「{商品名}は、在庫不足のため、数を増やすことができません。」
+	// 買い物かごを表示した時点で、在庫数＜買い物かごの個数となる場合に表示する
 }

@@ -14,7 +14,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,7 +32,9 @@ import jp.co.sss.shop.service.BeanTools;
 import jp.co.sss.shop.service.PriceCalc;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 注文登録機能(一般会員用)のコントローラクラスです。
@@ -209,16 +214,18 @@ public class ClientOrderRegistController {
 			form.setPayMethod(lastOrderForm.getPayMethod());
 		}
 
-		// 入力チェック結果に関係なく、ユーザーが入力した最新の届け先情報を一度セッションへ保存する。
-		// これにより、エラーで入力画面に戻った場合でも、入力済みの値を画面に再表示できる。
-		session.setAttribute(ORDER_FORM, form);
 		if (result.hasErrors()) {
+			clearInvalidAddressFields(form, result);
+			session.setAttribute(ORDER_FORM, form);
 			// 入力エラーがある場合は、エラー情報をセッションへ一時退避する。
 			// Redirect先のGETメソッド(addressInput)でこのBindingResultをModelへ戻すことで、
 			// 入力画面にエラーメッセージを表示できる。
-			session.setAttribute("result", result);
+			session.setAttribute("result", createClearedRejectedValueResult(form, result));
 			return "redirect:/client/order/address/input";
 		}
+		// 入力チェック結果に関係なく、ユーザーが入力した最新の届け先情報を一度セッションへ保存する。
+		// これにより、エラーで入力画面に戻った場合でも、入力済みの値を画面に再表示できる。
+		session.setAttribute(ORDER_FORM, form);
 		return "redirect:/client/order/payment/input";
 	}
 
@@ -391,6 +398,45 @@ public class ClientOrderRegistController {
 		user.setId(orderForm.getId());
 		order.setUser(user);
 		return order;
+	}
+
+	private void clearInvalidAddressFields(OrderForm form, BindingResult result) {
+		Set<String> invalidFields = new HashSet<String>();
+		for (FieldError fieldError : result.getFieldErrors()) {
+			invalidFields.add(fieldError.getField());
+		}
+
+		if (invalidFields.contains("postalCode")) {
+			form.setPostalCode("");
+		}
+		if (invalidFields.contains("address")) {
+			form.setAddress("");
+		}
+		if (invalidFields.contains("name")) {
+			form.setName("");
+		}
+		if (invalidFields.contains("phoneNumber")) {
+			form.setPhoneNumber("");
+		}
+	}
+
+	private BindingResult createClearedRejectedValueResult(OrderForm form, BindingResult result) {
+		BindingResult clearedResult = new BeanPropertyBindingResult(form, result.getObjectName());
+		for (ObjectError error : result.getAllErrors()) {
+			if (error instanceof FieldError fieldError) {
+				clearedResult.addError(new FieldError(
+						fieldError.getObjectName(),
+						fieldError.getField(),
+						"",
+						fieldError.isBindingFailure(),
+						fieldError.getCodes(),
+						fieldError.getArguments(),
+						fieldError.getDefaultMessage()));
+			} else {
+				clearedResult.addError(error);
+			}
+		}
+		return clearedResult;
 	}
 
 	/**
