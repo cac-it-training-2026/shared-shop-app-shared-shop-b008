@@ -54,7 +54,6 @@ public class ClientItemShowController {
 	 */
 	@RequestMapping(path = "/", method = { RequestMethod.GET, RequestMethod.POST })
 	public String index(Model model) {
-		//TODO: トップ画面の表示内容。
 
 //		// トップ画面は売れ筋順を初期表示にする。
 //		int sortType = SORT_HOT_SELL;
