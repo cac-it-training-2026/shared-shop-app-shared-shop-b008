@@ -68,9 +68,9 @@ public class ClientUserUpdateController {
 		// TODO 金宮 永茉担当: セッションのUserFormと入力エラー情報を画面へ渡す。
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
 		model.addAttribute("userForm", userForm);
-		if (session.getAttribute("errors") != null) {
-			model.addAttribute("errors", session.getAttribute("errors"));
-			session.removeAttribute("errors");
+		if (session.getAttribute("result") != null) {
+			model.addAttribute("org.springframework.validation.BindingResult.userForm", session.getAttribute("result"));
+			session.removeAttribute("result");
 		}
 		return "client/user/update_input";
 	}
@@ -88,9 +88,10 @@ public class ClientUserUpdateController {
 		// TODO 金宮 永茉担当: 入力フォームと入力チェック結果をセッションへ保存し、遷移先を判定する。
 		session.setAttribute("userForm", form);
 		if (result.hasErrors()) {
-			session.setAttribute("errors", result);
+			session.setAttribute("result", result);
 			return "redirect:/client/user/update/input";
 		}
+		session.removeAttribute("result");
 		return "redirect:/client/user/update/check";
 	}
 
