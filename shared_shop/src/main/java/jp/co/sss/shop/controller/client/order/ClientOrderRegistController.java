@@ -122,7 +122,7 @@ public class ClientOrderRegistController {
 		return "client/order/payment_input";
 	}
 
-	// ===== 担当: シュエ ジーハン / 注文確認 =====
+	// ===== 担当: 秋葉　真穂/ 注文確認 =====
 	/**
 	 * 支払方法を保存し、注文確認画面へ遷移します。
 	 *
@@ -131,11 +131,11 @@ public class ClientOrderRegistController {
 	 */
 	@RequestMapping(path = "/client/order/check", method = RequestMethod.POST)
 	public String orderCheck(@RequestParam Integer payMethod) {
-		// TODO シュエ ジーハン担当: 選択された支払方法を注文入力フォームへ設定し、セッションへ保存する。
+		// TODO 秋葉　真穂担当: 選択された支払方法を注文入力フォームへ設定し、セッションへ保存する。
 		return "redirect:/client/order/check";
 	}
 
-	// ===== 担当: シュエ ジーハン / 注文確認 =====
+	// ===== 担当: 秋葉　真穂 / 注文確認 =====
 	/**
 	 * 注文確認画面を表示します。
 	 *
@@ -144,11 +144,11 @@ public class ClientOrderRegistController {
 	 */
 	@RequestMapping(path = "/client/order/check", method = RequestMethod.GET)
 	public String orderCheckView(Model model) {
-		// TODO シュエ ジーハン担当: 買い物かご商品の在庫確認、注文商品Bean生成、合計金額計算を行い画面へ渡す。
+		// TODO 秋葉　真穂担当: 買い物かご商品の在庫確認、注文商品Bean生成、合計金額計算を行い画面へ渡す。
 		return "client/order/check";
 	}
 
-	// ===== 担当: シュエ ジーハン / 注文確認 =====
+	// ===== 担当: 秋葉　真穂 / 注文確認 =====
 	/**
 	 * 注文確認画面または支払方法選択画面から前画面へ戻ります。
 	 *
@@ -156,11 +156,11 @@ public class ClientOrderRegistController {
 	 */
 	@RequestMapping(path = "/client/order/payment/back", method = RequestMethod.POST)
 	public String paymentBack() {
-		// TODO シュエ ジーハン担当: 設計書の戻り先に従い、届け先入力画面表示処理へリダイレクトする。
+		// TODO 秋葉　真穂担当: 設計書の戻り先に従い、届け先入力画面表示処理へリダイレクトする。
 		return "redirect:/client/order/address/input";
 	}
 
-	// ===== 担当: シュエ ジーハン / 注文完了 =====
+	// ===== 担当: 秋葉　真穂 / 注文完了 =====
 	/**
 	 * 注文を確定します。
 	 *
@@ -168,12 +168,12 @@ public class ClientOrderRegistController {
 	 */
 	@RequestMapping(path = "/client/order/complete", method = RequestMethod.POST)
 	public String orderComplete() {
-		// TODO シュエ ジーハン担当: 注文確定直前の在庫確認、注文/注文商品登録、セッション情報削除を行う。
+		// TODO 秋葉　真穂担当: 注文確定直前の在庫確認、注文/注文商品登録、セッション情報削除を行う。
 		// TODO 注意: OrderFormのidは会員IDのため、Orderエンティティのidへコピーしないこと。
 		return "redirect:/client/order/complete";
 	}
 
-	// ===== 担当: シュエ ジーハン / 注文完了 =====
+	// ===== 担当: 秋葉　真穂 / 注文完了 =====
 	/**
 	 * 注文完了画面を表示します。
 	 *
@@ -181,7 +181,7 @@ public class ClientOrderRegistController {
 	 */
 	@RequestMapping(path = "/client/order/complete", method = RequestMethod.GET)
 	public String orderCompleteFinish() {
-		// TODO シュエ ジーハン担当: 注文完了画面を表示するための後処理が必要な場合はここに実装する。
+		// TODO 秋葉　真穂担当: 注文完了画面を表示するための後処理が必要な場合はここに実装する。
 		return "client/order/complete";
 	}
 }
