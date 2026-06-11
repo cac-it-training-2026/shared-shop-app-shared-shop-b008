@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import jp.co.sss.shop.bean.ItemBean;
 import jp.co.sss.shop.entity.Item;
+import jp.co.sss.shop.repository.CategoryRepository;
 import jp.co.sss.shop.repository.ItemRepository;
 import jp.co.sss.shop.service.BeanTools;
 import jp.co.sss.shop.util.Constant;
@@ -53,7 +54,7 @@ public class ClientItemShowController {
 	 * @return "index" トップ画面
 	 */
 	@RequestMapping(path = "/", method = { RequestMethod.GET, RequestMethod.POST })
-	public String index(Model model) {
+	public String top(Model model) {
 
 		// トップ画面は売れ筋順を初期表示にする。
 		int sortType = SORT_HOT_SELL;
@@ -72,10 +73,16 @@ public class ClientItemShowController {
 		// エンティティ内の検索結果をJavaBeansにコピー
 		List<ItemBean> itemBeanList = beanTools.copyEntityListToItemBeanList(itemList);
 
-		//		商品情報をViewへ渡す
+		// 商品情報をViewへ渡す
 		model.addAttribute("items", itemBeanList);
 		model.addAttribute("sortType", sortType);
-		//
+
+		// カテゴリ一覧を画面に渡している
+		model.addAttribute(
+				"categories",
+				categoryRepository.findByDeleteFlagOrderByInsertDateDescIdDesc(
+						Constant.NOT_DELETED));
+
 		return "index";
 	}
 
@@ -88,11 +95,14 @@ public class ClientItemShowController {
 	 * @param sortType 表示順種別(1:新着順、2:売れ筋順)
 	 * @param categoryId カテゴリID
 	 * @param model Viewとの値受渡し
-	 * @return "client/item/list" 商品一覧画面
+	 * @return "client/item/list" 商品一覧画面表示
 	 */
+	@Autowired
+	CategoryRepository categoryRepository;
+
 	@RequestMapping(path = "/client/item/list/{sortType}", method = { RequestMethod.GET, RequestMethod.POST })
 	public String showItemList(
-			// 	/client/item/list/1にアクセスされるとsortType = 1が入る
+			// 	/client/item/list/1にアクセスされるとsortType = 1（新着順）が入る
 			@PathVariable Integer sortType,
 			@RequestParam(required = false) Integer categoryId,
 			Model model) {
@@ -107,11 +117,17 @@ public class ClientItemShowController {
 		model.addAttribute("sortType", sortType);
 		model.addAttribute("categoryId", categoryId);
 
+		// カテゴリ一覧を画面に渡している
+		model.addAttribute(
+				"categories",
+				categoryRepository.findByDeleteFlagOrderByInsertDateDescIdDesc(
+						Constant.NOT_DELETED));
+
 		return "client/item/list";
 	}
 
 	/**
-	 * 表示順とカテゴリ条件に応じた商品一覧を取得します。
+	 * 表示順（新着か売れ筋か）とカテゴリ条件に応じた商品一覧を取得します。
 	 *
 	 * @param sortType 表示順種別
 	 * @param categoryId カテゴリID
