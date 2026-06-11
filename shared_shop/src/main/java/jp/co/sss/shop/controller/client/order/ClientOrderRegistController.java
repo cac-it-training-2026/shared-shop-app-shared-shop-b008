@@ -111,10 +111,10 @@ public class ClientOrderRegistController {
 	@Autowired
 	HttpSession session;
 
-	// ===== 担当: シュエ ジーハン / 届け先入力（入力チェック） =====
 	/**
 	 * 注文手続き開始時に届け先入力フォームを初期化します。
-	 *
+	 * 
+	 * @author シュエ ジーハン
 	 * @return "redirect:/client/order/address/input" 届け先入力画面表示処理へリダイレクト
 	 */
 	@RequestMapping(path = "/client/order/address/input", method = RequestMethod.POST)
@@ -161,12 +161,13 @@ public class ClientOrderRegistController {
 		return "redirect:/client/order/address/input";
 	}
 
-	// ===== 担当: シュエ ジーハン / 届け先入力（入力チェック） =====
 	/**
 	 * 届け先入力画面を表示します。
 	 *
+	 * @author シュエ ジーハン
 	 * @param model Viewとの値受渡し
 	 * @return "client/order/address_input" 届け先入力画面
+	 * @throws RuntimeException 注文情報がセッションに存在しない場合
 	 */
 	@RequestMapping(path = "/client/order/address/input", method = RequestMethod.GET)
 	public String addressInput(Model model) {
@@ -196,13 +197,14 @@ public class ClientOrderRegistController {
 		return "client/order/address_input";
 	}
 
-	// ===== 担当: シュエ ジーハン / 届け先入力（入力チェック） =====
 	/**
 	 * 届け先入力値をチェックし、支払方法選択画面へ遷移します。
 	 *
+	 * @author シュエ ジーハン
 	 * @param form 注文入力フォーム
 	 * @param result 入力チェック結果
-	 * @return 入力エラーあり: "redirect:/client/order/address/input"、なし: "redirect:/client/order/payment/input"
+	 * @return 入力エラーあり: "redirect:/client/order/address/input"
+	 * 					なし: "redirect:/client/order/payment/input"
 	 */
 	@RequestMapping(path = "/client/order/payment/input", method = RequestMethod.POST)
 	public String addressInputCheck(@Valid @ModelAttribute OrderForm form, BindingResult result) {
@@ -238,12 +240,13 @@ public class ClientOrderRegistController {
 		return "redirect:/client/order/payment/input";
 	}
 
-	// ===== 担当: シュエ ジーハン / 支払方法選択 =====
 	/**
 	 * 支払方法選択画面を表示します。
 	 *
+	 * @author シュエ ジーハン
 	 * @param model Viewとの値受渡し
 	 * @return "client/order/payment_input" 支払方法選択画面
+	 * @throws RuntimeException 注文情報がセッションに存在しない場合
 	 */
 	@RequestMapping(path = "/client/order/payment/input", method = RequestMethod.GET)
 	public String paymentInput(Model model) {
@@ -262,12 +265,14 @@ public class ClientOrderRegistController {
 		return "client/order/payment_input";
 	}
 
-	// ===== 担当: 秋葉　真穂/ 注文確認 =====
 	/**
 	 * 支払方法を保存し、注文確認画面へ遷移します。
 	 *
+	 * @author 秋葉 真穂
 	 * @param payMethod 支払方法
-	 * @return "redirect:/client/order/check" 注文確認画面表示処理へリダイレクト
+	 * @return "redirect:/client/order/check" 
+	 * 			注文確認画面表示処理へリダイレクト
+	 * @throws RuntimeException セッション情報が取得できない場合
 	 */
 	@RequestMapping(path = "/client/order/check", method = RequestMethod.POST)
 	public String orderCheck(@RequestParam Integer payMethod) {
@@ -291,12 +296,13 @@ public class ClientOrderRegistController {
 		return "redirect:/client/order/check";
 	}
 
-	// ===== 担当: 秋葉　真穂 / 注文確認 =====
 	/**
 	 * 注文確認画面を表示します。
 	 *
+	 * @author 秋葉 真穂
 	 * @param model Viewとの値受渡し
 	 * @return "client/order/check" 注文確認画面
+	 * @see #createOrderItemBeansForCheck(Model)
 	 */
 	@RequestMapping(path = "/client/order/check", method = RequestMethod.GET)
 	public String orderCheckView(Model model) {
@@ -339,10 +345,10 @@ public class ClientOrderRegistController {
 		return "client/order/check";
 	}
 
-	// ===== 担当: 秋葉　真穂 / 注文確認 =====
 	/**
 	 * 注文確認画面または支払方法選択画面から前画面へ戻ります。
 	 *
+	 * @author 秋葉 真穂
 	 * @return "redirect:/client/order/address/input" 届け先入力画面表示処理へリダイレクト
 	 */
 	@RequestMapping(path = "/client/order/payment/back", method = RequestMethod.POST)
@@ -352,11 +358,18 @@ public class ClientOrderRegistController {
 		return "redirect:/client/order/address/input";
 	}
 
-	// ===== 担当: 秋葉　真穂 / 注文完了 =====
 	/**
 	 * 注文を確定します。
-	 *
-	 * @return 在庫エラーあり: "redirect:/client/order/check"、なし: "redirect:/client/order/complete"
+	 * 
+	 * @author 秋葉 真穂
+	 * @return 在庫エラーあり:
+	 *         "redirect:/client/order/check"
+	 *         在庫エラーなし:
+	 *         "redirect:/client/order/complete"
+	 * @throws RuntimeException
+	 *         注文登録処理中にDB更新エラーが発生した場合
+	 * @see #createOrder(OrderForm)
+	 * @see #canOrder(List)
 	 */
 	@RequestMapping(path = "/client/order/complete", method = RequestMethod.POST)
 	public String orderComplete() {
@@ -418,10 +431,10 @@ public class ClientOrderRegistController {
 		return "redirect:/client/order/complete";
 	}
 
-	// ===== 担当: 秋葉　真穂 / 注文完了 =====
 	/**
 	 * 注文完了画面を表示します。
 	 *
+	 * @author 秋葉 真穂
 	 * @return "client/order/complete" 注文完了画面
 	 */
 	@RequestMapping(path = "/client/order/complete", method = RequestMethod.GET)

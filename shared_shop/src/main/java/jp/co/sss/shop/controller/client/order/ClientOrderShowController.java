@@ -53,10 +53,10 @@ public class ClientOrderShowController {
 	@Autowired
 	HttpSession session;
 
-	// ===== 担当: 秋葉 真穂 / 注文一覧 =====
 	/**
 	 * ログイン会員の注文一覧画面を表示します。
-	 *
+	 * 
+	 * @author 秋葉 真穂
 	 * @param model Viewとの値受渡し
 	 * @param pageable ページング情報
 	 * @return "client/order/list" 注文一覧画面
@@ -89,10 +89,10 @@ public class ClientOrderShowController {
 		return "client/order/list";
 	}
 
-	// ===== 担当: 秋葉 真穂 / 注文詳細 =====
 	/**
 	 * ログイン会員の注文詳細画面を表示します。
-	 *
+	 * 
+	 * @author 秋葉 真穂
 	 * @param id 注文ID
 	 * @param model Viewとの値受渡し
 	 * @return "client/order/detail" 注文詳細画面
