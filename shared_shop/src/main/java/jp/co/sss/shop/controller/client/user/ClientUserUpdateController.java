@@ -1,5 +1,9 @@
 package jp.co.sss.shop.controller.client.user;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,10 +15,6 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -130,6 +130,14 @@ public class ClientUserUpdateController {
 	@RequestMapping(path = "/client/user/update/complete", method = RequestMethod.POST)
 	public String updateComplete() {
 		// TODO 金宮 永茉担当: UserFormからUserエンティティを更新し、セッションのログイン会員情報も更新する。
+		UserForm userForm = (UserForm) session.getAttribute("userForm");
+		User user = userRepository.getReferenceById(userForm.getId());
+		BeanUtils.copyProperties(userForm, user);
+		userRepository.save(user);
+		session.removeAttribute("userForm");
+		UserBean userBean = new UserBean();
+		BeanUtils.copyProperties(user, userBean);
+		session.setAttribute("user", userBean);
 		return "redirect:/client/user/update/complete";
 	}
 
