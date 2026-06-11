@@ -16,8 +16,7 @@ import jp.co.sss.shop.repository.UserRepository;
 
 /**
  * 会員詳細表示機能(一般会員用)のコントローラクラスです。
- *
- * @author SystemShared
+ * @author シュエ　ジーハン
  */
 @Controller
 public class ClientUserShowController {
@@ -40,6 +39,8 @@ public class ClientUserShowController {
 	 *
 	 * @param model Viewとの値受渡し
 	 * @return "client/user/detail" 会員詳細画面
+	 * @see jp.co.sss.shop.bean.UserBean
+	 * @see jp.co.sss.shop.entity.User
 	 */
 	@RequestMapping(path = "/client/user/detail", method = { RequestMethod.GET, RequestMethod.POST })
 	public String showUser(Model model) {

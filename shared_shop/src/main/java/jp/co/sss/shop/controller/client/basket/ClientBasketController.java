@@ -20,8 +20,7 @@ import java.util.List;
 
 /**
  * 買い物かご機能(一般会員用)のコントローラクラスです。
- *
- * @author SystemShared
+ * @author シュエ　ジーハン
  */
 @Controller
 public class ClientBasketController {
@@ -59,6 +58,7 @@ public class ClientBasketController {
 	 *
 	 * @param model Viewとの値受渡し
 	 * @return "client/basket/list" 買い物かご画面
+	 * @see jp.co.sss.shop.bean.BasketBean
 	 */
 	@RequestMapping(path = "/client/basket/list", method = { RequestMethod.GET, RequestMethod.POST })
 	public String showBasket(Model model) {
@@ -105,6 +105,7 @@ public class ClientBasketController {
 	 *
 	 * @param id 商品ID
 	 * @return "redirect:/client/basket/list" 買い物かご画面表示処理へリダイレクト
+	 * @see jp.co.sss.shop.entity.Item
 	 */
 	@RequestMapping(path = "/client/basket/add", method = RequestMethod.POST)
 	public String addItem(@RequestParam Integer id) {
@@ -151,6 +152,7 @@ public class ClientBasketController {
 	 *
 	 * @param id 商品ID
 	 * @return "redirect:/client/basket/list" 買い物かご画面表示処理へリダイレクト
+	 * @see jp.co.sss.shop.bean.BasketBean
 	 */
 	@RequestMapping(path = "/client/basket/delete", method = RequestMethod.POST)
 	public String deleteItem(@RequestParam Integer id) {
@@ -179,6 +181,7 @@ public class ClientBasketController {
 	 * 買い物かご内の商品をすべて削除します。
 	 *
 	 * @return "redirect:/client/basket/list" 買い物かご画面表示処理へリダイレクト
+	 * @see jakarta.servlet.http.HttpSession#removeAttribute(String)
 	 */
 	@RequestMapping(path = "/client/basket/allDelete", method = RequestMethod.POST)
 	public String deleteAllItems() {
@@ -191,6 +194,7 @@ public class ClientBasketController {
 	 * セッションから買い物かご情報を取得します。
 	 *
 	 * @return 買い物かご情報
+	 * @see jakarta.servlet.http.HttpSession#getAttribute(String)
 	 */
 	@SuppressWarnings("unchecked")
 	private List<BasketBean> getBasketBeans() {
@@ -201,6 +205,8 @@ public class ClientBasketController {
 	 * 買い物かご情報をセッションへ保存します。
 	 *
 	 * @param basketBeans 買い物かご情報
+	 * @see jakarta.servlet.http.HttpSession#setAttribute(String, Object)
+	 * @see jakarta.servlet.http.HttpSession#removeAttribute(String)
 	 */
 	private void saveBasketBeans(List<BasketBean> basketBeans) {
 		if (basketBeans == null || basketBeans.isEmpty()) {
@@ -215,6 +221,7 @@ public class ClientBasketController {
 	 *
 	 * @param attributeName 属性名
 	 * @param itemName 商品名
+	 * @see jakarta.servlet.http.HttpSession#setAttribute(String, Object)
 	 */
 	private void addSessionMessage(String attributeName, String itemName) {
 		List<String> itemNameList = drainMessageList(attributeName);
@@ -227,6 +234,8 @@ public class ClientBasketController {
 	 *
 	 * @param attributeName 属性名
 	 * @return 商品名リスト
+	 * @see jakarta.servlet.http.HttpSession#getAttribute(String)
+	 * @see jakarta.servlet.http.HttpSession#removeAttribute(String)
 	 */
 	@SuppressWarnings("unchecked")
 	private List<String> drainMessageList(String attributeName) {
@@ -237,10 +246,4 @@ public class ClientBasketController {
 		}
 		return itemNameList;
 	}
-
-	//テスト
-	//「{商品名}は、は、在庫切れです。他の商品を選択してください。」
-	// 買い物かごを表示した時点で、在庫数切れの場合に表示する
-	//「{商品名}は、在庫不足のため、数を増やすことができません。」
-	// 買い物かごを表示した時点で、在庫数＜買い物かごの個数となる場合に表示する
 }
