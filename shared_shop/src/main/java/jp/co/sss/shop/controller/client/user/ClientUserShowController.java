@@ -33,10 +33,10 @@ public class ClientUserShowController {
 	@Autowired
 	HttpSession session;
 
-	// ===== 担当: シュエ ジーハン / 会員詳細表示 =====
 	/**
 	 * ログイン会員の詳細画面を表示します。
 	 *
+	 * @author シュエ　ジーハン
 	 * @param model Viewとの値受渡し
 	 * @return "client/user/detail" 会員詳細画面
 	 * @see jp.co.sss.shop.bean.UserBean

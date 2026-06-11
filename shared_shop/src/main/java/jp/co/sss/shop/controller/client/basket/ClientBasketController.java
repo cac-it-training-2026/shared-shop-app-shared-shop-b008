@@ -52,10 +52,10 @@ public class ClientBasketController {
 	@Autowired
 	HttpSession session;
 
-	// ===== 担当: シュエ ジーハン / 買い物かご内の商品一覧表示 =====
 	/**
 	 * 買い物かご画面を表示します。
 	 *
+	 * @author シュエ　ジーハン
 	 * @param model Viewとの値受渡し
 	 * @return "client/basket/list" 買い物かご画面
 	 * @see jp.co.sss.shop.bean.BasketBean
@@ -99,10 +99,10 @@ public class ClientBasketController {
 		return "client/basket/list";
 	}
 
-	// ===== 担当: シュエ ジーハン / 商品追加 =====
 	/**
 	 * 商品を買い物かごに追加します。
 	 *
+	 * @author シュエ　ジーハン
 	 * @param id 商品ID
 	 * @return "redirect:/client/basket/list" 買い物かご画面表示処理へリダイレクト
 	 * @see jp.co.sss.shop.entity.Item
@@ -146,10 +146,10 @@ public class ClientBasketController {
 		return "redirect:/client/basket/list";
 	}
 
-	// ===== 担当: シュエ ジーハン / 商品削除 =====
 	/**
 	 * 買い物かご内の商品を削除します。
 	 *
+	 * @author シュエ　ジーハン
 	 * @param id 商品ID
 	 * @return "redirect:/client/basket/list" 買い物かご画面表示処理へリダイレクト
 	 * @see jp.co.sss.shop.bean.BasketBean
@@ -176,10 +176,10 @@ public class ClientBasketController {
 		return "redirect:/client/basket/list";
 	}
 
-	// ===== 担当: シュエ ジーハン / 商品全削除 =====
 	/**
 	 * 買い物かご内の商品をすべて削除します。
 	 *
+	 * @author シュエ　ジーハン
 	 * @return "redirect:/client/basket/list" 買い物かご画面表示処理へリダイレクト
 	 * @see jakarta.servlet.http.HttpSession#removeAttribute(String)
 	 */
@@ -193,6 +193,7 @@ public class ClientBasketController {
 	/**
 	 * セッションから買い物かご情報を取得します。
 	 *
+	 * @author シュエ　ジーハン
 	 * @return 買い物かご情報
 	 * @see jakarta.servlet.http.HttpSession#getAttribute(String)
 	 */
@@ -204,6 +205,7 @@ public class ClientBasketController {
 	/**
 	 * 買い物かご情報をセッションへ保存します。
 	 *
+	 * @author シュエ　ジーハン
 	 * @param basketBeans 買い物かご情報
 	 * @see jakarta.servlet.http.HttpSession#setAttribute(String, Object)
 	 * @see jakarta.servlet.http.HttpSession#removeAttribute(String)
@@ -219,6 +221,7 @@ public class ClientBasketController {
 	/**
 	 * セッションに一時メッセージ用の商品名を追加します。
 	 *
+	 * @author シュエ　ジーハン
 	 * @param attributeName 属性名
 	 * @param itemName 商品名
 	 * @see jakarta.servlet.http.HttpSession#setAttribute(String, Object)
@@ -232,6 +235,7 @@ public class ClientBasketController {
 	/**
 	 * セッションから一時メッセージリストを取得して削除します。
 	 *
+	 * @author シュエ　ジーハン
 	 * @param attributeName 属性名
 	 * @return 商品名リスト
 	 * @see jakarta.servlet.http.HttpSession#getAttribute(String)
