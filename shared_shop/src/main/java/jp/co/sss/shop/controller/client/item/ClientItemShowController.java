@@ -61,6 +61,14 @@ public class ClientItemShowController {
 		// 注文商品情報から売れ筋順の商品情報を取得する。
 		List<Item> itemList = itemRepository.findHotSellItems(Constant.NOT_DELETED);
 
+		// 売れ筋商品が存在しない場合は新着順を表示
+		if (itemList.isEmpty()) {
+			itemList = itemRepository
+					.findByDeleteFlagOrderByInsertDateDesc(Constant.NOT_DELETED);
+
+			sortType = SORT_LATEST;
+		}
+
 		// エンティティ内の検索結果をJavaBeansにコピー
 		List<ItemBean> itemBeanList = beanTools.copyEntityListToItemBeanList(itemList);
 
@@ -127,7 +135,7 @@ public class ClientItemShowController {
 
 		// 新着順の場合は商品登録日の降順で取得する
 		if (hasCategory) {
-			// //選択したカテゴリの商品だけ新着順で取得
+			//選択したカテゴリの商品だけ新着順で取得
 			return itemRepository.findByCategoryIdAndDeleteFlagOrderByInsertDateDesc(categoryId, Constant.NOT_DELETED);
 		}
 		// 全商品を新着順で取得する。
