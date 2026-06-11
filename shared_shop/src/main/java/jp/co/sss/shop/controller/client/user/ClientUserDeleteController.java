@@ -1,13 +1,16 @@
 package jp.co.sss.shop.controller.client.user;
 
-import jakarta.servlet.http.HttpSession;
-
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import jakarta.servlet.http.HttpSession;
+import jp.co.sss.shop.bean.UserBean;
+import jp.co.sss.shop.entity.User;
+import jp.co.sss.shop.form.UserForm;
 import jp.co.sss.shop.repository.UserRepository;
 
 /**
@@ -39,6 +42,10 @@ public class ClientUserDeleteController {
 	@RequestMapping(path = "/client/user/delete/check", method = RequestMethod.POST)
 	public String deleteCheckInit() {
 		// TODO 金宮 永茉担当: セッションのログイン会員情報を元に退会確認用フォームを作成し、セッションへ保存する。
+		UserBean userBean = (UserBean) session.getAttribute("user");
+		UserForm userForm = new UserForm();
+		BeanUtils.copyProperties(userBean, userForm);
+		session.setAttribute("userForm", userForm);
 		return "redirect:/client/user/delete/check";
 	}
 
@@ -52,6 +59,8 @@ public class ClientUserDeleteController {
 	@RequestMapping(path = "/client/user/delete/check", method = RequestMethod.GET)
 	public String deleteCheck(Model model) {
 		// TODO 金宮 永茉担当: セッションの退会確認用フォームを画面へ渡す。
+		UserForm userForm = (UserForm) session.getAttribute("userForm");
+		model.addAttribute("userForm", userForm);
 		return "client/user/delete_check";
 	}
 
@@ -63,7 +72,12 @@ public class ClientUserDeleteController {
 	 */
 	@RequestMapping(path = "/client/user/delete/complete", method = RequestMethod.POST)
 	public String deleteComplete() {
-		// TODO 金宮 永茉担当: 会員の削除フラグ更新、買い物かご/注文入力フォーム削除、セッション破棄を行う。
+		// TODO 金宮 永茉担当: 会員の削除フラグ更新、セッション破棄を行う。
+		UserForm userForm = (UserForm) session.getAttribute("userForm");
+		User user = userRepository.getReferenceById(userForm.getId());
+		user.setDeleteFlag(1);
+		userRepository.save(user);
+		session.invalidate();
 		return "redirect:/client/user/delete/complete";
 	}
 
