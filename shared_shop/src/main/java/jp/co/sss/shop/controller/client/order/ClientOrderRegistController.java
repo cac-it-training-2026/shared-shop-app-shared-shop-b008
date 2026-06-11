@@ -272,7 +272,7 @@ public class ClientOrderRegistController {
 	@RequestMapping(path = "/client/order/check", method = RequestMethod.POST)
 	public String orderCheck(@RequestParam Integer payMethod) {
 		
-		// 秋葉　真穂担当: 選択された支払方法を注文入力フォームへ設定し、セッションへ保存する。
+		// 選択された支払方法を注文入力フォームへ設定し、セッションへ保存する。
 		// 1. セッションからORDER_FORMキーでOrderFormを取得する。
 		OrderForm orderForm = (OrderForm) session.getAttribute(ORDER_FORM);
 		
@@ -301,7 +301,7 @@ public class ClientOrderRegistController {
 	@RequestMapping(path = "/client/order/check", method = RequestMethod.GET)
 	public String orderCheckView(Model model) {
 		
-		// 秋葉　真穂担当: 買い物かご商品の在庫確認、注文商品Bean生成、合計金額計算を行い画面へ渡す。
+		// 買い物かご商品の在庫確認、注文商品Bean生成、合計金額計算を行い画面へ渡す。
 		// 実装手順参考メモ:
 		// 1. セッションからORDER_FORMキーでOrderFormを取得する。
 		OrderForm orderForm = (OrderForm) session.getAttribute(ORDER_FORM);
@@ -348,7 +348,7 @@ public class ClientOrderRegistController {
 	@RequestMapping(path = "/client/order/payment/back", method = RequestMethod.POST)
 	public String paymentBack() {
 		
-		// 秋葉　真穂担当: 設計書の戻り先に従い、届け先入力画面表示処理へリダイレクトする。
+		// 設計書の戻り先に従い、届け先入力画面表示処理へリダイレクトする。
 		return "redirect:/client/order/address/input";
 	}
 
@@ -361,7 +361,7 @@ public class ClientOrderRegistController {
 	@RequestMapping(path = "/client/order/complete", method = RequestMethod.POST)
 	public String orderComplete() {
 		
-		// 秋葉　真穂担当: 注文確定直前の在庫確認、注文/注文商品登録、セッション情報削除を行う。
+		// 注文確定直前の在庫確認、注文/注文商品登録、セッション情報削除を行う。
 		// 注意点: OrderFormのidは会員IDのため、Orderエンティティのidへコピーしないこと。
 
 		// 1. セッションからOrderFormと買い物かご情報(BasketBeanリスト)を取得する。
@@ -427,7 +427,7 @@ public class ClientOrderRegistController {
 	@RequestMapping(path = "/client/order/complete", method = RequestMethod.GET)
 	public String orderCompleteFinish() {
 		
-		// 秋葉　真穂担当: 注文完了画面を表示するための後処理が必要な場合はここに実装する。
+		// 注文完了画面を表示するための後処理が必要な場合はここに実装する。
 		return "client/order/complete";
 	}
 
