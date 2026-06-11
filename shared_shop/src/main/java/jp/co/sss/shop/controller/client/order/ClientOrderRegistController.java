@@ -26,6 +26,7 @@ import jp.co.sss.shop.bean.OrderItemBean;
 import jp.co.sss.shop.bean.UserBean;
 import jp.co.sss.shop.entity.Item;
 import jp.co.sss.shop.entity.Order;
+import jp.co.sss.shop.entity.OrderItem;
 import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.form.OrderForm;
 import jp.co.sss.shop.repository.ItemRepository;
@@ -271,8 +272,7 @@ public class ClientOrderRegistController {
 	@RequestMapping(path = "/client/order/check", method = RequestMethod.POST)
 	public String orderCheck(@RequestParam Integer payMethod) {
 		
-		// TODO 秋葉　真穂担当: 選択された支払方法を注文入力フォームへ設定し、セッションへ保存する。
-		// 実装手順参考メモ:
+		// 秋葉　真穂担当: 選択された支払方法を注文入力フォームへ設定し、セッションへ保存する。
 		// 1. セッションからORDER_FORMキーでOrderFormを取得する。
 		OrderForm orderForm = (OrderForm) session.getAttribute(ORDER_FORM);
 		
@@ -347,11 +347,8 @@ public class ClientOrderRegistController {
 	 */
 	@RequestMapping(path = "/client/order/payment/back", method = RequestMethod.POST)
 	public String paymentBack() {
-		// TODO 秋葉　真穂担当: 設計書の戻り先に従い、届け先入力画面表示処理へリダイレクトする。
-		// 実装手順参考メモ:
-		// 1. この処理ではDB更新やセッション削除は行わない。
-		// 2. すでにセッションに保存されているOrderFormをそのまま利用し、届け先入力画面へ戻す。
-		// 3. 戻り先はGETの/client/order/address/inputであるため、redirect形式で遷移する。
+		
+		// 秋葉　真穂担当: 設計書の戻り先に従い、届け先入力画面表示処理へリダイレクトする。
 		return "redirect:/client/order/address/input";
 	}
 
@@ -363,21 +360,58 @@ public class ClientOrderRegistController {
 	 */
 	@RequestMapping(path = "/client/order/complete", method = RequestMethod.POST)
 	public String orderComplete() {
-		// TODO 秋葉　真穂担当: 注文確定直前の在庫確認、注文/注文商品登録、セッション情報削除を行う。
-		// TODO 注意点: OrderFormのidは会員IDのため、Orderエンティティのidへコピーしないこと。
+		
+		// 秋葉　真穂担当: 注文確定直前の在庫確認、注文/注文商品登録、セッション情報削除を行う。
+		// 注意点: OrderFormのidは会員IDのため、Orderエンティティのidへコピーしないこと。
 
-		// 実装手順参考メモ:
 		// 1. セッションからOrderFormと買い物かご情報(BasketBeanリスト)を取得する。
+		OrderForm orderForm = (OrderForm) session.getAttribute(ORDER_FORM);
+		List<BasketBean> basketBeans = getBasketBeans();
+		
 		// 2. OrderFormがnull、買い物かごがnull、または空の場合は、注文に必要な情報が不足しているためシステムエラーへ遷移する。
+		if (orderForm == null || basketBeans == null || basketBeans.isEmpty()) {
+			return "redirect:/syserror";
+		}
+		
 		// 3. canOrder(basketBeans)を呼び出し、注文確定直前の最新在庫で本当に注文可能か確認する。
-		// 4. 在庫不足・在庫切れなどで注文不可の場合は、注文確認画面へ戻す。
-		//    注文確認画面側でcreateOrderItemBeansForCheck(model)が再度在庫状態を確認し、エラー表示や数量補正を行う。
+		if (!canOrder(basketBeans)) {
+			
+			// 4. 注文不可の場合は注文確認画面へ戻す
+			return "redirect:/client/order/check";
+		}
+		
 		// 5. createOrder(orderForm)を呼び出し、届け先・支払方法・会員情報を持つOrder Entityを生成する。
+		Order order = createOrder(orderForm);
+		
 		// 6. orderRepository.save(order)で注文情報を登録し、保存後のOrderを取得する。
+		order = orderRepository.save(order);
+		
 		// 7. 買い物かご内の商品ごとに、商品情報をDBから取得する。
-		// 8. OrderItem Entityを生成し、保存済みOrder、商品、注文数、注文時点の商品単価を設定して保存する。
-		// 9. 注文数分だけItemの在庫数を減らし、itemRepository.save(item)で在庫を更新する。
+		for (BasketBean basketBean : basketBeans) {
+
+			Item item = itemRepository.findByIdAndDeleteFlag(
+					basketBean.getId(),
+					Constant.NOT_DELETED);
+			
+			// 8. OrderItem Entityを生成し、保存済みOrder、商品、注文数、注文時点の商品単価を設定して保存する。
+			OrderItem orderItem = new OrderItem();
+			orderItem.setOrder(order);
+			orderItem.setItem(item);
+			orderItem.setQuantity(basketBean.getOrderNum());
+			
+			// 注文時点の価格を保存
+			orderItem.setPrice(item.getPrice());
+			orderItemRepository.save(orderItem);
+
+			// 9. 注文数分だけItemの在庫数を減らし、itemRepository.save(item)で在庫を更新する。
+			item.setStock(item.getStock() - basketBean.getOrderNum());
+			itemRepository.save(item);
+		}
+		
 		// 10. 注文登録後は、セッションからORDER_FORMとBASKET_BEANSを削除する。
+		session.removeAttribute(ORDER_FORM);
+		session.removeAttribute(BASKET_BEANS);
+		
 		// 11. 注文完了画面表示用のGETメソッドへリダイレクトする。
 		// 補足: この処理は注文登録・注文商品登録・在庫更新をまとめて行うため、
 		//       実装時は@Transactionalを付与すると、途中でエラーが発生した場合に一括ロールバックできる。
@@ -392,30 +426,10 @@ public class ClientOrderRegistController {
 	 */
 	@RequestMapping(path = "/client/order/complete", method = RequestMethod.GET)
 	public String orderCompleteFinish() {
-		// TODO 秋葉　真穂担当: 注文完了画面を表示するための後処理が必要な場合はここに実装する。
-		// 実装手順参考メモ:
-		// 1. 注文完了画面は、基本的に完了メッセージを表示するだけでよい。
-		// 2. 注文確定処理(orderComplete)で不要なセッション情報は削除済みの想定。
-		// 3. 追加でModelへ渡す情報がなければ、このまま注文完了画面のView名を返す。
+		
+		// 秋葉　真穂担当: 注文完了画面を表示するための後処理が必要な場合はここに実装する。
 		return "client/order/complete";
 	}
-
-	/**
-	 * To 秋葉 真穂 さん：
-	 * お疲れ様です!
-	 * 以下は、注文情報（Order Entity）の生成、注文確認画面表示用の注文商品Beanの作成、
-	 * 注文可能な在庫数の判定、および各種ユーティリティメソッドをまとめたものです。
-	 * 注文確認および注文完了のControllerメソッド内で、
-	 * 適切な箇所から必要なメソッドを呼び出していただくことで、実装がよりスムーズになります。
-	 *
-	 * なお、ご自身で別のメソッドを実装したり、Controller内で直接処理を記述していただいても問題ありません。
-	 * ただし、私の既存のコードを削除・変更すると、Git上でコンフリクトが発生する可能性があるため、
-	 * 基本的にはそのままご利用いただくことを推奨します。
-	 * もし私の冗長なコードの削除による簡略化が必要な場合は、
-	 * お手数ですが私までご連絡ください。こちらで対応いたします。
-	 *
-	 * --シュエ　ジーハン
-	 */
 
 	/**
 	 * 注文情報を生成します。
@@ -522,11 +536,13 @@ public class ClientOrderRegistController {
 		List<OrderItemBean> orderItemBeans = new ArrayList<OrderItemBean>();
 
 		for (BasketBean basketBean : basketBeans) {
+			
 			// 買い物かごに入れた時点から注文確認時点までの間に、
 			// 商品が削除されたり、在庫数が変わったりしている可能性がある。
 			// そのため、BasketBeanの情報だけを信用せず、DBから最新の商品情報を取得して確認する。
 			Item item = itemRepository.findByIdAndDeleteFlag(basketBean.getId(), Constant.NOT_DELETED);
 			if (item == null || item.getStock() == null || item.getStock() == 0) {
+				
 				// 商品が存在しない、論理削除済み、または在庫数が0の場合は注文できない。
 				// 注文確認画面でユーザーに知らせるため、対象商品名を在庫切れリストへ追加する。
 				// continueにより、この商品は更新後の買い物かご・注文商品表示リストには追加しない。
@@ -539,6 +555,7 @@ public class ClientOrderRegistController {
 			BasketBean updatedBasketBean = new BasketBean(
 					item.getId(), item.getName(), item.getStock(), basketBean.getOrderNum());
 			if (updatedBasketBean.getOrderNum() > item.getStock()) {
+				
 				// 注文数が現在在庫数を超えている場合、そのままでは注文できない。
 				// 注文可能な最大数である現在在庫数まで注文数を自動補正し、
 				// 注文確認画面に注意メッセージを表示するため商品名を在庫不足リストへ追加する。
@@ -578,12 +595,14 @@ public class ClientOrderRegistController {
 	 */
 	private boolean canOrder(List<BasketBean> basketBeans) {
 		for (BasketBean basketBean : basketBeans) {
+			
 			// 注文確認画面を表示した後、注文確定ボタンを押すまでの短い間にも、
 			// 他ユーザーの注文などによって在庫数が変わる可能性がある。
 			// そのため、注文確定直前にもDBから最新の商品情報を取得して再確認する。
 			Item item = itemRepository.findByIdAndDeleteFlag(basketBean.getId(), Constant.NOT_DELETED);
 			if (basketBean.getOrderNum() == null || basketBean.getOrderNum() <= 0
 					|| item == null || item.getStock() == null || item.getStock() < basketBean.getOrderNum()) {
+				
 				// 注文数が不正、商品が存在しない、在庫数が取得できない、または在庫数が注文数より少ない場合は注文不可。
 				return false;
 			}
@@ -597,6 +616,7 @@ public class ClientOrderRegistController {
 	 * @return true: 空、false: 商品あり
 	 */
 	private boolean isBasketEmpty() {
+		
 		// 買い物かご情報はセッションに保存されているため、共通メソッドから取得する。
 		// nullまたは空リストの場合は、注文手続きを開始できる商品が存在しないと判定する。
 		List<BasketBean> basketBeans = getBasketBeans();
@@ -610,6 +630,7 @@ public class ClientOrderRegistController {
 	 */
 	@SuppressWarnings("unchecked")
 	private List<BasketBean> getBasketBeans() {
+		
 		// HttpSessionから買い物かご情報を取得する。
 		// session.getAttributeの戻り値はObject型のため、BasketBeanのListとしてキャストする。
 		// 呼び出し元ではnullの可能性も考慮して判定する。
@@ -622,11 +643,13 @@ public class ClientOrderRegistController {
 	 * @param basketBeans 買い物かご情報
 	 */
 	private void saveBasketBeans(List<BasketBean> basketBeans) {
+		
 		// 保存対象がnullまたは空の場合は、買い物かごに商品が存在しない状態とみなし、
 		// セッションから買い物かご情報自体を削除する。
 		if (basketBeans == null || basketBeans.isEmpty()) {
 			session.removeAttribute(BASKET_BEANS);
 		} else {
+			
 			// 注文可能な商品が残っている場合は、最新状態の買い物かご情報としてセッションへ保存する。
 			session.setAttribute(BASKET_BEANS, basketBeans);
 		}
