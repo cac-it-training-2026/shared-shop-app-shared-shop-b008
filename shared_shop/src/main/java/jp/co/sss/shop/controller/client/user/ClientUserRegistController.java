@@ -4,11 +4,18 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -24,8 +31,10 @@ import jp.co.sss.shop.repository.UserRepository;
  */
 @Controller
 public class ClientUserRegistController {
-	
-	
+
+	private static final String[] USER_FORM_FIELD_ORDER = {
+			"email", "password", "name", "postalCode", "address", "phoneNumber"
+	};
 
 	/**
 	 * 会員情報リポジトリ
@@ -107,7 +116,8 @@ public class ClientUserRegistController {
 		// 【設計書③】 入力値のチェック結果判定
 		if (result.hasErrors()) {
 			// 設計書のリダイレクト仕様を満たすため、Springの標準機能でエラー結果を一時保存して引き継ぐ
-			redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.userForm", result);
+			redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.userForm",
+					createSortedBindingResult(form, result));
 			redirectAttributes.addFlashAttribute("userForm", form);
 
 			// 【設計書③】 エラーあり：登録入力画面表示処理にリダイレクトする
@@ -185,5 +195,27 @@ public class ClientUserRegistController {
 
 		// 登録完了画面を表示する（フォワード）
 		return "client/user/regist_complete";
+	}
+
+	private BindingResult createSortedBindingResult(UserForm form, BindingResult result) {
+		BindingResult sortedResult = new BeanPropertyBindingResult(form, result.getObjectName());
+		List<ObjectError> errors = new ArrayList<ObjectError>(result.getAllErrors());
+		errors.sort(Comparator.comparingInt(this::userFormFieldOrder));
+		for (ObjectError error : errors) {
+			sortedResult.addError(error);
+		}
+		return sortedResult;
+	}
+
+	private int userFormFieldOrder(ObjectError error) {
+		if (!(error instanceof FieldError fieldError)) {
+			return USER_FORM_FIELD_ORDER.length;
+		}
+		for (int i = 0; i < USER_FORM_FIELD_ORDER.length; i++) {
+			if (USER_FORM_FIELD_ORDER[i].equals(fieldError.getField())) {
+				return i;
+			}
+		}
+		return USER_FORM_FIELD_ORDER.length;
 	}
 }
