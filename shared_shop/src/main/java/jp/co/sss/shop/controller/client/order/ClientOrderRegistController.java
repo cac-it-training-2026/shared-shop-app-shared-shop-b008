@@ -1,15 +1,11 @@
 package jp.co.sss.shop.controller.client.order;
 
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import jp.co.sss.shop.bean.BasketBean;
-import jp.co.sss.shop.bean.OrderItemBean;
-import jp.co.sss.shop.bean.UserBean;
-import jp.co.sss.shop.entity.Item;
-import jp.co.sss.shop.entity.Order;
-import jp.co.sss.shop.entity.User;
-import jp.co.sss.shop.util.Constant;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,6 +19,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+import jp.co.sss.shop.bean.BasketBean;
+import jp.co.sss.shop.bean.OrderItemBean;
+import jp.co.sss.shop.bean.UserBean;
+import jp.co.sss.shop.entity.Item;
+import jp.co.sss.shop.entity.Order;
+import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.form.OrderForm;
 import jp.co.sss.shop.repository.ItemRepository;
 import jp.co.sss.shop.repository.OrderItemRepository;
@@ -30,12 +34,7 @@ import jp.co.sss.shop.repository.OrderRepository;
 import jp.co.sss.shop.repository.UserRepository;
 import jp.co.sss.shop.service.BeanTools;
 import jp.co.sss.shop.service.PriceCalc;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import jp.co.sss.shop.util.Constant;
 
 /**
  * 注文登録機能(一般会員用)のコントローラクラスです。
@@ -180,6 +179,7 @@ public class ClientOrderRegistController {
 		// addressInputCheckメソッド側で一時的にセッションへ退避したエラー情報をここで取り出す。
 		BindingResult result = (BindingResult) session.getAttribute("result");
 		if (result != null) {
+			
 			// Thymeleaf/Springのフォームエラー表示が正しく動作するように、
 			// BindingResultを「org.springframework.validation.BindingResult.フォーム名」というキーでModelへ戻す。
 			// ここでは画面側のForm名がorderFormであるため、この固定形式のキーを使用している。
@@ -209,6 +209,7 @@ public class ClientOrderRegistController {
 		if (lastOrderForm == null) {
 			return "redirect:/syserror";
 		}
+		
 		// 画面からPOSTされる届け先入力フォームには、入力項目として表示されていない値が含まれない場合がある。
 		// 特に会員IDや支払方法は、注文登録・確認の後続処理で必要になるため、
 		// POSTされたformに値が入っていない場合は、セッションに保存していた前回のOrderFormから補完する。
@@ -222,12 +223,14 @@ public class ClientOrderRegistController {
 		if (result.hasErrors()) {
 			clearInvalidAddressFields(form, result);
 			session.setAttribute(ORDER_FORM, form);
+			
 			// 入力エラーがある場合は、エラー情報をセッションへ一時退避する。
 			// Redirect先のGETメソッド(addressInput)でこのBindingResultをModelへ戻すことで、
 			// 入力画面にエラーメッセージを表示できる。
 			session.setAttribute("result", createClearedRejectedValueResult(form, result));
 			return "redirect:/client/order/address/input";
 		}
+		
 		// 入力チェック結果に関係なく、ユーザーが入力した最新の届け先情報を一度セッションへ保存する。
 		// これにより、エラーで入力画面に戻った場合でも、入力済みの値を画面に再表示できる。
 		session.setAttribute(ORDER_FORM, form);
@@ -267,12 +270,23 @@ public class ClientOrderRegistController {
 	 */
 	@RequestMapping(path = "/client/order/check", method = RequestMethod.POST)
 	public String orderCheck(@RequestParam Integer payMethod) {
+		
 		// TODO 秋葉　真穂担当: 選択された支払方法を注文入力フォームへ設定し、セッションへ保存する。
 		// 実装手順参考メモ:
 		// 1. セッションからORDER_FORMキーでOrderFormを取得する。
+		OrderForm orderForm = (OrderForm) session.getAttribute(ORDER_FORM);
+		
 		// 2. OrderFormがnullの場合、注文手続きの途中情報が失われているため、システムエラー画面へリダイレクトする。
+		if (orderForm == null) {
+	        return "redirect:/syserror";
+	    }
+		
 		// 3. 取得できたOrderFormに、画面で選択されたpayMethodをsetPayMethodで設定する。
+		orderForm.setPayMethod(payMethod);
+		
 		// 4. 更新後のOrderFormを再度セッションへ保存する。
+		session.setAttribute(ORDER_FORM, orderForm);
+		
 		// 5. 注文確認画面表示用のGETメソッドへリダイレクトする。
 		return "redirect:/client/order/check";
 	}
@@ -286,15 +300,41 @@ public class ClientOrderRegistController {
 	 */
 	@RequestMapping(path = "/client/order/check", method = RequestMethod.GET)
 	public String orderCheckView(Model model) {
-		// TODO 秋葉　真穂担当: 買い物かご商品の在庫確認、注文商品Bean生成、合計金額計算を行い画面へ渡す。
+		
+		// 秋葉　真穂担当: 買い物かご商品の在庫確認、注文商品Bean生成、合計金額計算を行い画面へ渡す。
 		// 実装手順参考メモ:
 		// 1. セッションからORDER_FORMキーでOrderFormを取得する。
+		OrderForm orderForm = (OrderForm) session.getAttribute(ORDER_FORM);
+		
 		// 2. OrderFormがnullの場合、注文者情報や届け先情報が確認できないため、システムエラー画面へリダイレクトする。
+		if (orderForm == null) {
+			return "redirect:/syserror";
+			}
+		
 		// 3. createOrderItemBeansForCheck(model)を呼び出し、買い物かご情報をもとに注文確認画面用のOrderItemBeanリストを生成する。
-		//    このメソッド内で、在庫切れ商品・在庫不足商品の判定と、買い物かご数量の補正も行われる。
+		// このメソッド内で、在庫切れ商品・在庫不足商品の判定と、買い物かご数量の補正も行われる。
+		List<OrderItemBean> orderItemBeans = createOrderItemBeansForCheck(model);
+		
+		// 注文時点で注文商品すべての在庫が0の場合の考慮
+		if (orderItemBeans == null || orderItemBeans.isEmpty()) {
+		    model.addAttribute("orderItemBeans", null);
+		    return "client/order/check";
+		}
+		
 		// 4. OrderFormをModelへ追加し、画面で届け先情報・支払方法を表示できるようにする。
+		model.addAttribute(ORDER_FORM, orderForm);
+		
 		// 5. OrderItemBeanリストがnullではなく空でもない場合、priceCalcで小計込みの合計金額を計算する。
-		// 6. orderItemBeansとtotalをModelへ追加し、注文確認画面へ渡す。
+		if (orderItemBeans != null && !orderItemBeans.isEmpty()) {
+			Integer total = priceCalc.orderItemBeanPriceTotalUseSubtotal(orderItemBeans);
+			
+			// totalをModelへ追加
+			model.addAttribute("total", total);
+			}
+		
+		// 6. orderItemBeansをModelへ追加し、注文確認画面へ渡す。
+		model.addAttribute("orderItemBeans", orderItemBeans);
+		
 		// 7. 最後に注文確認画面のView名を返す。
 		return "client/order/check";
 	}
