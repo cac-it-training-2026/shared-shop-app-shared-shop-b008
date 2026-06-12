@@ -114,11 +114,12 @@ public class ClientItemShowController {
 		// カテゴリが指定されているかを判定　（null,0=false 1,2=true）
 		boolean hasCategory = categoryId != null && categoryId != 0;
 
-		// トップ画面では見出し表示のためにsortType=2(売れ筋順)をModelへ渡している。
-		// その値が共通サイドバーのカテゴリ検索URLにも使われるため、
-		// トップ画面からのカテゴリ検索だけは要件どおり新着順へ補正する。
+		// 商品一覧画面以外のサイドバーからカテゴリ検索した場合は、設計どおり新着順を初期表示にする。
+		// 商品一覧画面内でカテゴリ検索した場合だけは、現在の表示順(sortType)を維持する。
 		// categoryId=0(指定なし)もカテゴリ検索フォームから送信された値のため、補正対象に含める。
-		if (isTopPageCategorySearch(sortType, categoryId, referer, request.getContextPath())) {
+		// TODO 切通 隆晟: 買い物カゴ画面・注文一覧画面にカテゴリ検索欄を実装する場合も、
+		// categoryIdを付けて商品一覧へ遷移させれば、この補正処理で新着順表示になります。
+		if (isCategorySearchFromOutsideItemList(sortType, categoryId, referer, request.getContextPath())) {
 			sortType = SORT_LATEST;
 		}
 
@@ -173,31 +174,31 @@ public class ClientItemShowController {
 	}
 
 	/**
-	 * トップ画面から送信されたカテゴリ検索かどうかを判定します。
+	 * 商品一覧画面以外から送信されたカテゴリ検索かどうかを判定します。
 	 *
 	 * @param sortType 表示順種別
 	 * @param categoryId カテゴリID
 	 * @param referer 遷移元URL
 	 * @param contextPath アプリケーションのコンテキストパス
-	 * @return トップ画面からのカテゴリ検索の場合true
+	 * @return 商品一覧画面以外からのカテゴリ検索の場合true
 	 */
-	private boolean isTopPageCategorySearch(
+	private boolean isCategorySearchFromOutsideItemList(
 			Integer sortType,
 			Integer categoryId,
 			String referer,
 			String contextPath) {
 
-		if (categoryId == null || sortType == null || sortType != SORT_HOT_SELL || referer == null) {
+		if (categoryId == null || sortType == null || referer == null) {
 			return false;
 		}
 
 		try {
 			String refererPath = URI.create(referer).getPath();
-			String topPath = contextPath + "/";
+			String itemListPath = contextPath + "/client/item/list/";
 
-			// 商品一覧画面から売れ筋順へ切り替える場合は、遷移元が商品一覧画面になる。
-			// そのケースまで新着順へ補正しないよう、遷移元がトップ画面のときだけtrueにする。
-			return refererPath.equals(contextPath) || refererPath.equals(topPath);
+			// 遷移元が商品一覧画面の場合は、カテゴリ検索後も現在の表示順を維持する。
+			// それ以外の画面からのカテゴリ検索は、設計どおり新着順へ補正する。
+			return !refererPath.startsWith(itemListPath);
 		} catch (IllegalArgumentException e) {
 			return false;
 		}
