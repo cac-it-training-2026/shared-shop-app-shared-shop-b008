@@ -1,15 +1,18 @@
 package jp.co.sss.shop.controller.client.item;
 
+import java.net.URI;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jp.co.sss.shop.bean.ItemBean;
 import jp.co.sss.shop.entity.Item;
 import jp.co.sss.shop.repository.CategoryRepository;
@@ -105,9 +108,19 @@ public class ClientItemShowController {
 			// 	/client/item/list/1にアクセスされるとsortType = 1（新着順）が入る
 			@PathVariable Integer sortType,
 			@RequestParam(required = false) Integer categoryId,
+			@RequestHeader(value = "Referer", required = false) String referer,
+			HttpServletRequest request,
 			Model model) {
 		// カテゴリが指定されているかを判定　（null,0=false 1,2=true）
 		boolean hasCategory = categoryId != null && categoryId != 0;
+
+		// トップ画面では見出し表示のためにsortType=2(売れ筋順)をModelへ渡している。
+		// その値が共通サイドバーのカテゴリ検索URLにも使われるため、
+		// トップ画面からのカテゴリ検索だけは要件どおり新着順へ補正する。
+		// categoryId=0(指定なし)もカテゴリ検索フォームから送信された値のため、補正対象に含める。
+		if (isTopPageCategorySearch(sortType, categoryId, referer, request.getContextPath())) {
+			sortType = SORT_LATEST;
+		}
 
 		List<Item> itemList;
 
@@ -157,6 +170,37 @@ public class ClientItemShowController {
 						Constant.NOT_DELETED));
 
 		return "client/item/list";
+	}
+
+	/**
+	 * トップ画面から送信されたカテゴリ検索かどうかを判定します。
+	 *
+	 * @param sortType 表示順種別
+	 * @param categoryId カテゴリID
+	 * @param referer 遷移元URL
+	 * @param contextPath アプリケーションのコンテキストパス
+	 * @return トップ画面からのカテゴリ検索の場合true
+	 */
+	private boolean isTopPageCategorySearch(
+			Integer sortType,
+			Integer categoryId,
+			String referer,
+			String contextPath) {
+
+		if (categoryId == null || sortType == null || sortType != SORT_HOT_SELL || referer == null) {
+			return false;
+		}
+
+		try {
+			String refererPath = URI.create(referer).getPath();
+			String topPath = contextPath + "/";
+
+			// 商品一覧画面から売れ筋順へ切り替える場合は、遷移元が商品一覧画面になる。
+			// そのケースまで新着順へ補正しないよう、遷移元がトップ画面のときだけtrueにする。
+			return refererPath.equals(contextPath) || refererPath.equals(topPath);
+		} catch (IllegalArgumentException e) {
+			return false;
+		}
 	}
 
 	/**
