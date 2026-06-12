@@ -1,5 +1,9 @@
 package jp.co.sss.shop.controller.client.user;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,10 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import jp.co.sss.shop.bean.UserBean;
@@ -27,7 +27,8 @@ import jp.co.sss.shop.repository.UserRepository;
 /**
  * 会員登録機能(一般会員用)のコントローラクラスです。
  *
- * @author SystemShared
+ * @author 小暮 太陽
+ * @see jp.co.sss.shop.form.UserForm
  */
 @Controller
 public class ClientUserRegistController {
@@ -48,26 +49,27 @@ public class ClientUserRegistController {
 	@Autowired
 	HttpSession session;
 
-	// ===== 担当: コグレ / 登録入力（入力チェック） =====
 	/**
 	 * 新規会員登録フォームを初期化します。
 	 *
+	 * @author 小暮 太陽
+	 * @see jp.co.sss.shop.form.UserForm
 	 * @return "redirect:/client/user/regist/input" 登録入力画面表示処理へリダイレクト
 	 */
 	@RequestMapping(path = "/client/user/regist/input/init", method = RequestMethod.GET)
 	public String userRegistInputLink() {
-
-		// 【設計書①】 新規に入力フォーム情報を生成し、セッションスコープに保存する
+		// 新規に入力フォーム情報を生成し、セッションスコープに保存する
 		session.setAttribute("userForm", new UserForm());
 
-		// 【設計書①】 登録入力画面表示処理にリダイレクトする
+		// 登録入力画面表示処理にリダイレクトする
 		return "redirect:/client/user/regist/input";
 	}
 
-	// ===== 担当: コグレ / 登録入力（入力チェック） =====
 	/**
 	 * 登録入力画面へ戻ります。
 	 *
+	 * @author 小暮 太陽
+	 * @see jp.co.sss.shop.form.UserForm
 	 * @return "redirect:/client/user/regist/input" 登録入力画面表示処理へリダイレクト
 	 */
 	@RequestMapping(path = "/client/user/regist/input", method = RequestMethod.POST)
@@ -75,33 +77,34 @@ public class ClientUserRegistController {
 		return "redirect:/client/user/regist/input";
 	}
 
-	// ===== 担当: コグレ / 登録入力（入力チェック） =====
 	/**
 	 * 登録入力画面を表示します。
 	 *
+	 * @author 小暮 太陽
+	 * @see jp.co.sss.shop.form.UserForm
 	 * @param model Viewとの値受渡し
 	 * @return "client/user/regist_input" 登録入力画面
 	 */
 	@RequestMapping(path = "/client/user/regist/input", method = RequestMethod.GET)
 	public String userRegistInput(Model model) {
-
-		// 【設計書②】 セッションスコープから入力フォーム情報を取得
+		// セッションスコープから入力フォーム情報を取得
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
 
-		// 【設計書②】 入力フォーム情報をリクエストスコープに設定
+		// 入力フォーム情報をリクエストスコープに設定
 		// (リダイレクトされたエラー用のフォーム情報がない場合のみ設定する)
 		if (!model.containsAttribute("userForm")) {
 			model.addAttribute("userForm", userForm);
 		}
 
-		// 【設計書②】 登録入力画面を表示する
+		// 登録入力画面を表示する
 		return "client/user/regist_input";
 	}
 
-	// ===== 担当: コグレ / 登録確認 =====
 	/**
 	 * 登録入力値をチェックし、登録確認画面へ遷移します。
 	 *
+	 * @author 小暮 太陽
+	 * @see jp.co.sss.shop.form.UserForm
 	 * @param form 会員入力フォーム
 	 * @param result 入力チェック結果
 	 * @param redirectAttributes リダイレクト先へエラー情報を引き継ぐためのオブジェクト
@@ -109,90 +112,90 @@ public class ClientUserRegistController {
 	 */
 	@RequestMapping(path = "/client/user/regist/check", method = RequestMethod.POST)
 	public String userRegistCheckButton(@Valid @ModelAttribute UserForm form, BindingResult result, RedirectAttributes redirectAttributes) {
-
-		// 【設計書③】 画面から入力された会員情報を取得した入力フォーム情報に設定し、セッションスコープに保存
+		// 画面から入力された会員情報を取得した入力フォーム情報に設定し、セッションスコープに保存
 		session.setAttribute("userForm", form);
 
-		// 【設計書③】 入力値のチェック結果判定
+		// 入力値のチェック結果判定
 		if (result.hasErrors()) {
-			// 設計書のリダイレクト仕様を満たすため、Springの標準機能でエラー結果を一時保存して引き継ぐ
+			// リダイレクト仕様を満たすため、Springの標準機能でエラー結果を一時保存して引き継ぐ
 			redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.userForm",
 					createSortedBindingResult(form, result));
 			redirectAttributes.addFlashAttribute("userForm", form);
 
-			// 【設計書③】 エラーあり：登録入力画面表示処理にリダイレクトする
+			// エラーあり：登録入力画面表示処理にリダイレクトする
 			return "redirect:/client/user/regist/input";
 		}
 
-		// 【設計書③】 エラーなし：登録確認画面表示処理にリダイレクトする
+		// エラーなし：登録確認画面表示処理にリダイレクトする
 		return "redirect:/client/user/regist/check";
 	}
 
-	// ===== 担当: コグレ / 登録確認 =====
 	/**
 	 * 登録確認画面を表示します。
 	 *
+	 * @author 小暮 太陽
+	 * @see jp.co.sss.shop.form.UserForm
 	 * @param model Viewとの値受渡し
 	 * @return "client/user/regist_check" 登録確認画面
 	 */
 	@RequestMapping(path = "/client/user/regist/check", method = RequestMethod.GET)
 	public String userRegistCheck(Model model) {
-
-		// 【設計書⑤】 セッションスコープから入力フォーム情報を取得
+		// セッションスコープから入力フォーム情報を取得
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
 
-		// 【設計書⑤】 入力フォーム情報をリクエストスコープに設定
+		// 入力フォーム情報をリクエストスコープに設定
 		model.addAttribute("userForm", userForm);
 
-		// 【設計書⑤】 登録確認画面を表示する
+		// 登録確認画面を表示する
 		return "client/user/regist_check";
 	}
 
-	// ===== 担当: コグレ / 登録完了 =====
 	/**
 	 * 会員情報を登録します。
 	 *
+	 * @author 小暮 太陽
+	 * @see jp.co.sss.shop.entity.User
+	 * @see jp.co.sss.shop.bean.UserBean
 	 * @return "redirect:/client/user/regist/complete" 登録完了画面表示処理へリダイレクト
 	 */
 	@RequestMapping(path = "/client/user/regist/complete", method = RequestMethod.POST)
 	public String userRegistCompleteButton() {
-
-		// 【設計書⑥】 セッションスコープから入力フォーム情報を取得
+		// セッションスコープから入力フォーム情報を取得
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
 
-		// 【設計書⑥】 入力フォーム情報を元にDB登録用エンティティオブジェクトを生成
+		// 入力フォーム情報を元にDB登録用エンティティオブジェクトを生成
 		User user = new User();
-		
+
 		// BeanToolsに会員用メソッドがないため、Spring標準の機能でコピーを行う
 		BeanUtils.copyProperties(userForm, user);
-		
+
 		// 一般会員権限(2)を設定
 		user.setAuthority(2);
 
-		// 【設計書⑥】 DB登録を実施する
+		// DB登録を実施する
 		userRepository.save(user);
 
-		// 【設計書⑥】 セッションスコープの入力フォーム情報削除
+		// セッションスコープの入力フォーム情報削除
 		session.removeAttribute("userForm");
 
-		 //【設計書⑥】 未ログインでの会員登録の場合、セッションスコープに会員情報をセットしログイン状態にする
+		// 未ログインでの会員登録の場合、セッションスコープに会員情報をセットしログイン状態にする
 		UserBean userBean = new UserBean();
 		BeanUtils.copyProperties(user, userBean);
 		session.setAttribute("user", userBean);
 
-		// 【設計書⑥】 登録完了画面表示処理にリダイレクトする
+		// 登録完了画面表示処理にリダイレクトする
 		return "redirect:/client/user/regist/complete";
 	}
 
-	// ===== 担当: コグレ / 登録完了 =====
 	/**
 	 * 登録完了画面を表示します。
 	 *
+	 * @author 小暮 太陽
+	 * @see jp.co.sss.shop.bean.UserBean
 	 * @return "client/user/regist_complete" 登録完了画面
 	 */
 	@RequestMapping(path = "/client/user/regist/complete", method = RequestMethod.GET)
 	public String userRegistComplete() {
-
 		// 登録完了画面を表示する（フォワード）
 		return "client/user/regist_complete";
 	}
@@ -208,7 +211,7 @@ public class ClientUserRegistController {
 	}
 
 	private int userFormFieldOrder(ObjectError error) {
-		if (!(error instanceof FieldError fieldError)) {
+		if (! (error instanceof FieldError fieldError)) {
 			return USER_FORM_FIELD_ORDER.length;
 		}
 		for (int i = 0; i < USER_FORM_FIELD_ORDER.length; i++) {
