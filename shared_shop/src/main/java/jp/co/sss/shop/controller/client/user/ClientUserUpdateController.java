@@ -26,7 +26,7 @@ import jp.co.sss.shop.repository.UserRepository;
 /**
  * 会員変更機能(一般会員用)のコントローラクラスです。
  *
- * @author SystemShared
+ * @author 金宮　永茉
  */
 @Controller
 public class ClientUserUpdateController {

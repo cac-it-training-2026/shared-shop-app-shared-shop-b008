@@ -16,7 +16,7 @@ import jp.co.sss.shop.repository.UserRepository;
 /**
  * 会員退会機能(一般会員用)のコントローラクラスです。
  *
- * @author SystemShared
+ * @author 金宮　永茉
  */
 @Controller
 public class ClientUserDeleteController {
@@ -38,7 +38,7 @@ public class ClientUserDeleteController {
 	@RequestMapping(path = "/client/user/delete/check", method = RequestMethod.POST)
 	public String deleteCheckInit() {
 
-		// セッションのログイン会員情報を元に退会確認用フォームを作成し、セッションへ保存する。
+		// セッションのログイン会員情報を元に退会確認用フォームを生成し、セッションへ保存する。
 		UserBean userBean = (UserBean) session.getAttribute("user");
 		UserForm userForm = new UserForm();
 		BeanUtils.copyProperties(userBean, userForm);
@@ -56,7 +56,7 @@ public class ClientUserDeleteController {
 	@RequestMapping(path = "/client/user/delete/check", method = RequestMethod.GET)
 	public String deleteCheck(Model model) {
 
-		// セッションの退会確認用フォームを画面へ渡す。
+		// セッションから退会確認用フォームを取得し、画面表示用に設定する。
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
 		model.addAttribute("userForm", userForm);
 		return "client/user/delete_check";
@@ -71,11 +71,13 @@ public class ClientUserDeleteController {
 	@RequestMapping(path = "/client/user/delete/complete", method = RequestMethod.POST)
 	public String deleteComplete() {
 
-		// 会員の削除フラグ更新、セッション破棄を行う。
+		// 会員情報の削除フラグを更新し、データベースへ反映する。
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
 		User user = userRepository.getReferenceById(userForm.getId());
 		user.setDeleteFlag(1);
 		userRepository.save(user);
+
+		// セッションを破棄し、ログイン状態を終了する。
 		session.invalidate();
 		return "redirect:/client/user/delete/complete";
 	}
