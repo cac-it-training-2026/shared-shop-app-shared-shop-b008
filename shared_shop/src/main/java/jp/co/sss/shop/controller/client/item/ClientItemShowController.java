@@ -90,7 +90,7 @@ public class ClientItemShowController {
 	// ===== 担当: シュエ ジーハン / 商品一覧（売れ筋） =====
 	// ===== 担当: 切通 隆晟 / 商品検索（カテゴリ） =====
 	/**
-	 * 商品一覧画面を表示します。
+	 * 商品詳細画面の並び替え及びカテゴリ検索
 	 *
 	 * @param sortType 表示順種別(1:新着順、2:売れ筋順)
 	 * @param categoryId カテゴリID
@@ -106,7 +106,7 @@ public class ClientItemShowController {
 			@PathVariable Integer sortType,
 			@RequestParam(required = false) Integer categoryId,
 			Model model) {
-		// カテゴリが指定されているかを判定（null,0=false 1,2=true）
+		// カテゴリが指定されているかを判定　（null,0=false 1,2=true）
 		boolean hasCategory = categoryId != null && categoryId != 0;
 
 		List<Item> itemList;
