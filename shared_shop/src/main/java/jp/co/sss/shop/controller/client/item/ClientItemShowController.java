@@ -9,7 +9,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -56,7 +55,7 @@ public class ClientItemShowController {
 	 * @param model    Viewとの値受渡し
 	 * @return "index" トップ画面
 	 */
-	@RequestMapping(path = "/", method = { RequestMethod.GET, RequestMethod.POST })
+	@RequestMapping(path = "/")
 	public String top(Model model) {
 
 		// トップ画面は売れ筋順を初期表示にする。
@@ -80,12 +79,6 @@ public class ClientItemShowController {
 		model.addAttribute("items", itemBeanList);
 		model.addAttribute("sortType", sortType);
 
-		// カテゴリ一覧を画面に渡している
-		model.addAttribute(
-				"categories",
-				categoryRepository.findByDeleteFlagOrderByInsertDateDescIdDesc(
-						Constant.NOT_DELETED));
-
 		return "index";
 	}
 
@@ -103,7 +96,7 @@ public class ClientItemShowController {
 	@Autowired
 	CategoryRepository categoryRepository;
 
-	@RequestMapping(path = "/client/item/list/{sortType}", method = { RequestMethod.GET, RequestMethod.POST })
+	@RequestMapping(path = "/client/item/list/{sortType}")
 	public String showItemList(
 			// 	/client/item/list/1にアクセスされるとsortType = 1（新着順）が入る
 			@PathVariable Integer sortType,
@@ -163,12 +156,6 @@ public class ClientItemShowController {
 		model.addAttribute("items", itemBeanList);
 		model.addAttribute("sortType", sortType);
 		model.addAttribute("categoryId", categoryId);
-
-		// カテゴリ一覧を画面に渡している
-		model.addAttribute(
-				"categories",
-				categoryRepository.findByDeleteFlagOrderByInsertDateDescIdDesc(
-						Constant.NOT_DELETED));
 
 		return "client/item/list";
 	}
