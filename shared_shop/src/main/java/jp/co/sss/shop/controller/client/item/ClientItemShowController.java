@@ -106,9 +106,42 @@ public class ClientItemShowController {
 			@PathVariable Integer sortType,
 			@RequestParam(required = false) Integer categoryId,
 			Model model) {
+		// カテゴリが指定されているかを判定（null,0=false 1,2=true）
+		boolean hasCategory = categoryId != null && categoryId != 0;
 
-		// 表示順(新着順、売れ筋順)とカテゴリ条件に応じて商品情報を取得する。
-		List<Item> itemList = findItems(sortType, categoryId);
+		List<Item> itemList;
+
+		//　if文で、新着順か売れ筋順かを選定
+		// 売れ筋順か判定
+		if (sortType != null && sortType == SORT_HOT_SELL) {
+
+			if (hasCategory) {
+				// 選択したカテゴリの商品だけ売れ筋順で取得
+				itemList = itemRepository.findHotSellItemsByCategoryId(
+						categoryId,
+						Constant.NOT_DELETED);
+			} else {
+				// 注文商品情報をもとに全商品を売れ筋順で取得
+				itemList = itemRepository.findHotSellItems(
+						Constant.NOT_DELETED);
+			}
+		}
+
+		else {
+			// 新着順の場合は商品登録日の降順で取得する
+			if (hasCategory) {
+				//選択したカテゴリの商品だけ新着順で取得
+				itemList = itemRepository
+						.findByCategoryIdAndDeleteFlagOrderByInsertDateDesc(
+								categoryId,
+								Constant.NOT_DELETED);
+			} else {
+				// 全商品を新着順で取得する。
+				itemList = itemRepository
+						.findByDeleteFlagOrderByInsertDateDesc(
+								Constant.NOT_DELETED);
+			}
+		}
 
 		// 商品情報を画面表示用Beanにコピーする。
 		List<ItemBean> itemBeanList = beanTools.copyEntityListToItemBeanList(itemList);
@@ -124,38 +157,6 @@ public class ClientItemShowController {
 						Constant.NOT_DELETED));
 
 		return "client/item/list";
-	}
-
-	/**
-	 * 表示順（新着か売れ筋か）とカテゴリ条件に応じた商品一覧を取得します。
-	 *
-	 * @param sortType 表示順種別
-	 * @param categoryId カテゴリID
-	 * @return 商品エンティティのリスト
-	 */
-	private List<Item> findItems(Integer sortType, Integer categoryId) {
-		// カテゴリが指定されているかを判定（null,0=false 1,2=true）
-		boolean hasCategory = categoryId != null && categoryId != 0;
-
-		//　if文で、新着順か売れ筋順かを選定
-		// 売れ筋順か判定
-		if (sortType != null && sortType == SORT_HOT_SELL) {
-
-			if (hasCategory) {
-				// 選択したカテゴリの商品だけ売れ筋順で取得
-				return itemRepository.findHotSellItemsByCategoryId(categoryId, Constant.NOT_DELETED);
-			}
-			// 注文商品情報をもとに全商品を売れ筋順で取得
-			return itemRepository.findHotSellItems(Constant.NOT_DELETED);
-		}
-
-		// 新着順の場合は商品登録日の降順で取得する
-		if (hasCategory) {
-			//選択したカテゴリの商品だけ新着順で取得
-			return itemRepository.findByCategoryIdAndDeleteFlagOrderByInsertDateDesc(categoryId, Constant.NOT_DELETED);
-		}
-		// 全商品を新着順で取得する。
-		return itemRepository.findByDeleteFlagOrderByInsertDateDesc(Constant.NOT_DELETED);
 	}
 
 	/**
@@ -182,5 +183,4 @@ public class ClientItemShowController {
 
 		return "client/item/detail";
 	}
-
 }
