@@ -26,7 +26,7 @@ import jp.co.sss.shop.repository.UserRepository;
 /**
  * 会員変更機能(一般会員用)のコントローラクラスです。
  *
- * @author 金宮　永茉
+ * @author 金宮 永茉
  */
 @Controller
 public class ClientUserUpdateController {
@@ -50,7 +50,7 @@ public class ClientUserUpdateController {
 	/**
 	 * 変更入力画面表示用の会員フォームを初期化するメソッド
 	 * 
-	 * @author 金宮　永茉
+	 * @author 金宮 永茉
 	 * @return "redirect:/client/user/update/input" 変更入力画面表示処理へリダイレクト
 	 */
 	@RequestMapping(path = "/client/user/update/input", method = RequestMethod.POST)
@@ -63,6 +63,9 @@ public class ClientUserUpdateController {
 			User user = userRepository.getReferenceById(userBean.getId());
 			UserForm userForm = new UserForm();
 			BeanUtils.copyProperties(user, userForm);
+
+			// パスワードは初期表示しない
+			userForm.setPassword("");
 			session.setAttribute("userForm", userForm);
 		}
 		return "redirect:/client/user/update/input";
@@ -71,7 +74,7 @@ public class ClientUserUpdateController {
 	/**
 	 * 変更入力画面を表示するメソッド
 	 *
-	 * @author 金宮　永茉
+	 * @author 金宮 永茉
 	 * @param model Viewとの値受渡し
 	 * @return "client/user/update_input" 変更入力画面
 	 */
@@ -93,7 +96,7 @@ public class ClientUserUpdateController {
 	/**
 	 * 変更入力値をチェックし、変更確認画面へ遷移するメソッド
 	 *
-	 * @author 金宮　永茉
+	 * @author 金宮 永茉
 	 * @param form 会員入力フォーム
 	 * @param result 入力チェック結果
 	 * @return 入力エラーあり: "redirect:/client/user/update/input"、なし: "redirect:/client/user/update/check"
@@ -119,7 +122,7 @@ public class ClientUserUpdateController {
 	/**
 	 * 変更確認画面を表示するメソッド
 	 *
-	 * @author 金宮　永茉
+	 * @author 金宮 永茉
 	 * @param model Viewとの値受渡し
 	 * @return "client/user/update_check" 変更確認画面
 	 */
@@ -135,7 +138,7 @@ public class ClientUserUpdateController {
 	/**
 	 * 会員情報を更新するメソッド
 	 *
-	 * @author 金宮　永茉
+	 * @author 金宮 永茉
 	 * @return "redirect:/client/user/update/complete" 変更完了画面表示処理へリダイレクト
 	 */
 	@RequestMapping(path = "/client/user/update/complete", method = RequestMethod.POST)
@@ -158,7 +161,7 @@ public class ClientUserUpdateController {
 	/**
 	 * 変更完了画面を表示するメソッド
 	 *
-	 * @author 金宮　永茉
+	 * @author 金宮 永茉
 	 * @return "client/user/update_complete" 変更完了画面
 	 */
 	@RequestMapping(path = "/client/user/update/complete", method = RequestMethod.GET)
@@ -169,7 +172,7 @@ public class ClientUserUpdateController {
 	/**
 	 * 入力エラーメッセージをUserFormの項目順に並び替えるメソッド
 	 * 
-	 * @author シュエ　ジーハン
+	 * @author シュエ ジーハン
 	 * @param form 入力フォーム
 	 * @param result 元の入力チェック結果
 	 * @return 項目順に並び替えた入力チェック結果
@@ -191,7 +194,7 @@ public class ClientUserUpdateController {
 	/**
 	 * 入力エラーに対応するUserFormの項目順を取得するメソッド
 	 * 
-	 * @author シュエ　ジーハン
+	 * @author シュエ ジーハン
 	 * @param error
 	 * @return USER_FORM_FIELD_ORDERにおける項目の位置
 	 */

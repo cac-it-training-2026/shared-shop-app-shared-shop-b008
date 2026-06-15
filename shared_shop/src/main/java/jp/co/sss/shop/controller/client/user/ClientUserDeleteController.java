@@ -16,7 +16,7 @@ import jp.co.sss.shop.repository.UserRepository;
 /**
  * 会員退会機能(一般会員用)のコントローラクラスです。
  *
- * @author 金宮　永茉
+ * @author 金宮 永茉
  */
 @Controller
 public class ClientUserDeleteController {
@@ -32,7 +32,7 @@ public class ClientUserDeleteController {
 	/**
 	 * 退会確認画面表示用の会員フォームを初期化するメソッド
 	 *
-	 * @author 金宮　永茉
+	 * @author 金宮 永茉
 	 * @return "redirect:/client/user/delete/check" 退会確認画面表示処理へリダイレクト
 	 */
 	@RequestMapping(path = "/client/user/delete/check", method = RequestMethod.POST)
@@ -49,7 +49,7 @@ public class ClientUserDeleteController {
 	/**
 	 * 退会確認画面を表示するメソッド
 	 *
-	 * @author 金宮　永茉
+	 * @author 金宮 永茉
 	 * @param model Viewとの値受渡し
 	 * @return "client/user/delete_check" 退会確認画面
 	 */
@@ -65,7 +65,7 @@ public class ClientUserDeleteController {
 	/**
 	 * ログイン会員の退会処理を行うメソッド
 	 *
-	 * @author 金宮　永茉
+	 * @author 金宮 永茉
 	 * @return "redirect:/client/user/delete/complete" 退会完了画面表示処理へリダイレクト
 	 */
 	@RequestMapping(path = "/client/user/delete/complete", method = RequestMethod.POST)
@@ -85,7 +85,7 @@ public class ClientUserDeleteController {
 	/**
 	 * 退会完了画面を表示するメソッド
 	 *
-	 * @author 金宮　永茉
+	 * @author 金宮 永茉
 	 * @return "client/user/delete_complete" 退会完了画面
 	 */
 	@RequestMapping(path = "/client/user/delete/complete", method = RequestMethod.GET)
