@@ -16,7 +16,6 @@ import jp.co.sss.shop.filter.SystemAdminAccountCheckFilter;
  * @author SystemShared
  */
 
-//TODO 開発中はフィルター制限を防ぐため無効化する
 @Configuration
 public class FilterConfig {
 	/**
