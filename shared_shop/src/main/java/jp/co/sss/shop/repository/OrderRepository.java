@@ -1,5 +1,7 @@
 package jp.co.sss.shop.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -34,8 +36,8 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 	 * @return 注文エンティティのページオブジェクト
 	 */
 	@Query("SELECT o FROM Order o WHERE o.user.id =:userId ORDER BY o.insertDate DESC,o.id DESC")
-	Page<Order> findByUserIdOrderByInsertDateDescIdDesc(
-			@Param(value = "userId") Integer userId, Pageable pageable);
+	List<Order> findByUserIdOrderByInsertDateDescIdDesc(
+			@Param(value = "userId") Integer userId);
 
 	/**
 	 * 注文IDと会員IDを条件に注文情報を検索します。

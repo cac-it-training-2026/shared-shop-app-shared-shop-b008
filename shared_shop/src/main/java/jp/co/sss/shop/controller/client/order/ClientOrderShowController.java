@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -58,22 +56,21 @@ public class ClientOrderShowController {
 	 * 
 	 * @author 秋葉 真穂
 	 * @param model Viewとの値受渡し
-	 * @param pageable ページング情報
 	 * @return "client/order/list" 注文一覧画面
 	 */
 	@RequestMapping(path = "/client/order/list", method = { RequestMethod.GET, RequestMethod.POST })
-	public String showOrderList(Model model, Pageable pageable) {
+	public String showOrderList(Model model) {
 		
 		// ログイン会員IDを条件に注文一覧を取得し、注文Beanリストを画面へ渡す。
 		// ログイン会員取得
 		UserBean user = (UserBean) session.getAttribute("user");
 		
 		// 注文情報を注文日時の新しい順に取得
-		Page<Order> orders = orderRepository.findByUserIdOrderByInsertDateDescIdDesc(user.getId(), pageable);
+		List<Order> orders = orderRepository.findByUserIdOrderByInsertDateDescIdDesc(user.getId());
 		
 		// Entityから画面表示用のBeanリストへ変換
 		List<OrderBean> orderBeans = new ArrayList<>();
-		for (Order order : orders.getContent()) {
+		for (Order order : orders) {
 			
 			// BeanTools共通クラスを使って一括コピー
 			OrderBean bean = beanTools.copyEntityToOrderBean(order);
