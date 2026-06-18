@@ -1,5 +1,7 @@
 package jp.co.sss.shop.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,6 +28,50 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
 	@Query("SELECT i FROM Item i INNER JOIN i.category c WHERE i.deleteFlag =:deleteFlag ORDER BY i.insertDate DESC,i.id DESC")
 	Page<Item> findByDeleteFlagOrderByInsertDateDescPage(
 			@Param(value = "deleteFlag") int deleteFlag, Pageable pageable);
+
+	/**
+	 * 商品情報を登録日付降順で取得します。
+	 * 切通 隆晟担当: 商品一覧（新着）/トップ画面（売れ筋順改修）で利用します。
+	 * @param deleteFlag 削除フラグ
+	 * @return 商品エンティティのリスト
+	 */
+	@Query("SELECT i FROM Item i INNER JOIN i.category c WHERE i.deleteFlag =:deleteFlag ORDER BY i.insertDate DESC,i.id DESC")
+	List<Item> findByDeleteFlagOrderByInsertDateDesc(
+			@Param(value = "deleteFlag") int deleteFlag);
+
+	/**
+	 * 商品情報をカテゴリ別、登録日付降順で取得します。
+	 * コグレ担当: 商品検索（カテゴリ）で利用します。
+	 * @param categoryId カテゴリID
+	 * @param deleteFlag 削除フラグ
+	 * @return 商品エンティティのリスト
+	 */
+	@Query("SELECT i FROM Item i INNER JOIN i.category c WHERE c.id =:categoryId AND i.deleteFlag =:deleteFlag ORDER BY i.insertDate DESC,i.id DESC")
+	List<Item> findByCategoryIdAndDeleteFlagOrderByInsertDateDesc(
+			@Param(value = "categoryId") Integer categoryId,
+			@Param(value = "deleteFlag") int deleteFlag);
+
+	/**
+	 * 売れ筋順の商品情報を取得します。
+	 * シュエ ジーハン担当: 商品一覧（売れ筋）で利用します。
+	 * @param deleteFlag 削除フラグ
+	 * @return 商品エンティティのリスト
+	 */
+	@Query("SELECT i FROM Item i INNER JOIN i.category c INNER JOIN i.orderItemList oi WHERE i.deleteFlag =:deleteFlag GROUP BY i ORDER BY SUM(oi.quantity) DESC,i.id ASC")
+	List<Item> findHotSellItems(
+			@Param(value = "deleteFlag") int deleteFlag);
+
+	/**
+	 * カテゴリ別に売れ筋順の商品情報を取得します。
+	 * シュエ ジーハン担当/コグレ担当: 売れ筋順とカテゴリ検索を組み合わせる場合に利用します。
+	 * @param categoryId カテゴリID
+	 * @param deleteFlag 削除フラグ
+	 * @return 商品エンティティのリスト
+	 */
+	@Query("SELECT i FROM Item i INNER JOIN i.category c INNER JOIN i.orderItemList oi WHERE c.id =:categoryId AND i.deleteFlag =:deleteFlag GROUP BY i ORDER BY SUM(oi.quantity) DESC,i.id ASC")
+	List<Item> findHotSellItemsByCategoryId(
+			@Param(value = "categoryId") Integer categoryId,
+			@Param(value = "deleteFlag") int deleteFlag);
 
 	/**
 	 * 商品IDと削除フラグを条件に検索（管理者,商品詳細機能で利用）
