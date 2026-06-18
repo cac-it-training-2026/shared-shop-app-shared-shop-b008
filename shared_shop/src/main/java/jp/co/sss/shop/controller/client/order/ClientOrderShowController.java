@@ -53,28 +53,28 @@ public class ClientOrderShowController {
 
 	/**
 	 * ログイン会員の注文一覧画面を表示します。
-	 * 
+	 *
 	 * @author 秋葉 真穂
 	 * @param model Viewとの値受渡し
 	 * @return "client/order/list" 注文一覧画面
 	 */
 	@RequestMapping(path = "/client/order/list", method = { RequestMethod.GET, RequestMethod.POST })
 	public String showOrderList(Model model) {
-		
+
 		// ログイン会員IDを条件に注文一覧を取得し、注文Beanリストを画面へ渡す。
 		// ログイン会員取得
 		UserBean user = (UserBean) session.getAttribute("user");
-		
+
 		// 注文情報を注文日時の新しい順に取得
 		List<Order> orders = orderRepository.findByUserIdOrderByInsertDateDescIdDesc(user.getId());
-		
+
 		// Entityから画面表示用のBeanリストへ変換
 		List<OrderBean> orderBeans = new ArrayList<>();
 		for (Order order : orders) {
-			
+
 			// BeanTools共通クラスを使って一括コピー
 			OrderBean bean = beanTools.copyEntityToOrderBean(order);
-			
+
 			// PriceCalc共通クラスを使って合計金額を計算する
 			int total = priceCalc.orderItemPriceTotal(order.getOrderItemsList());
 			bean.setTotal(total);
@@ -88,7 +88,7 @@ public class ClientOrderShowController {
 
 	/**
 	 * ログイン会員の注文詳細画面を表示します。
-	 * 
+	 *
 	 * @author 秋葉 真穂
 	 * @param id 注文ID
 	 * @param model Viewとの値受渡し
@@ -96,26 +96,26 @@ public class ClientOrderShowController {
 	 */
 	@RequestMapping(path = "/client/order/detail/{id}", method = { RequestMethod.GET, RequestMethod.POST })
 	public String showOrder(@PathVariable Integer id, Model model) {
-		
+
 		// 秋葉 真穂担当: ログイン会員の注文であることを確認し、注文詳細と注文商品Beanリストを画面へ渡す。
 		// ログイン会員の注文であることを確認し、注文詳細と注文商品Beanリストを画面へ渡す。
 		// ログイン会員取得
 		UserBean user = (UserBean) session.getAttribute("user");
-		
+
 		// 該当する注文情報の詳細を取得
 		Order order = orderRepository.findByIdAndUserId(id, user.getId());
-		
+
 		// BeanTools共通クラスを使って一括コピー
 		OrderBean bean = beanTools.copyEntityToOrderBean(order);
-		
+
 		// 該当する注文商品Beanリストを取得
 		List<OrderItemBean> orderItemBeans = beanTools.generateOrderItemBeanList(order.getOrderItemsList());
-		
+
 		// 注文時の商品単価から合計金額を算出し表示
 		// PriceCalc共通クラスを使って合計金額を計算する
 		int total = priceCalc.orderItemBeanPriceTotalUseSubtotal(orderItemBeans);
 		bean.setTotal(total);
-		
+
 		// リクエストスコープに保存
 		model.addAttribute("order", bean);
 		model.addAttribute("orderItemBeans", orderItemBeans);

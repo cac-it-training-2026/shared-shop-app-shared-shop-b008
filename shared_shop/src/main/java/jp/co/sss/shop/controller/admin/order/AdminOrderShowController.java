@@ -26,7 +26,7 @@ import jp.co.sss.shop.service.PriceCalc;
  * 注文管理 一覧表示機能(運用管理者用)のコントローラクラス
  *
  * @author SystemShared
- * 
+ *
  * TIPS: 一般会員向けの注文一覧と注文詳細に類似した処理です。
  */
 @Controller

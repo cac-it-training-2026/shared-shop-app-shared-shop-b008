@@ -12,6 +12,7 @@ import jp.co.sss.shop.bean.UserBean;
 import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.form.UserForm;
 import jp.co.sss.shop.repository.UserRepository;
+import jp.co.sss.shop.util.Constant;
 
 /**
  * 会員退会機能(一般会員用)のコントローラクラスです。
@@ -39,9 +40,18 @@ public class ClientUserDeleteController {
 	public String deleteCheckInit() {
 
 		// セッションのログイン会員情報を元に退会確認用フォームを生成し、セッションへ保存する。
-		UserBean userBean = (UserBean) session.getAttribute("user");
+		UserBean loginUser = (UserBean) session.getAttribute("user");
+		if (loginUser == null) {
+			return "redirect:/login";
+		}
+
+		User user = userRepository.findByIdAndDeleteFlag(loginUser.getId(), Constant.NOT_DELETED);
+		if (user == null) {
+			return "redirect:/syserror";
+		}
+
 		UserForm userForm = new UserForm();
-		BeanUtils.copyProperties(userBean, userForm);
+		BeanUtils.copyProperties(user, userForm);
 		session.setAttribute("userForm", userForm);
 		return "redirect:/client/user/delete/check";
 	}
@@ -58,6 +68,10 @@ public class ClientUserDeleteController {
 
 		// セッションから退会確認用フォームを取得し、画面表示用に設定する。
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
+		if (userForm == null) {
+			return "redirect:/client/user/detail";
+		}
+
 		model.addAttribute("userForm", userForm);
 		return "client/user/delete_check";
 	}
@@ -73,8 +87,16 @@ public class ClientUserDeleteController {
 
 		// 会員情報の削除フラグを更新し、データベースへ反映する。
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
-		User user = userRepository.getReferenceById(userForm.getId());
-		user.setDeleteFlag(1);
+		if (userForm == null) {
+			return "redirect:/client/user/detail";
+		}
+
+		User user = userRepository.findByIdAndDeleteFlag(userForm.getId(), Constant.NOT_DELETED);
+		if (user == null) {
+			return "redirect:/syserror";
+		}
+
+		user.setDeleteFlag(Constant.DELETED);
 		userRepository.save(user);
 
 		// セッションを破棄し、ログイン状態を終了する。

@@ -113,6 +113,9 @@ public class ClientItemShowController {
 		// TODO 切通 隆晟: 買い物カゴ画面・注文一覧画面にカテゴリ検索欄を実装する場合も、
 		// categoryIdを付けて商品一覧へ遷移させれば、この補正処理で新着順表示になります。
 		if (isCategorySearchFromOutsideItemList(sortType, categoryId, referer, request.getContextPath())) {
+			if (sortType != SORT_LATEST) {
+				return "redirect:/client/item/list/" + SORT_LATEST + "?categoryId=" + categoryId;
+			}
 			sortType = SORT_LATEST;
 		}
 

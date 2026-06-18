@@ -74,6 +74,9 @@ public class ClientUserRegistController {
 	 */
 	@RequestMapping(path = "/client/user/regist/input", method = RequestMethod.POST)
 	public String userRegistInputButton() {
+		if (session.getAttribute("userForm") == null) {
+			return "redirect:/login";
+		}
 		return "redirect:/client/user/regist/input";
 	}
 
@@ -142,6 +145,9 @@ public class ClientUserRegistController {
 	public String userRegistCheck(Model model) {
 		// セッションスコープから入力フォーム情報を取得
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
+		if (userForm == null) {
+			return "redirect:/login";
+		}
 
 		// 入力フォーム情報をリクエストスコープに設定
 		model.addAttribute("userForm", userForm);
@@ -162,6 +168,9 @@ public class ClientUserRegistController {
 	public String userRegistCompleteButton() {
 		// セッションスコープから入力フォーム情報を取得
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
+		if (userForm == null) {
+			return "redirect:/login";
+		}
 
 		// 入力フォーム情報を元にDB登録用エンティティオブジェクトを生成
 		User user = new User();

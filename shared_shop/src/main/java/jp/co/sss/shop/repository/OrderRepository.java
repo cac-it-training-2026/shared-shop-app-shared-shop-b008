@@ -32,7 +32,6 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 	 * 会員IDを条件に注文日付降順で注文情報を検索します。
 	 * 注文一覧で利用
 	 * @param userId 会員ID
-	 * @param pageable ページング情報
 	 * @return 注文エンティティのページオブジェクト
 	 */
 	@Query("SELECT o FROM Order o WHERE o.user.id =:userId ORDER BY o.insertDate DESC,o.id DESC")
