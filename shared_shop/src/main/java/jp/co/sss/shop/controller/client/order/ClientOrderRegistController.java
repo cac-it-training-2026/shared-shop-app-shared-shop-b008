@@ -9,6 +9,7 @@ import java.util.Set;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
@@ -387,6 +388,7 @@ public class ClientOrderRegistController {
 	 * @see #createOrder(OrderForm)
 	 * @see #canOrder(List)
 	 */
+	@Transactional
 	@RequestMapping(path = "/client/order/complete", method = RequestMethod.POST)
 	public String orderComplete() {
 		
@@ -498,15 +500,6 @@ public class ClientOrderRegistController {
 			invalidFields.add(fieldError.getField());
 		}
 
-		if (invalidFields.contains("postalCode")) {
-			form.setPostalCode("");
-		}
-		if (invalidFields.contains("address")) {
-			form.setAddress("");
-		}
-		if (invalidFields.contains("name")) {
-			form.setName("");
-		}
 		if (invalidFields.contains("phoneNumber")) {
 			form.setPhoneNumber("");
 		}
