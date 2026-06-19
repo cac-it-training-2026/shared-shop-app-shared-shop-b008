@@ -74,6 +74,37 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
 			@Param(value = "deleteFlag") int deleteFlag);
 
 	/**
+	 * 同一カテゴリの商品を累計注文数量の多い順に取得します。
+	 * 注文実績がない商品も候補に含めます。
+	 *
+	 * @param categoryId カテゴリID
+	 * @param currentItemId 現在表示中の商品ID
+	 * @param deleteFlag 削除フラグ
+	 * @param pageable ページング情報
+	 * @return 関連商品エンティティのリスト
+	 */
+	@Query("""
+			SELECT i
+			FROM Item i
+			INNER JOIN i.category c
+			LEFT JOIN i.orderItemList oi
+			WHERE c.id = :categoryId
+			  AND i.id <> :currentItemId
+			  AND i.deleteFlag = :deleteFlag
+			  AND c.deleteFlag = :deleteFlag
+			  AND i.stock > 0
+			GROUP BY i
+			ORDER BY COALESCE(SUM(oi.quantity), 0) DESC,
+			         i.insertDate DESC,
+			         i.id DESC
+			""")
+	List<Item> findRelatedItems(
+			@Param(value = "categoryId") Integer categoryId,
+			@Param(value = "currentItemId") Integer currentItemId,
+			@Param(value = "deleteFlag") int deleteFlag,
+			Pageable pageable);
+
+	/**
 	 * 商品IDと削除フラグを条件に検索（管理者,商品詳細機能で利用）
 	 * @param id 商品ID
 	 * @param deleteFlag 削除フラグ

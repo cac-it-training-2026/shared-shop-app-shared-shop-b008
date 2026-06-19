@@ -44,6 +44,11 @@ public class ClientItemShowController {
 	private static final int SORT_HOT_SELL = 2;
 
 	/**
+	 * 関連商品の最大表示件数
+	 */
+	private static final int RELATED_ITEM_LIMIT = 4;
+
+	/**
 	 * 商品情報
 	 */
 	@Autowired
@@ -251,8 +256,17 @@ public class ClientItemShowController {
 		// Itemエンティティの各フィールドの値をItemBeanにコピー
 		ItemBean itemBean = beanTools.copyEntityToItemBean(item);
 
+		// 同一カテゴリの関連商品を、累計注文数量の多い順に最大4件取得する
+		List<Item> relatedItemList = itemRepository.findRelatedItems(
+				item.getCategory().getId(),
+				item.getId(),
+				Constant.NOT_DELETED,
+				PageRequest.of(0, RELATED_ITEM_LIMIT));
+		List<ItemBean> relatedItemBeanList = beanTools.copyEntityListToItemBeanList(relatedItemList);
+
 		// 商品情報をViewへ渡す
 		model.addAttribute("item", itemBean);
+		model.addAttribute("relatedItems", relatedItemBeanList);
 
 		return "client/item/detail";
 	}
