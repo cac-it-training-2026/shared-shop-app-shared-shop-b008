@@ -569,6 +569,86 @@ select {
 	display: flex;
 	justify-content: space-between;
 }
+
+/* ---- 関連商品 ---- */
+.related_items {
+	margin-top: 45px;
+}
+
+.related_items_title {
+	border-bottom: 2px solid #3d98bf;
+	padding: 8px 4px;
+	font-size: 1.3rem;
+	font-weight: bold;
+}
+
+.related_item_list {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 16px;
+	margin-top: 20px;
+}
+
+.related_item {
+	min-width: 0;
+	border: 1px solid #c6dce5;
+	border-radius: 6px;
+	background: #fff;
+	overflow: hidden;
+}
+
+.related_item_image {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 150px;
+	padding: 8px;
+	box-sizing: border-box;
+}
+
+.related_item_image img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+.related_item_info {
+	border-top: 1px solid #e8f1f5;
+	padding: 10px;
+}
+
+.related_item_name {
+	display: -webkit-box;
+	min-height: 2.8em;
+	overflow: hidden;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	color: #3d98bf;
+	font-weight: bold;
+	line-height: 1.4;
+	text-decoration: none;
+	overflow-wrap: anywhere;
+}
+
+.related_item_name:hover {
+	text-decoration: underline;
+}
+
+.related_item_price {
+	margin: 10px 0 0;
+	color: #12526d;
+}
+
+@media screen and (max-width: 768px) {
+	.related_item_list {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media screen and (max-width: 480px) {
+	.related_item_list {
+		grid-template-columns: 1fr;
+	}
+}
 /* ---- 注文一覧 ---- */
 .list_table.order{
 	margin-top: 50px;
