@@ -1,17 +1,16 @@
 package jp.co.sss.shop.validator;
 
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.ConstraintValidator;
-import jakarta.validation.ConstraintValidatorContext;
+import java.time.LocalDateTime;
 
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import jp.co.sss.shop.annotation.LoginCheck;
 import jp.co.sss.shop.bean.UserBean;
-import java.sql.Timestamp;
-
 import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.repository.UserRepository;
 import jp.co.sss.shop.util.Constant;
@@ -40,17 +39,27 @@ public class LoginValidator implements ConstraintValidator<LoginCheck, Object> {
 	@Override
 	public boolean isValid(Object value, ConstraintValidatorContext context) {
 		BeanWrapper beanWrapper = new BeanWrapperImpl(value);
-		boolean isValidFlg = false;
 		String emailProp = (String) beanWrapper.getPropertyValue(this.email);
 		String passwordProp = (String) beanWrapper.getPropertyValue(this.password);
 
 		User user = userRepository.findByEmailAndDeleteFlag(emailProp, Constant.NOT_DELETED);
 
 		if (user != null) {
-			// ロック判定
-			Timestamp lockReleaseTime = user.getLockReleaseTime();
-			if (lockReleaseTime != null && lockReleaseTime.after(new Timestamp(System.currentTimeMillis()))) {
-				// ロック中のため、認証失敗
+			LocalDateTime now = LocalDateTime.now();
+			LocalDateTime lockUntil = user.getLockUntil();
+
+			// ロック解除判定
+			if (lockUntil != null && now.isAfter(lockUntil)) {
+				user.setLoginFailureCount(0);
+				user.setLockUntil(null);
+				userRepository.save(user);
+				lockUntil = null;
+			}
+
+			// ロック中判定
+			if (lockUntil != null) {
+				context.disableDefaultConstraintViolation();
+				context.buildConstraintViolationWithTemplate("{login.locked.message}").addConstraintViolation();
 				return false;
 			}
 
@@ -65,12 +74,12 @@ public class LoginValidator implements ConstraintValidator<LoginCheck, Object> {
 				// セッションスコープにログインしたユーザの情報を登録
 				session.setAttribute("user", userBean);
 
-				// 失敗回数とロック解除時刻をリセット
+				// 失敗回数とロック解除日時をリセット
 				user.setLoginFailureCount(0);
-				user.setLockReleaseTime(null);
+				user.setLockUntil(null);
 				userRepository.save(user);
 
-				isValidFlg = true;
+				return true;
 			} else {
 				// 認証失敗
 				int failureCount = (user.getLoginFailureCount() == null) ? 0 : user.getLoginFailureCount();
@@ -79,17 +88,15 @@ public class LoginValidator implements ConstraintValidator<LoginCheck, Object> {
 
 				if (failureCount >= Constant.MAX_LOGIN_FAILURE) {
 					// ロック時間を設定
-					long lockTimeMillis = System.currentTimeMillis() + (Constant.LOCK_DURATION_MINUTES * 60 * 1000);
-					user.setLockReleaseTime(new Timestamp(lockTimeMillis));
+					user.setLockUntil(now.plusMinutes(Constant.LOCK_DURATION_MINUTES));
 				}
 				userRepository.save(user);
 
-				isValidFlg = false;
+				return false;
 			}
 		} else {
 			// ユーザが存在しない、または削除済み
-			isValidFlg = false;
+			return false;
 		}
-		return isValidFlg;
 	}
 }
