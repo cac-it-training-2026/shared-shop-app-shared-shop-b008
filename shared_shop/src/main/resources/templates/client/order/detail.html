@@ -42,6 +42,10 @@
 				<th>[[#{data.address}+#{data.address.phonenumber}]]</th>
 				<td th:text="${order.phoneNumber}"></td>
 			</tr>
+			<tr>
+				<th>[[#{data.delivery.date}]]</th>
+				<td th:text="${order.deliveryDate != null && order.deliveryDate != ''} ? ${order.deliveryDate} : #{data.delivery.date.none}"></td>
+			</tr>
 		</table>
 		<table class="list_table detail">
 			<tr>

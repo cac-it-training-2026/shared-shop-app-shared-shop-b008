@@ -223,6 +223,22 @@ public class ClientOrderRegistController {
 			form.setPayMethod(lastOrderForm.getPayMethod());
 		}
 
+		// 配送希望日のバリデーション
+		if (form.getDeliveryDate() != null && !form.getDeliveryDate().isEmpty()) {
+			try {
+				java.time.LocalDate deliveryDate = java.time.LocalDate.parse(form.getDeliveryDate());
+				java.time.LocalDate today = java.time.LocalDate.now();
+				java.time.LocalDate minDate = today.plusDays(3);
+				java.time.LocalDate maxDate = today.plusDays(14);
+
+				if (deliveryDate.isBefore(minDate) || deliveryDate.isAfter(maxDate)) {
+					result.rejectValue("deliveryDate", "orderForm.deliveryDate.invalid");
+				}
+			} catch (java.time.format.DateTimeParseException e) {
+				result.rejectValue("deliveryDate", "orderForm.deliveryDate.invalid");
+			}
+		}
+
 		if (result.hasErrors()) {
 			clearInvalidAddressFields(form, result);
 			session.setAttribute(ORDER_FORM, form);
@@ -463,6 +479,10 @@ public class ClientOrderRegistController {
 		order.setPhoneNumber(orderForm.getPhoneNumber());
 		order.setPayMethod(orderForm.getPayMethod());
 
+		if (orderForm.getDeliveryDate() != null && !orderForm.getDeliveryDate().isEmpty()) {
+			order.setDeliveryDate(java.sql.Date.valueOf(orderForm.getDeliveryDate()));
+		}
+
 		// 注文者の会員情報をOrderへ紐付ける。
 		// ここでは会員IDだけを持つUser Entityを作成して設定している。
 		// これにより、ordersテーブルのuser_idに該当会員のIDが登録される。
@@ -489,6 +509,9 @@ public class ClientOrderRegistController {
 		}
 		if (invalidFields.contains("phoneNumber")) {
 			form.setPhoneNumber("");
+		}
+		if (invalidFields.contains("deliveryDate")) {
+			form.setDeliveryDate("");
 		}
 	}
 

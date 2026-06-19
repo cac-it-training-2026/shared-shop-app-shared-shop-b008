@@ -67,6 +67,12 @@ public class Order {
 	private Date insertDate;
 
 	/**
+	 * 配送希望日
+	 */
+	@Column
+	private Date deliveryDate;
+
+	/**
 	 * 会員情報
 	 */
 	@ManyToOne
@@ -189,6 +195,22 @@ public class Order {
 	 */
 	public void setInsertDate(Date insertDate) {
 		this.insertDate = insertDate;
+	}
+
+	/**
+	 * 配送希望日の取得
+	 * @return 配送希望日
+	 */
+	public Date getDeliveryDate() {
+		return deliveryDate;
+	}
+
+	/**
+	 * 配送希望日のセット
+	 * @param deliveryDate 配送希望日
+	 */
+	public void setDeliveryDate(Date deliveryDate) {
+		this.deliveryDate = deliveryDate;
 	}
 
 	/**

@@ -57,6 +57,11 @@ public class OrderForm implements Serializable {
 	private Integer payMethod;
 
 	/**
+	 * 配送希望日
+	 */
+	private String deliveryDate;
+
+	/**
 	 * 注文するユーザIDの取得
 	 * @return 注文するユーザID
 	 */
@@ -152,5 +157,20 @@ public class OrderForm implements Serializable {
 		this.payMethod = payMethod;
 	}
 
+	/**
+	 * 配送希望日の取得
+	 * @return 配送希望日
+	 */
+	public String getDeliveryDate() {
+		return deliveryDate;
+	}
+
+	/**
+	 * 配送希望日のセット
+	 * @param deliveryDate 配送希望日
+	 */
+	public void setDeliveryDate(String deliveryDate) {
+		this.deliveryDate = deliveryDate;
+	}
 
 }
