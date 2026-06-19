@@ -26,6 +26,15 @@
 				</select> <input type="submit" th:value="#{select}" />
 			</form>
 		</div>
+		<!-- 最近見た商品 -->
+		<th:block th:if="${not #lists.isEmpty(recentlyViewedItems)}">
+			<h2 class="title" th:text="#{recently.viewed.items}"></h2>
+			<ul class="menu">
+				<li th:each="rvItem : ${recentlyViewedItems}">
+					<a th:href="@{/client/item/detail/{id}(id=${rvItem.id})}" th:text="${rvItem.name}"></a>
+				</li>
+			</ul>
+		</th:block>
 	</div>
 
 	<!--/* メニュー(運用管理者、及びシステム管理者用) */-->

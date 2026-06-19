@@ -1,9 +1,11 @@
 package jp.co.sss.shop.controller.client.item;
 
 import java.net.URI;
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,10 +14,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jp.co.sss.shop.bean.ItemBean;
+import jp.co.sss.shop.bean.UserBean;
 import jp.co.sss.shop.entity.Item;
+import jp.co.sss.shop.entity.User;
+import jp.co.sss.shop.entity.ViewHistory;
 import jp.co.sss.shop.repository.CategoryRepository;
 import jp.co.sss.shop.repository.ItemRepository;
+import jp.co.sss.shop.repository.ViewHistoryRepository;
 import jp.co.sss.shop.service.BeanTools;
 import jp.co.sss.shop.util.Constant;
 
@@ -195,19 +202,50 @@ public class ClientItemShowController {
 	}
 
 	/**
+	 * 閲覧履歴情報
+	 */
+	@Autowired
+	ViewHistoryRepository viewHistoryRepository;
+
+	/**
 	 * 詳細表示処理
 	 *
 	 * @param id      表示対象ID
+	 * @param session セッション
 	 * @param model   Viewとの値受渡し
 	 * @return "client/item/detail" 詳細画面 表示
 	 */
 	@RequestMapping(path = "/client/item/detail/{id}")
-	public String showItem(@PathVariable int id, Model model) {
+	public String showItem(@PathVariable int id, HttpSession session, Model model) {
 
 		// 商品IDに該当する商品情報を取得する
 		Item item = itemRepository.findByIdAndDeleteFlag(id, Constant.NOT_DELETED);
 		if (item == null) {
 			return "redirect:/syserror";
+		}
+
+		// ログイン済みの場合、閲覧履歴を保存
+		UserBean userBean = (UserBean) session.getAttribute("user");
+		if (userBean != null) {
+			User user = new User();
+			user.setId(userBean.getId());
+
+			// 既にある場合は更新、ない場合は新規登録
+			ViewHistory viewHistory = viewHistoryRepository.findByUserAndItem(user, item);
+			if (viewHistory == null) {
+				viewHistory = new ViewHistory();
+				viewHistory.setUser(user);
+				viewHistory.setItem(item);
+			} else {
+				// 更新のために現在日時をセット
+				viewHistory.setViewDate(new Timestamp(System.currentTimeMillis()));
+			}
+			viewHistoryRepository.save(viewHistory);
+
+			// 最近見た商品を取得（自分自身を除外して最大5件）
+			List<Item> recentlyViewedItems = viewHistoryRepository.findItemsByUser(user, item, PageRequest.of(0, 5));
+			List<ItemBean> recentlyViewedItemBeans = beanTools.copyEntityListToItemBeanList(recentlyViewedItems);
+			model.addAttribute("recentlyViewedItems", recentlyViewedItemBeans);
 		}
 
 		// Itemエンティティの各フィールドの値をItemBeanにコピー
