@@ -86,13 +86,13 @@ public class User {
 	 * ログイン失敗回数
 	 */
 	@Column(name = "login_failure_count")
-	private Integer loginFailureCount;
+	private Integer loginFailureCount = 0;
 
 	/**
-	 * ロック解除日時
+	 * ロック解除時刻
 	 */
-	@Column(name = "lock_until")
-	private Timestamp lockUntil;
+	@Column(name = "lock_release_time")
+	private Timestamp lockReleaseTime;
 
 	/**
 	 * 会員IDの取得
@@ -271,18 +271,18 @@ public class User {
 	}
 
 	/**
-	 * ロック解除日時の取得
-	 * @return ロック解除日時
+	 * ロック解除時刻の取得
+	 * @return ロック解除時刻
 	 */
-	public Timestamp getLockUntil() {
-		return lockUntil;
+	public Timestamp getLockReleaseTime() {
+		return lockReleaseTime;
 	}
 
 	/**
-	 * ロック解除日時のセット
-	 * @param lockUntil ロック解除日時
+	 * ロック解除時刻のセット
+	 * @param lockReleaseTime ロック解除時刻
 	 */
-	public void setLockUntil(Timestamp lockUntil) {
-		this.lockUntil = lockUntil;
+	public void setLockReleaseTime(Timestamp lockReleaseTime) {
+		this.lockReleaseTime = lockReleaseTime;
 	}
 }

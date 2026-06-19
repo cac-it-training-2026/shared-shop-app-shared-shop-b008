@@ -63,14 +63,14 @@ class LoginValidatorTest {
 		user.setEmail("test@example.com");
 		user.setPassword("password");
 		user.setLoginFailureCount(3);
-		user.setLockUntil(null);
+		user.setLockReleaseTime(null);
 
 		when(userRepository.findByEmailAndDeleteFlag("test@example.com", Constant.NOT_DELETED)).thenReturn(user);
 
 		assertTrue(validator.isValid(form, context));
 
 		assertEquals(0, user.getLoginFailureCount());
-		assertNull(user.getLockUntil());
+		assertNull(user.getLockReleaseTime());
 		verify(userRepository).save(user);
 	}
 
@@ -84,7 +84,7 @@ class LoginValidatorTest {
 		user.setEmail("test@example.com");
 		user.setPassword("password");
 		user.setLoginFailureCount(0);
-		user.setLockUntil(null);
+		user.setLockReleaseTime(null);
 
 		when(userRepository.findByEmailAndDeleteFlag("test@example.com", Constant.NOT_DELETED)).thenReturn(user);
 
@@ -104,14 +104,14 @@ class LoginValidatorTest {
 		user.setEmail("test@example.com");
 		user.setPassword("password");
 		user.setLoginFailureCount(4);
-		user.setLockUntil(null);
+		user.setLockReleaseTime(null);
 
 		when(userRepository.findByEmailAndDeleteFlag("test@example.com", Constant.NOT_DELETED)).thenReturn(user);
 
 		assertFalse(validator.isValid(form, context));
 
 		assertEquals(5, user.getLoginFailureCount());
-		assertTrue(user.getLockUntil().after(new Timestamp(System.currentTimeMillis())));
+		assertTrue(user.getLockReleaseTime().after(new Timestamp(System.currentTimeMillis())));
 		verify(userRepository).save(user);
 	}
 
@@ -125,7 +125,7 @@ class LoginValidatorTest {
 		user.setEmail("test@example.com");
 		user.setPassword("password");
 		user.setLoginFailureCount(5);
-		user.setLockUntil(new Timestamp(System.currentTimeMillis() + 30 * 60 * 1000));
+		user.setLockReleaseTime(new Timestamp(System.currentTimeMillis() + 30 * 60 * 1000));
 
 		when(userRepository.findByEmailAndDeleteFlag("test@example.com", Constant.NOT_DELETED)).thenReturn(user);
 
@@ -148,14 +148,14 @@ class LoginValidatorTest {
 		user.setEmail("test@example.com");
 		user.setPassword("password");
 		user.setLoginFailureCount(5);
-		user.setLockUntil(new Timestamp(System.currentTimeMillis() - 60 * 1000));
+		user.setLockReleaseTime(new Timestamp(System.currentTimeMillis() - 60 * 1000));
 
 		when(userRepository.findByEmailAndDeleteFlag("test@example.com", Constant.NOT_DELETED)).thenReturn(user);
 
 		assertTrue(validator.isValid(form, context));
 
 		assertEquals(0, user.getLoginFailureCount());
-		assertNull(user.getLockUntil());
+		assertNull(user.getLockReleaseTime());
 		ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
 		verify(userRepository, atLeastOnce()).save(captor.capture());
 	}

@@ -46,18 +46,18 @@ public class LoginValidator implements ConstraintValidator<LoginCheck, Object> {
 
 		if (user != null) {
 			Timestamp now = new Timestamp(System.currentTimeMillis());
-			Timestamp lockUntil = user.getLockUntil();
+			Timestamp lockReleaseTime = user.getLockReleaseTime();
 
 			// ロック解除判定
-			if (lockUntil != null && now.after(lockUntil)) {
+			if (lockReleaseTime != null && now.after(lockReleaseTime)) {
 				user.setLoginFailureCount(0);
-				user.setLockUntil(null);
+				user.setLockReleaseTime(null);
 				userRepository.save(user);
-				lockUntil = null;
+				lockReleaseTime = null;
 			}
 
 			// ロック中判定
-			if (lockUntil != null) {
+			if (lockReleaseTime != null) {
 				context.disableDefaultConstraintViolation();
 				context.buildConstraintViolationWithTemplate("{login.locked.message}").addConstraintViolation();
 				return false;
@@ -74,9 +74,9 @@ public class LoginValidator implements ConstraintValidator<LoginCheck, Object> {
 				// セッションスコープにログインしたユーザの情報を登録
 				session.setAttribute("user", userBean);
 
-				// 失敗回数とロック解除日時をリセット
+				// 失敗回数とロック解除時刻をリセット
 				user.setLoginFailureCount(0);
-				user.setLockUntil(null);
+				user.setLockReleaseTime(null);
 				userRepository.save(user);
 
 				return true;
@@ -89,7 +89,7 @@ public class LoginValidator implements ConstraintValidator<LoginCheck, Object> {
 				if (failureCount >= Constant.MAX_LOGIN_FAILURE) {
 					// ロック時間を設定
 					long lockTimeMillis = System.currentTimeMillis() + (Constant.LOCK_DURATION_MINUTES * 60 * 1000);
-					user.setLockUntil(new Timestamp(lockTimeMillis));
+					user.setLockReleaseTime(new Timestamp(lockTimeMillis));
 				}
 				userRepository.save(user);
 
