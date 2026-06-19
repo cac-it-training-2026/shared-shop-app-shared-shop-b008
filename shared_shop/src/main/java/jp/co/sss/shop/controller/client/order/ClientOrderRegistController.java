@@ -57,7 +57,7 @@ public class ClientOrderRegistController {
 	private static final String ORDER_FORM = "orderForm";
 
 	private static final String[] ORDER_FORM_FIELD_ORDER = {
-			"postalCode", "address", "name", "phoneNumber"
+			"postalCode", "address", "name", "phoneNumber", "deliveryDate"
 	};
 
 	/**
@@ -225,17 +225,13 @@ public class ClientOrderRegistController {
 		}
 
 		// 配送希望日のバリデーション
-		if (form.getDeliveryDate() != null && !form.getDeliveryDate().isEmpty()) {
-			try {
-				java.time.LocalDate deliveryDate = java.time.LocalDate.parse(form.getDeliveryDate());
-				java.time.LocalDate today = java.time.LocalDate.now();
-				java.time.LocalDate minDate = today.plusDays(3);
-				java.time.LocalDate maxDate = today.plusDays(14);
+		if (form.getDeliveryDate() != null) {
+			java.time.LocalDate deliveryDate = form.getDeliveryDate().toLocalDate();
+			java.time.LocalDate today = java.time.LocalDate.now();
+			java.time.LocalDate minDate = today.plusDays(3);
+			java.time.LocalDate maxDate = today.plusDays(14);
 
-				if (deliveryDate.isBefore(minDate) || deliveryDate.isAfter(maxDate)) {
-					result.rejectValue("deliveryDate", "orderForm.deliveryDate.invalid");
-				}
-			} catch (java.time.format.DateTimeParseException e) {
+			if (deliveryDate.isBefore(minDate) || deliveryDate.isAfter(maxDate)) {
 				result.rejectValue("deliveryDate", "orderForm.deliveryDate.invalid");
 			}
 		}
@@ -480,10 +476,7 @@ public class ClientOrderRegistController {
 		order.setName(orderForm.getName());
 		order.setPhoneNumber(orderForm.getPhoneNumber());
 		order.setPayMethod(orderForm.getPayMethod());
-
-		if (orderForm.getDeliveryDate() != null && !orderForm.getDeliveryDate().isEmpty()) {
-			order.setDeliveryDate(java.sql.Date.valueOf(orderForm.getDeliveryDate()));
-		}
+		order.setDeliveryDate(orderForm.getDeliveryDate());
 
 		// 注文者の会員情報をOrderへ紐付ける。
 		// ここでは会員IDだけを持つUser Entityを作成して設定している。
@@ -504,7 +497,7 @@ public class ClientOrderRegistController {
 			form.setPhoneNumber("");
 		}
 		if (invalidFields.contains("deliveryDate")) {
-			form.setDeliveryDate("");
+			form.setDeliveryDate(null);
 		}
 	}
 

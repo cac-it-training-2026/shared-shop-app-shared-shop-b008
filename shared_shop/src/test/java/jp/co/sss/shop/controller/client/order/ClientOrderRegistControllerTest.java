@@ -1,9 +1,13 @@
 package jp.co.sss.shop.controller.client.order;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +29,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
 
 class ClientOrderRegistControllerTest {
 
@@ -90,5 +96,74 @@ class ClientOrderRegistControllerTest {
         verify(orderRepository).save(any(Order.class));
         verify(orderItemRepository).save(any());
         verify(itemRepository).save(any(Item.class));
+    }
+
+    @Test
+    void addressInputCheck_DeliveryDate_RangeError_Before() {
+        OrderForm lastForm = new OrderForm();
+        session.setAttribute("orderForm", lastForm);
+
+        OrderForm form = new OrderForm();
+        LocalDate today = LocalDate.now();
+        form.setDeliveryDate(Date.valueOf(today.plusDays(2))); // 2 days later (invalid)
+
+        BindingResult result = new BeanPropertyBindingResult(form, "orderForm");
+
+        String view = controller.addressInputCheck(form, result);
+
+        assertEquals("redirect:/client/order/address/input", view);
+        assertTrue(result.hasFieldErrors("deliveryDate"));
+        assertEquals("orderForm.deliveryDate.invalid", result.getFieldError("deliveryDate").getCode());
+    }
+
+    @Test
+    void addressInputCheck_DeliveryDate_RangeError_After() {
+        OrderForm lastForm = new OrderForm();
+        session.setAttribute("orderForm", lastForm);
+
+        OrderForm form = new OrderForm();
+        LocalDate today = LocalDate.now();
+        form.setDeliveryDate(Date.valueOf(today.plusDays(15))); // 15 days later (invalid)
+
+        BindingResult result = new BeanPropertyBindingResult(form, "orderForm");
+
+        String view = controller.addressInputCheck(form, result);
+
+        assertEquals("redirect:/client/order/address/input", view);
+        assertTrue(result.hasFieldErrors("deliveryDate"));
+        assertEquals("orderForm.deliveryDate.invalid", result.getFieldError("deliveryDate").getCode());
+    }
+
+    @Test
+    void addressInputCheck_DeliveryDate_Valid() {
+        OrderForm lastForm = new OrderForm();
+        session.setAttribute("orderForm", lastForm);
+
+        OrderForm form = new OrderForm();
+        LocalDate today = LocalDate.now();
+        form.setDeliveryDate(Date.valueOf(today.plusDays(3))); // 3 days later (valid)
+
+        BindingResult result = new BeanPropertyBindingResult(form, "orderForm");
+
+        String view = controller.addressInputCheck(form, result);
+
+        assertEquals("redirect:/client/order/payment/input", view);
+        assertNull(result.getFieldError("deliveryDate"));
+    }
+
+    @Test
+    void addressInputCheck_DeliveryDate_Null_Valid() {
+        OrderForm lastForm = new OrderForm();
+        session.setAttribute("orderForm", lastForm);
+
+        OrderForm form = new OrderForm();
+        form.setDeliveryDate(null); // Not specified (valid)
+
+        BindingResult result = new BeanPropertyBindingResult(form, "orderForm");
+
+        String view = controller.addressInputCheck(form, result);
+
+        assertEquals("redirect:/client/order/payment/input", view);
+        assertNull(result.getFieldError("deliveryDate"));
     }
 }
