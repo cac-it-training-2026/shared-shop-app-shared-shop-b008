@@ -2,7 +2,6 @@ package jp.co.sss.shop.controller.client.item;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
@@ -21,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
@@ -102,9 +102,35 @@ when(beanTools.copyEntityListToItemBeanList(Collections.emptyList())).thenReturn
 String view = controller.showItem(1, session, model);
 
 assertEquals("client/item/detail", view);
-assertNull(model.getAttribute("recentlyViewedItems"));
+assertEquals(Collections.emptyList(), model.getAttribute("recentlyViewedItems"));
 assertEquals(Collections.emptyList(), model.getAttribute("relatedItems"));
 verify(viewHistoryRepository, never()).save(any(ViewHistory.class));
+}
+
+@Test
+void showItemDisplaysRecommendationsWhenViewHistoryFails() {
+Item item = createItem(1, 3);
+Item relatedItem = createItem(2, 3);
+List<Item> relatedItems = List.of(relatedItem);
+List<ItemBean> relatedItemBeans = List.of(new ItemBean());
+
+UserBean loginUser = new UserBean();
+loginUser.setId(10);
+session.setAttribute("user", loginUser);
+
+when(itemRepository.findByIdAndDeleteFlag(1, Constant.NOT_DELETED)).thenReturn(item);
+when(itemRepository.findRelatedItems(3, 1, Constant.NOT_DELETED, PageRequest.of(0, 4)))
+.thenReturn(relatedItems);
+when(beanTools.copyEntityToItemBean(item)).thenReturn(new ItemBean());
+when(beanTools.copyEntityListToItemBeanList(relatedItems)).thenReturn(relatedItemBeans);
+when(viewHistoryRepository.findByUserAndItem(any(User.class), eq(item)))
+.thenThrow(new DataRetrievalFailureException("view_histories is unavailable"));
+
+String view = controller.showItem(1, session, model);
+
+assertEquals("client/item/detail", view);
+assertEquals(relatedItemBeans, model.getAttribute("relatedItems"));
+assertEquals(Collections.emptyList(), model.getAttribute("recentlyViewedItems"));
 }
 
 @Test
