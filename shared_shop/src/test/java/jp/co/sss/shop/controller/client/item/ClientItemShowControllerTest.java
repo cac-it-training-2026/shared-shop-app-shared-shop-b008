@@ -2,6 +2,7 @@ package jp.co.sss.shop.controller.client.item;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
@@ -101,7 +102,7 @@ when(beanTools.copyEntityListToItemBeanList(Collections.emptyList())).thenReturn
 String view = controller.showItem(1, session, model);
 
 assertEquals("client/item/detail", view);
-assertEquals(null, model.getAttribute("recentlyViewedItems"));
+assertNull(model.getAttribute("recentlyViewedItems"));
 assertEquals(Collections.emptyList(), model.getAttribute("relatedItems"));
 verify(viewHistoryRepository, never()).save(any(ViewHistory.class));
 }
