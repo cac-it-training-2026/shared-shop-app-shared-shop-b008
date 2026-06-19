@@ -137,7 +137,8 @@ p {
 	overflow: hidden;
 }
 
-.main>.item_list{
+.main>.item_list,
+.item_list {
 	display: flex;
 	flex-wrap: wrap;
 }

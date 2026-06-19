@@ -69,6 +69,19 @@
 			</article>
 		</div>
 	</section>
+	<!-- 最近見た商品 -->
+	<th:block th:if="${not #lists.isEmpty(recentlyViewedItems)}">
+		<h2 class="title">最近見た商品</h2>
+		<div class="item_list">
+			<div class="item" th:each="rvItem : ${recentlyViewedItems}">
+				<a th:href="@{/client/item/detail/{id}(id=${rvItem.id})}">
+					<img th:if="${rvItem.image != null}" th:src="@{/images/{image}(image=${rvItem.image})}" />
+					<img th:if="${rvItem.image == null}" th:src="@{/images/common/no_image.jpg}" />
+					<span class="item_name" th:text="${rvItem.name}"></span>
+				</a>
+			</div>
+		</div>
+	</th:block>
 
 </body>
 
