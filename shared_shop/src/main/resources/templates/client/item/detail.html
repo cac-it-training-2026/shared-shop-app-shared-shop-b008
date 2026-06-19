@@ -70,7 +70,7 @@
 		</div>
 	</section>
 	<!-- 最近見た商品 -->
-	<th:block th:if="${not #lists.isEmpty(recentlyViewedItems)}">
+	<th:block th:if="${recentlyViewedItems != null and not #lists.isEmpty(recentlyViewedItems)}">
 		<h2 class="title">最近見た商品</h2>
 		<div class="item_list">
 			<div class="item" th:each="rvItem : ${recentlyViewedItems}">

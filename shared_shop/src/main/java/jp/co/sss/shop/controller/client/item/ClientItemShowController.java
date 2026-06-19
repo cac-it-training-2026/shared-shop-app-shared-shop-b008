@@ -2,9 +2,13 @@ package jp.co.sss.shop.controller.client.item;
 
 import java.net.URI;
 import java.sql.Timestamp;
+import java.util.Collections;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,6 +37,8 @@ import jp.co.sss.shop.util.Constant;
  */
 @Controller
 public class ClientItemShowController {
+	private static final Logger logger = LoggerFactory.getLogger(ClientItemShowController.class);
+
 	/**
 	 * 新着順
 	 */
@@ -229,44 +235,50 @@ public class ClientItemShowController {
 			return "redirect:/syserror";
 		}
 
-		// ログイン済みの場合、閲覧履歴を保存
-		UserBean userBean = (UserBean) session.getAttribute("user");
-		if (userBean != null) {
-			User user = new User();
-			user.setId(userBean.getId());
-
-			// 既にある場合は更新、ない場合は新規登録
-			ViewHistory viewHistory = viewHistoryRepository.findByUserAndItem(user, item);
-			if (viewHistory == null) {
-				viewHistory = new ViewHistory();
-				viewHistory.setUser(user);
-				viewHistory.setItem(item);
-			} else {
-				// 更新のために現在日時をセット
-				viewHistory.setViewDate(new Timestamp(System.currentTimeMillis()));
-			}
-			viewHistoryRepository.save(viewHistory);
-
-			// 最近見た商品を取得（自分自身を除外して最大4件）
-			List<Item> recentlyViewedItems = viewHistoryRepository.findItemsByUser(user, item, PageRequest.of(0, 4));
-			List<ItemBean> recentlyViewedItemBeans = beanTools.copyEntityListToItemBeanList(recentlyViewedItems);
-			model.addAttribute("recentlyViewedItems", recentlyViewedItemBeans);
-		}
-
-		// Itemエンティティの各フィールドの値をItemBeanにコピー
+		// 商品情報と関連商品を先にModelへ格納し、閲覧履歴処理と責務を分離する
 		ItemBean itemBean = beanTools.copyEntityToItemBean(item);
-
-		// 同一カテゴリの関連商品を、累計注文数量の多い順に最大4件取得する
 		List<Item> relatedItemList = itemRepository.findRelatedItems(
 				item.getCategory().getId(),
 				item.getId(),
 				Constant.NOT_DELETED,
 				PageRequest.of(0, RELATED_ITEM_LIMIT));
 		List<ItemBean> relatedItemBeanList = beanTools.copyEntityListToItemBeanList(relatedItemList);
-
-		// 商品情報をViewへ渡す
 		model.addAttribute("item", itemBean);
 		model.addAttribute("relatedItems", relatedItemBeanList);
+		model.addAttribute("recentlyViewedItems", Collections.emptyList());
+
+		// ログイン済みの場合、閲覧履歴を保存
+		UserBean userBean = (UserBean) session.getAttribute("user");
+		if (userBean != null) {
+			try {
+				User user = new User();
+				user.setId(userBean.getId());
+
+				// 既にある場合は更新、ない場合は新規登録
+				ViewHistory viewHistory = viewHistoryRepository.findByUserAndItem(user, item);
+				if (viewHistory == null) {
+					viewHistory = new ViewHistory();
+					viewHistory.setUser(user);
+					viewHistory.setItem(item);
+				} else {
+					// 更新のために現在日時をセット
+					viewHistory.setViewDate(new Timestamp(System.currentTimeMillis()));
+				}
+				viewHistoryRepository.save(viewHistory);
+
+				// 最近見た商品を取得（自分自身を除外して最大4件）
+				List<Item> recentlyViewedItems = viewHistoryRepository.findItemsByUser(
+						user,
+						item,
+						PageRequest.of(0, 4));
+				List<ItemBean> recentlyViewedItemBeans = beanTools
+						.copyEntityListToItemBeanList(recentlyViewedItems);
+				model.addAttribute("recentlyViewedItems", recentlyViewedItemBeans);
+			} catch (DataAccessException e) {
+				// 閲覧履歴の障害で商品詳細と関連商品まで表示不能にしない
+				logger.error("閲覧履歴処理に失敗しました。商品ID: {}", item.getId(), e);
+			}
+		}
 
 		return "client/item/detail";
 	}
