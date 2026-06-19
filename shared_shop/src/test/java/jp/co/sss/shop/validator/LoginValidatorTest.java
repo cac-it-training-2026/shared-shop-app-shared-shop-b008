@@ -10,7 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -111,7 +111,7 @@ class LoginValidatorTest {
 		assertFalse(validator.isValid(form, context));
 
 		assertEquals(5, user.getLoginFailureCount());
-		assertTrue(user.getLockUntil().isAfter(LocalDateTime.now()));
+		assertTrue(user.getLockUntil().after(new Timestamp(System.currentTimeMillis())));
 		verify(userRepository).save(user);
 	}
 
@@ -125,7 +125,7 @@ class LoginValidatorTest {
 		user.setEmail("test@example.com");
 		user.setPassword("password");
 		user.setLoginFailureCount(5);
-		user.setLockUntil(LocalDateTime.now().plusMinutes(30));
+		user.setLockUntil(new Timestamp(System.currentTimeMillis() + 30 * 60 * 1000));
 
 		when(userRepository.findByEmailAndDeleteFlag("test@example.com", Constant.NOT_DELETED)).thenReturn(user);
 
@@ -148,7 +148,7 @@ class LoginValidatorTest {
 		user.setEmail("test@example.com");
 		user.setPassword("password");
 		user.setLoginFailureCount(5);
-		user.setLockUntil(LocalDateTime.now().minusMinutes(1));
+		user.setLockUntil(new Timestamp(System.currentTimeMillis() - 60 * 1000));
 
 		when(userRepository.findByEmailAndDeleteFlag("test@example.com", Constant.NOT_DELETED)).thenReturn(user);
 

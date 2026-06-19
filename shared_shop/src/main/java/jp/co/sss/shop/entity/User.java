@@ -1,7 +1,7 @@
 package jp.co.sss.shop.entity;
 
 import java.sql.Date;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -92,7 +92,7 @@ public class User {
 	 * ロック解除日時
 	 */
 	@Column(name = "lock_until")
-	private LocalDateTime lockUntil;
+	private Timestamp lockUntil;
 
 	/**
 	 * 会員IDの取得
@@ -274,7 +274,7 @@ public class User {
 	 * ロック解除日時の取得
 	 * @return ロック解除日時
 	 */
-	public LocalDateTime getLockUntil() {
+	public Timestamp getLockUntil() {
 		return lockUntil;
 	}
 
@@ -282,7 +282,7 @@ public class User {
 	 * ロック解除日時のセット
 	 * @param lockUntil ロック解除日時
 	 */
-	public void setLockUntil(LocalDateTime lockUntil) {
+	public void setLockUntil(Timestamp lockUntil) {
 		this.lockUntil = lockUntil;
 	}
 }

@@ -1,6 +1,6 @@
 package jp.co.sss.shop.validator;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
@@ -45,11 +45,11 @@ public class LoginValidator implements ConstraintValidator<LoginCheck, Object> {
 		User user = userRepository.findByEmailAndDeleteFlag(emailProp, Constant.NOT_DELETED);
 
 		if (user != null) {
-			LocalDateTime now = LocalDateTime.now();
-			LocalDateTime lockUntil = user.getLockUntil();
+			Timestamp now = new Timestamp(System.currentTimeMillis());
+			Timestamp lockUntil = user.getLockUntil();
 
 			// ロック解除判定
-			if (lockUntil != null && now.isAfter(lockUntil)) {
+			if (lockUntil != null && now.after(lockUntil)) {
 				user.setLoginFailureCount(0);
 				user.setLockUntil(null);
 				userRepository.save(user);
@@ -88,7 +88,8 @@ public class LoginValidator implements ConstraintValidator<LoginCheck, Object> {
 
 				if (failureCount >= Constant.MAX_LOGIN_FAILURE) {
 					// ロック時間を設定
-					user.setLockUntil(now.plusMinutes(Constant.LOCK_DURATION_MINUTES));
+					long lockTimeMillis = System.currentTimeMillis() + (Constant.LOCK_DURATION_MINUTES * 60 * 1000);
+					user.setLockUntil(new Timestamp(lockTimeMillis));
 				}
 				userRepository.save(user);
 

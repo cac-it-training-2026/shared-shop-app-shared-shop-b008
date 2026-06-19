@@ -1,5 +1,5 @@
 -- Issue #2: ログイン失敗時のアカウントロック機能に伴うテーブル変更
--- usersテーブルにログイン失敗回数とロック解除時刻を追加
+-- usersテーブルにログイン失敗回数とロック解除日時を追加
 
 ALTER TABLE users ADD (
     login_failure_count NUMBER(10) DEFAULT 0,
