@@ -44,7 +44,7 @@
 			</tr>
 			<tr>
 				<th>[[#{data.delivery.date}]]</th>
-				<td th:text="${order.deliveryDate != null && order.deliveryDate != ''} ? ${order.deliveryDate} : #{data.delivery.date.none}"></td>
+				<td th:text="${order.deliveryDate != null} ? ${order.deliveryDate} : #{data.delivery.date.none}"></td>
 			</tr>
 		</table>
 		<table class="list_table detail">
