@@ -25,6 +25,7 @@ import jp.co.sss.shop.entity.Item;
 import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.entity.ViewHistory;
 import jp.co.sss.shop.repository.CategoryRepository;
+import jp.co.sss.shop.repository.FavoriteRepository;
 import jp.co.sss.shop.repository.ItemRepository;
 import jp.co.sss.shop.repository.ViewHistoryRepository;
 import jp.co.sss.shop.service.BeanTools;
@@ -219,6 +220,12 @@ public class ClientItemShowController {
 	ViewHistoryRepository viewHistoryRepository;
 
 	/**
+	 * お気に入り情報
+	 */
+	@Autowired
+	FavoriteRepository favoriteRepository;
+
+	/**
 	 * 詳細表示処理
 	 *
 	 * @param id      表示対象ID
@@ -246,10 +253,15 @@ public class ClientItemShowController {
 		model.addAttribute("item", itemBean);
 		model.addAttribute("relatedItems", relatedItemBeanList);
 		model.addAttribute("recentlyViewedItems", Collections.emptyList());
+		model.addAttribute("isFavorite", false);
 
 		// ログイン済みの場合、閲覧履歴を保存
 		UserBean userBean = (UserBean) session.getAttribute("user");
 		if (userBean != null) {
+			// お気に入り状態の判定
+			boolean isFavorite = favoriteRepository.existsByUserIdAndItemId(userBean.getId(), id);
+			model.addAttribute("isFavorite", isFavorite);
+
 			try {
 				User user = new User();
 				user.setId(userBean.getId());
