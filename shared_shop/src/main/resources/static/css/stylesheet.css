@@ -717,3 +717,23 @@ p.link_center {
 }
 
 
+
+/* ---- ログイン履歴(会員詳細画面) ---- */
+.login_history_title {
+	margin-top: 32px !important; /* ボタン群との余白(24px～32px) */
+	margin-left: -50px;           /* 親要素(.info_form_area)の余白を打ち消してメインタイトルと揃える */
+}
+
+.login_history_area {
+	margin-left: 50px; /* 会員情報の詳細エリア(detail_area)と左端位置を揃える */
+	width: 70%;       /* 会員情報の詳細エリアと幅を揃える */
+}
+
+.login_history_list {
+	margin-top: 10px !important; /* 見出しとの余白を調整 */
+}
+
+.all_show_link {
+	text-align: right;
+	margin-top: 10px;
+}
