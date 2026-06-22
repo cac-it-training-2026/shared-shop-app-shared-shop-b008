@@ -13,13 +13,17 @@ import java.util.List;
 
 import jakarta.servlet.http.HttpSession;
 import jp.co.sss.shop.bean.BasketBean;
+import jp.co.sss.shop.bean.UserBean;
+import jp.co.sss.shop.entity.CouponType;
 import jp.co.sss.shop.entity.Item;
 import jp.co.sss.shop.entity.Order;
+import jp.co.sss.shop.entity.UserCoupon;
 import jp.co.sss.shop.form.OrderForm;
 import jp.co.sss.shop.repository.ItemRepository;
 import jp.co.sss.shop.repository.OrderItemRepository;
 import jp.co.sss.shop.repository.OrderRepository;
 import jp.co.sss.shop.repository.UserRepository;
+import jp.co.sss.shop.repository.UserCouponRepository;
 import jp.co.sss.shop.service.BeanTools;
 import jp.co.sss.shop.service.PriceCalc;
 import jp.co.sss.shop.util.Constant;
@@ -50,6 +54,9 @@ class ClientOrderRegistControllerTest {
     private UserRepository userRepository;
 
     @Mock
+    private UserCouponRepository userCouponRepository;
+
+    @Mock
     private BeanTools beanTools;
 
     @Mock
@@ -75,6 +82,10 @@ class ClientOrderRegistControllerTest {
         orderForm.setPayMethod(1);
         session.setAttribute("orderForm", orderForm);
 
+		UserBean loginUser = new UserBean();
+		loginUser.setId(1);
+		session.setAttribute("user", loginUser);
+
         List<BasketBean> basketBeans = new ArrayList<>();
         basketBeans.add(new BasketBean(1, "Test Item", 100, 1));
         session.setAttribute("basketBeans", basketBeans);
@@ -97,6 +108,72 @@ class ClientOrderRegistControllerTest {
         verify(orderItemRepository).save(any());
         verify(itemRepository).save(any(Item.class));
     }
+
+	@Test
+	void orderCheck_UsableCoupon_SavesDiscountSnapshot() {
+		OrderForm orderForm = new OrderForm();
+		orderForm.setId(1);
+		session.setAttribute("orderForm", orderForm);
+		UserBean loginUser = new UserBean();
+		loginUser.setId(1);
+		session.setAttribute("user", loginUser);
+
+		List<BasketBean> basketBeans = List.of(new BasketBean(1, "Test Item", 10, 2));
+		session.setAttribute("basketBeans", basketBeans);
+		Item item = new Item();
+		item.setId(1);
+		item.setPrice(500);
+		when(itemRepository.findByIdAndDeleteFlag(1, Constant.NOT_DELETED)).thenReturn(item);
+
+		CouponType type = new CouponType();
+		type.setName("10％割引クーポン");
+		type.setDiscountRate(10);
+		type.setMinimumOrderAmount(1000);
+		type.setActiveFlag(1);
+		UserCoupon coupon = new UserCoupon();
+		coupon.setId(9);
+		coupon.setCouponType(type);
+		coupon.setExpiresAt(java.sql.Timestamp.valueOf(java.time.LocalDateTime.now().plusDays(1)));
+		when(userCouponRepository.findAvailableByIdAndUserId(eq(9), eq(1), any())).thenReturn(coupon);
+
+		String view = controller.orderCheck(1, 9);
+
+		assertEquals("redirect:/client/order/check", view);
+		assertEquals(9, orderForm.getCouponId());
+		assertEquals(100, orderForm.getCouponDiscountAmount());
+		assertEquals("10％割引クーポン", orderForm.getCouponName());
+	}
+
+	@Test
+	void orderCheck_MinimumAmountNotMet_RejectsCoupon() {
+		OrderForm orderForm = new OrderForm();
+		orderForm.setId(1);
+		session.setAttribute("orderForm", orderForm);
+		UserBean loginUser = new UserBean();
+		loginUser.setId(1);
+		session.setAttribute("user", loginUser);
+		session.setAttribute("basketBeans", List.of(new BasketBean(1, "Test Item", 10, 1)));
+		Item item = new Item();
+		item.setId(1);
+		item.setPrice(999);
+		when(itemRepository.findByIdAndDeleteFlag(1, Constant.NOT_DELETED)).thenReturn(item);
+
+		CouponType type = new CouponType();
+		type.setDiscountRate(10);
+		type.setMinimumOrderAmount(1000);
+		type.setActiveFlag(1);
+		UserCoupon coupon = new UserCoupon();
+		coupon.setId(9);
+		coupon.setCouponType(type);
+		coupon.setExpiresAt(java.sql.Timestamp.valueOf(java.time.LocalDateTime.now().plusDays(1)));
+		when(userCouponRepository.findAvailableByIdAndUserId(eq(9), eq(1), any())).thenReturn(coupon);
+
+		String view = controller.orderCheck(1, 9);
+
+		assertEquals("redirect:/client/order/payment/input", view);
+		assertNull(orderForm.getCouponId());
+		assertEquals(0, orderForm.getCouponDiscountAmount());
+	}
 
     @Test
     void addressInputCheck_DeliveryDate_RangeError_Before() {

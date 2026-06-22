@@ -57,6 +57,15 @@ public class OrderBean {
 	 */
 	private String deliveryDate;
 
+	/** 注文時点のクーポン名称 */
+	private String couponName;
+
+	/** 注文時点のクーポン割引率 */
+	private Integer couponDiscountRate;
+
+	/** 注文時点のクーポン割引額 */
+	private Integer couponDiscountAmount;
+
 	/**
 	 * 注文IDの取得
 	 * @return 注文ID
@@ -215,6 +224,30 @@ public class OrderBean {
 	 */
 	public void setDeliveryDate(String deliveryDate) {
 		this.deliveryDate = deliveryDate;
+	}
+
+	public String getCouponName() {
+		return couponName;
+	}
+
+	public void setCouponName(String couponName) {
+		this.couponName = couponName;
+	}
+
+	public Integer getCouponDiscountRate() {
+		return couponDiscountRate;
+	}
+
+	public void setCouponDiscountRate(Integer couponDiscountRate) {
+		this.couponDiscountRate = couponDiscountRate;
+	}
+
+	public Integer getCouponDiscountAmount() {
+		return couponDiscountAmount;
+	}
+
+	public void setCouponDiscountAmount(Integer couponDiscountAmount) {
+		this.couponDiscountAmount = couponDiscountAmount;
 	}
 
 }

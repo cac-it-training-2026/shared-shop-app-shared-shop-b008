@@ -37,6 +37,9 @@
 		</div>
 
 		<div class="detail_button_area">
+			<form th:action="@{/client/coupon/list}" method="get">
+				<input type="submit" value="保有クーポン" class="coupon_button" />
+			</form>
 			<form th:action="@{/}" method="post">
 				<input type="submit" value="戻る" class="back_button" />
 			</form>

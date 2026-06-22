@@ -26,6 +26,10 @@
 				</select> <input type="submit" th:value="#{select}" />
 			</form>
 		</div>
+		<div class="coupon_sidebar" th:if="${session.user != null and session.user.authority == 2}">
+			<a th:href="@{/client/coupon/list}">マイクーポン</a>
+			<a th:href="@{/client/coupon/gacha}">クーポンガチャ</a>
+		</div>
 	</div>
 
 	<!--/* メニュー(運用管理者、及びシステム管理者用) */-->
