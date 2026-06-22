@@ -85,13 +85,13 @@ public class User {
 	/**
 	 * ログイン失敗回数
 	 */
-	@Column
-	private Integer loginFailureCount;
+	@Column(name = "login_failure_count")
+	private Integer loginFailureCount = 0;
 
 	/**
 	 * ロック解除時刻
 	 */
-	@Column
+	@Column(name = "lock_release_time")
 	private Timestamp lockReleaseTime;
 
 	/**

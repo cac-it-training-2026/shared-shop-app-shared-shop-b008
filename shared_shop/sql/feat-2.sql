@@ -2,7 +2,7 @@
 -- usersテーブルにログイン失敗回数とロック解除時刻を追加
 
 ALTER TABLE users ADD (
-    login_failure_count NUMBER(3) DEFAULT 0,
+    login_failure_count NUMBER(10) DEFAULT 0 NOT NULL,
     lock_release_time TIMESTAMP
 );
 
