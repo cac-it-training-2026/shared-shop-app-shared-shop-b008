@@ -666,6 +666,36 @@ select {
 	margin: 10px auto 20px;
 }
 
+/* ---- お気に入り一覧 ---- */
+.favorite_delete_area {
+	position: absolute;
+	bottom: 5px;
+	right: 5px;
+	z-index: 3;
+	text-align: right;
+	background: rgba(255, 255, 255, 0.8);
+	padding: 5px;
+	border-radius: 4px;
+}
+
+.favorite_delete_area .item_price {
+	font-size: 0.9em;
+	margin-bottom: 5px;
+}
+
+.favorite_delete_area .delete_button {
+	background-color: #f44336;
+	color: white;
+	border: none;
+	padding: 5px 10px;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.favorite_delete_area .delete_button:hover {
+	background-color: #d32f2f;
+}
+
 /* ---- 注文詳細 ---- */
 .list_table .total {
 	font-weight: bold;
