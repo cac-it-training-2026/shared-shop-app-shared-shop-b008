@@ -48,6 +48,16 @@ public class ItemBean {
 	private String categoryName;
 
 	/**
+	 * 平均評価
+	 */
+	private Double avgRating;
+
+	/**
+	 * レビュー件数
+	 */
+	private Long reviewCount;
+
+	/**
 	 * 商品ID取得
 	 * @return 商品ID
 	 */
@@ -173,6 +183,38 @@ public class ItemBean {
 	 */
 	public void setCategoryName(String categoryName) {
 		this.categoryName = categoryName;
+	}
+
+	/**
+	 * 平均評価を取得
+	 * @return 平均評価
+	 */
+	public Double getAvgRating() {
+		return avgRating;
+	}
+
+	/**
+	 * 平均評価をセット
+	 * @param avgRating 平均評価
+	 */
+	public void setAvgRating(Double avgRating) {
+		this.avgRating = avgRating;
+	}
+
+	/**
+	 * レビュー件数を取得
+	 * @return レビュー件数
+	 */
+	public Long getReviewCount() {
+		return reviewCount;
+	}
+
+	/**
+	 * レビュー件数をセット
+	 * @param reviewCount レビュー件数
+	 */
+	public void setReviewCount(Long reviewCount) {
+		this.reviewCount = reviewCount;
 	}
 
 }

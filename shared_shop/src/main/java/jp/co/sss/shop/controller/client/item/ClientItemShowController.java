@@ -22,6 +22,7 @@ import jakarta.servlet.http.HttpSession;
 import jp.co.sss.shop.bean.ItemBean;
 import jp.co.sss.shop.bean.UserBean;
 import jp.co.sss.shop.entity.Item;
+import jp.co.sss.shop.entity.Review;
 import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.entity.ViewHistory;
 import jp.co.sss.shop.repository.CategoryRepository;
@@ -92,6 +93,12 @@ public class ClientItemShowController {
 
 		// エンティティ内の検索結果をJavaBeansにコピー
 		List<ItemBean> itemBeanList = beanTools.copyEntityListToItemBeanList(itemList);
+
+		// 各商品のレビュー平均評価と件数を取得してセット
+		for (ItemBean itemBean : itemBeanList) {
+			itemBean.setAvgRating(reviewRepository.getAverageRatingByItemId(itemBean.getId()));
+			itemBean.setReviewCount(reviewRepository.countByItemId(itemBean.getId()));
+		}
 
 		// 商品情報をViewへ渡す
 		model.addAttribute("items", itemBeanList);
@@ -174,6 +181,12 @@ public class ClientItemShowController {
 		// 商品情報を画面表示用Beanにコピーする。
 		List<ItemBean> itemBeanList = beanTools.copyEntityListToItemBeanList(itemList);
 
+		// 各商品のレビュー平均評価と件数を取得してセット
+		for (ItemBean itemBean : itemBeanList) {
+			itemBean.setAvgRating(reviewRepository.getAverageRatingByItemId(itemBean.getId()));
+			itemBean.setReviewCount(reviewRepository.countByItemId(itemBean.getId()));
+		}
+
 		model.addAttribute("items", itemBeanList);
 		model.addAttribute("sortType", sortType);
 		model.addAttribute("categoryId", categoryId);
@@ -219,6 +232,12 @@ public class ClientItemShowController {
 	ViewHistoryRepository viewHistoryRepository;
 
 	/**
+	 * レビュー情報
+	 */
+	@Autowired
+	ReviewRepository reviewRepository;
+
+	/**
 	 * 詳細表示処理
 	 *
 	 * @param id      表示対象ID
@@ -246,6 +265,15 @@ public class ClientItemShowController {
 		model.addAttribute("item", itemBean);
 		model.addAttribute("relatedItems", relatedItemBeanList);
 		model.addAttribute("recentlyViewedItems", Collections.emptyList());
+
+		// レビュー情報の取得（平均評価、件数、最新5件）
+		Double averageRating = reviewRepository.getAverageRatingByItemId(id);
+		Long reviewCount = reviewRepository.countByItemId(id);
+		List<Review> latestReviews = reviewRepository.findByItemIdOrderByCreatedDateDesc(id, PageRequest.of(0, 5));
+
+		model.addAttribute("averageRating", averageRating);
+		model.addAttribute("reviewCount", reviewCount);
+		model.addAttribute("latestReviews", latestReviews);
 
 		// ログイン済みの場合、閲覧履歴を保存
 		UserBean userBean = (UserBean) session.getAttribute("user");

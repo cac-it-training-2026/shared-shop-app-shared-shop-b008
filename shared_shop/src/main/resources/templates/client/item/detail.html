@@ -30,6 +30,17 @@
 				<dd th:text="*{categoryName}"></dd>
 				<dt>[[#{data.description}]]</dt>
 				<dd th:text="*{description}"></dd>
+				<dt>平均評価</dt>
+				<dd>
+					<span th:if="${averageRating != null}">
+						<span style="color: #f39c12;">
+							<span th:each="i : ${#numbers.sequence(1, 5)}" th:text="${averageRating >= i ? '★' : '☆'}"></span>
+						</span>
+						<span th:text="${#numbers.formatDecimal(averageRating, 1, 1)}"></span>
+						/ レビュー件数：<span th:text="${reviewCount}"></span>件
+					</span>
+					<span th:if="${averageRating == null}">まだレビューがありません</span>
+				</dd>
 			</dl>
 		</div>
 		<div class="detail_button_area">
@@ -42,6 +53,31 @@
 			</form>
 		</div>
 	</div>
+
+	<!-- レビューセクション -->
+	<section class="review_section" style="margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">
+		<h2 class="title">カスタマーレビュー</h2>
+		<div th:if="${#lists.isEmpty(latestReviews)}">
+			<p>現在、この商品へのレビューはありません。</p>
+		</div>
+		<div th:if="${not #lists.isEmpty(latestReviews)}">
+			<div class="review_list">
+				<article class="review_item" th:each="review : ${latestReviews}" style="border-bottom: 1px solid #eee; padding: 10px 0;">
+					<div style="display: flex; justify-content: space-between;">
+						<span th:text="${review.user.name} + ' さん'" style="font-weight: bold;"></span>
+						<span th:text="${#dates.format(review.createdDate, 'yyyy/MM/dd')}" style="color: #666; font-size: 0.9em;"></span>
+					</div>
+					<div style="color: #f39c12;">
+						<span th:each="i : ${#numbers.sequence(1, 5)}" th:text="${review.rating >= i ? '★' : '☆'}"></span>
+					</div>
+					<div th:text="${review.comment}" style="margin-top: 5px; white-space: pre-wrap;"></div>
+				</article>
+			</div>
+			<div style="margin-top: 15px; text-align: center;">
+				<a th:href="@{/client/review/list/{id}(id=${item.id})}" class="send_button" style="text-decoration: none; padding: 5px 20px;">全件表示</a>
+			</div>
+		</div>
+	</section>
 
 	<section class="related_items"
 		th:if="${relatedItems != null and !#lists.isEmpty(relatedItems)}">

@@ -32,6 +32,7 @@ import jp.co.sss.shop.entity.Item;
 import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.entity.ViewHistory;
 import jp.co.sss.shop.repository.ItemRepository;
+import jp.co.sss.shop.repository.ReviewRepository;
 import jp.co.sss.shop.repository.ViewHistoryRepository;
 import jp.co.sss.shop.service.BeanTools;
 import jp.co.sss.shop.util.Constant;
@@ -46,6 +47,9 @@ private ItemRepository itemRepository;
 
 @Mock
 private ViewHistoryRepository viewHistoryRepository;
+
+@Mock
+private ReviewRepository reviewRepository;
 
 @Mock
 private BeanTools beanTools;

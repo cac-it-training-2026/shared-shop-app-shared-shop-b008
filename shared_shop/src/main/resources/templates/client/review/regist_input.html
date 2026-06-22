@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{common/layout_5block :: layout(~{::title},~{::body/content()})}">
+
+<head>
+	<title th:text="'レビュー投稿 | ' + #{shop.title}"> </title>
+	<meta charset="UTF-8" />
+</head>
+
+<body class="user">
+	<h2 class="title">レビュー投稿</h2>
+
+	<div class="info_form_area">
+		<div th:object="${item}" class="item_detail_area">
+			<div class="item_image_area">
+				<img th:if="*{image != null}" th:src="@{/images/{image}(image=*{image})}"></img>
+				<img th:if="*{image == null}" th:src="@{/images/common/no_image.jpg}"></img>
+			</div>
+			<dl class="item_detail_list">
+				<dt>[[#{data.item.name}]]</dt>
+				<dd th:text="*{name}"></dd>
+			</dl>
+		</div>
+
+		<form th:action="@{/client/review/regist/complete}" method="post" th:object="${reviewForm}" class="user_info_form">
+			<ul th:if="${#fields.hasErrors('*')}" class="error_list">
+				<li th:each="err : ${#fields.errors('*')}" th:text="${err}"></li>
+			</ul>
+
+			<input type="hidden" th:field="*{orderId}" />
+			<input type="hidden" th:field="*{itemId}" />
+
+			<dl class="info_list">
+				<dt>評価（★1〜5）</dt>
+				<dd>
+					<select th:field="*{rating}">
+						<option value="5">★★★★★ 5</option>
+						<option value="4">★★★★☆ 4</option>
+						<option value="3">★★★☆☆ 3</option>
+						<option value="2">★★☆☆☆ 2</option>
+						<option value="1">★☆☆☆☆ 1</option>
+					</select>
+				</dd>
+				<dt>コメント（任意）</dt>
+				<dd>
+					<textarea th:field="*{comment}" rows="5" cols="50" placeholder="商品の感想を入力してください"></textarea>
+				</dd>
+			</dl>
+			<div class="detail_button_area">
+				<input type="submit" value="投稿する" class="send_button" />
+				<input type="button" value="戻る" class="back_button" onclick="history.back()" />
+			</div>
+		</form>
+	</div>
+</body>
+
+</html>

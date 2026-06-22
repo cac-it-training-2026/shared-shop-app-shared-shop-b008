@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{common/layout_5block :: layout(~{::title},~{::body/content()})}">
+
+<head>
+	<title th:text="'レビュー一覧 | ' + #{shop.title}"> </title>
+	<meta charset="UTF-8" />
+</head>
+
+<body class="user">
+	<h2 class="title" th:text="${item.name} + ' のレビュー一覧'"></h2>
+
+	<div class="info_form_area">
+		<div class="item_detail_area">
+			<div class="item_image_area">
+				<img th:if="${item.image != null}" th:src="@{/images/{image}(image=${item.image})}"></img>
+				<img th:if="${item.image == null}" th:src="@{/images/common/no_image.jpg}"></img>
+			</div>
+			<dl class="item_detail_list">
+				<dt>[[#{data.item.name}]]</dt>
+				<dd th:text="${item.name}"></dd>
+				<dt>平均評価</dt>
+				<dd>
+					<span th:if="${averageRating != null}">
+						<span th:text="${#numbers.formatDecimal(averageRating, 1, 1)}"></span> / 5.0
+						（レビュー件数：<span th:text="${reviewCount}"></span>件）
+					</span>
+					<span th:if="${averageRating == null}">まだレビューがありません</span>
+				</dd>
+			</dl>
+		</div>
+
+		<div class="sorted_by" th:if="${not #lists.isEmpty(reviews)}">
+			<span th:if="${sortType == 1}">新しい順</span>
+			<a th:unless="${sortType == 1}" th:href="@{/client/review/list/{id}(id=${item.id}, sortType=1)}">新しい順</a>
+			<span th:if="${sortType == 2}">評価が高い順</span>
+			<a th:unless="${sortType == 2}" th:href="@{/client/review/list/{id}(id=${item.id}, sortType=2)}">評価が高い順</a>
+			<span th:if="${sortType == 3}">評価が低い順</span>
+			<a th:unless="${sortType == 3}" th:href="@{/client/review/list/{id}(id=${item.id}, sortType=3)}">評価が低い順</a>
+		</div>
+
+		<p th:if="${#lists.isEmpty(reviews)}">現在、この商品へのレビューはありません。</p>
+
+		<div class="review_list" th:if="${not #lists.isEmpty(reviews)}">
+			<article class="review_item" th:each="review : ${reviews}" style="border-bottom: 1px solid #ccc; padding: 10px 0;">
+				<div class="review_header" style="display: flex; justify-content: space-between;">
+					<span class="reviewer_name" th:text="${review.user.name} + ' さん'"></span>
+					<span class="review_date" th:text="${#dates.format(review.createdDate, 'yyyy/MM/dd HH:mm')}"></span>
+				</div>
+				<div class="review_rating" style="color: #f39c12;">
+					<span th:each="i : ${#numbers.sequence(1, 5)}" th:text="${review.rating >= i ? '★' : '☆'}"></span>
+					<span th:text="${review.rating}"></span>
+				</div>
+				<div class="review_comment" th:text="${review.comment}" style="margin-top: 5px; white-space: pre-wrap;"></div>
+
+				<div class="review_actions" th:if="${session.user != null and (session.user.id == review.user.id or session.user.authority == 1)}" style="margin-top: 10px; text-align: right;">
+					<form th:action="@{/client/review/delete/{id}(id=${review.id})}" method="post" onsubmit="return confirm('このレビューを削除してもよろしいですか？');">
+						<input type="hidden" name="itemId" th:value="${item.id}" />
+						<input type="submit" value="削除" class="back_button" style="padding: 2px 10px;" />
+					</form>
+				</div>
+			</article>
+		</div>
+
+		<div class="detail_button_area" style="margin-top: 20px;">
+			<a th:href="@{/client/item/detail/{id}(id=${item.id})}" class="back_button">商品詳細へ戻る</a>
+		</div>
+	</div>
+</body>
+
+</html>

@@ -73,6 +73,12 @@ public class Order {
 	private Date deliveryDate;
 
 	/**
+	 * 注文ステータス 0:未発送、1:発送済み
+	 */
+	@Column
+	private Integer status;
+
+	/**
 	 * 会員情報
 	 */
 	@ManyToOne
@@ -211,6 +217,22 @@ public class Order {
 	 */
 	public void setDeliveryDate(Date deliveryDate) {
 		this.deliveryDate = deliveryDate;
+	}
+
+	/**
+	 * 注文ステータスの取得
+	 * @return 注文ステータス
+	 */
+	public Integer getStatus() {
+		return status;
+	}
+
+	/**
+	 * 注文ステータスのセット
+	 * @param status 注文ステータス
+	 */
+	public void setStatus(Integer status) {
+		this.status = status;
 	}
 
 	/**
