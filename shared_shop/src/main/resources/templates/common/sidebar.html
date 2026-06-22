@@ -26,12 +26,10 @@
 				</select> <input type="submit" th:value="#{select}" />
 			</form>
 		</div>
-		<div th:if="${session.user != null and session.user.authority == 2}">
-			<ul class="menu">
-				<li>
-					<a th:href="@{/client/favorite/list}" class="display_list">お気に入り商品一覧</a>
-				</li>
-			</ul>
+		<div class="coupon_sidebar" th:if="${session.user != null and session.user.authority == 2}">
+			<a th:href="@{/client/coupon/list}">マイクーポン</a>
+			<a th:href="@{/client/coupon/gacha}">クーポンガチャ</a>
+			<a th:href="@{/client/favorite/list}">お気に入り商品一覧</a>
 		</div>
 	</div>
 
