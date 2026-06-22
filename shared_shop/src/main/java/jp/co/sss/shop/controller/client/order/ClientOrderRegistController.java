@@ -57,7 +57,7 @@ public class ClientOrderRegistController {
 	private static final String ORDER_FORM = "orderForm";
 
 	private static final String[] ORDER_FORM_FIELD_ORDER = {
-			"postalCode", "address", "name", "phoneNumber"
+			"postalCode", "address", "name", "phoneNumber", "deliveryDate"
 	};
 
 	/**
@@ -236,7 +236,11 @@ public class ClientOrderRegistController {
 					result.rejectValue("deliveryDate", "orderForm.deliveryDate.invalid");
 				}
 			} catch (java.time.format.DateTimeParseException e) {
-				result.rejectValue("deliveryDate", "orderForm.deliveryDate.invalid");
+				// 形式エラーは @Pattern でチェックしているため、ここでは何もしない、
+				// または確実にエラーにする
+				if (!result.hasFieldErrors("deliveryDate")) {
+					result.rejectValue("deliveryDate", "orderForm.deliveryDate.invalid_format");
+				}
 			}
 		}
 
