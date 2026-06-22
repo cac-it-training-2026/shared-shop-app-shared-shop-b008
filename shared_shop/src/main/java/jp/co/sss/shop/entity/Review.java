@@ -1,6 +1,6 @@
 package jp.co.sss.shop.entity;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -39,15 +39,15 @@ public class Review {
 	 * 商品情報
 	 */
 	@ManyToOne
-	@JoinColumn(name = "product_id", referencedColumnName = "id")
+	@JoinColumn(name = "item_id", referencedColumnName = "id")
 	private Item item;
 
 	/**
-	 * 注文情報
+	 * 注文商品情報
 	 */
 	@ManyToOne
-	@JoinColumn(name = "order_id", referencedColumnName = "id")
-	private Order order;
+	@JoinColumn(name = "order_item_id", referencedColumnName = "id")
+	private OrderItem orderItem;
 
 	/**
 	 * 評価
@@ -58,14 +58,14 @@ public class Review {
 	/**
 	 * コメント
 	 */
-	@Column
-	private String comment;
+	@Column(name = "review_comment")
+	private String reviewComment;
 
 	/**
 	 * 登録日付
 	 */
-	@Column(name = "created_date", insertable = false, updatable = false)
-	private Timestamp createdDate;
+	@Column(name = "insert_date", insertable = false, updatable = false)
+	private Date insertDate;
 
 	/**
 	 * レビューIDの取得
@@ -116,19 +116,19 @@ public class Review {
 	}
 
 	/**
-	 * 注文エンティティの取得
-	 * @return 注文エンティティ
+	 * 注文商品エンティティの取得
+	 * @return 注文商品エンティティ
 	 */
-	public Order getOrder() {
-		return order;
+	public OrderItem getOrderItem() {
+		return orderItem;
 	}
 
 	/**
-	 * 注文エンティティのセット
-	 * @param order 注文エンティティ
+	 * 注文商品エンティティのセット
+	 * @param orderItem 注文商品エンティティ
 	 */
-	public void setOrder(Order order) {
-		this.order = order;
+	public void setOrderItem(OrderItem orderItem) {
+		this.orderItem = orderItem;
 	}
 
 	/**
@@ -151,31 +151,31 @@ public class Review {
 	 * コメントの取得
 	 * @return コメント
 	 */
-	public String getComment() {
-		return comment;
+	public String getReviewComment() {
+		return reviewComment;
 	}
 
 	/**
 	 * コメントのセット
-	 * @param comment コメント
+	 * @param reviewComment コメント
 	 */
-	public void setComment(String comment) {
-		this.comment = comment;
+	public void setReviewComment(String reviewComment) {
+		this.reviewComment = reviewComment;
 	}
 
 	/**
 	 * 登録日付の取得
 	 * @return 登録日付
 	 */
-	public Timestamp getCreatedDate() {
-		return createdDate;
+	public Date getInsertDate() {
+		return insertDate;
 	}
 
 	/**
 	 * 登録日付のセット
-	 * @param createdDate 登録日付
+	 * @param insertDate 登録日付
 	 */
-	public void setCreatedDate(Timestamp createdDate) {
-		this.createdDate = createdDate;
+	public void setInsertDate(Date insertDate) {
+		this.insertDate = insertDate;
 	}
 }

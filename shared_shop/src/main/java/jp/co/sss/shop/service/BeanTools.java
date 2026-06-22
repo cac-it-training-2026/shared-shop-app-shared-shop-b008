@@ -191,6 +191,7 @@ public class BeanTools {
 		orderItemBean.setOrderNum(basketBean.getOrderNum());
 		int subtotal = orderItemBean.getPrice() * orderItemBean.getOrderNum();
 		orderItemBean.setSubtotal(subtotal);
+		orderItemBean.setItemId(item.getId());
 
 		return orderItemBean;
 
@@ -212,6 +213,8 @@ public class BeanTools {
 			orderItemBean.setName(orderItem.getItem().getName());
 			orderItemBean.setPrice(orderItem.getPrice());
 			orderItemBean.setOrderNum(orderItem.getQuantity());
+			orderItemBean.setId(orderItem.getId());
+			orderItemBean.setItemId(orderItem.getItem().getId());
 
 			//購入時単価の合計値を計算
 			//※OrderItemのItemフィールドからgetPriceを利用すると、購入時ではなく現在の単価になってしまう。

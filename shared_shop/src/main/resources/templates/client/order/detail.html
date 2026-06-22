@@ -58,7 +58,7 @@
 				<td>
 					<span th:text="${orderItem.name}"></span>
 					<a th:if="${order.status == 1}"
-					   th:href="@{/client/review/regist/input/{orderId}/{itemId}(orderId=${order.id}, itemId=${orderItem.id})}"
+					   th:href="@{/client/review/regist/input/{orderItemId}/{itemId}(orderItemId=${orderItem.id}, itemId=${orderItem.itemId})}"
 					   class="send_button" style="padding: 2px 5px; font-size: 0.8em; margin-left: 10px; text-decoration: none;">
 						レビューを書く
 					</a>

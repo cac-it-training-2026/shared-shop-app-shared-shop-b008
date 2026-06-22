@@ -27,6 +27,7 @@ import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.entity.ViewHistory;
 import jp.co.sss.shop.repository.CategoryRepository;
 import jp.co.sss.shop.repository.ItemRepository;
+import jp.co.sss.shop.repository.ReviewRepository;
 import jp.co.sss.shop.repository.ViewHistoryRepository;
 import jp.co.sss.shop.service.BeanTools;
 import jp.co.sss.shop.util.Constant;
@@ -269,7 +270,7 @@ public class ClientItemShowController {
 		// レビュー情報の取得（平均評価、件数、最新5件）
 		Double averageRating = reviewRepository.getAverageRatingByItemId(id);
 		Long reviewCount = reviewRepository.countByItemId(id);
-		List<Review> latestReviews = reviewRepository.findByItemIdOrderByCreatedDateDesc(id, PageRequest.of(0, 5));
+		List<Review> latestReviews = reviewRepository.findByItemIdOrderByInsertDateDesc(id, PageRequest.of(0, 5));
 
 		model.addAttribute("averageRating", averageRating);
 		model.addAttribute("reviewCount", reviewCount);

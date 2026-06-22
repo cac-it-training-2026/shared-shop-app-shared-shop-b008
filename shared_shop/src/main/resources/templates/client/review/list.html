@@ -45,13 +45,13 @@
 			<article class="review_item" th:each="review : ${reviews}" style="border-bottom: 1px solid #ccc; padding: 10px 0;">
 				<div class="review_header" style="display: flex; justify-content: space-between;">
 					<span class="reviewer_name" th:text="${review.user.name} + ' さん'"></span>
-					<span class="review_date" th:text="${#dates.format(review.createdDate, 'yyyy/MM/dd HH:mm')}"></span>
+					<span class="review_date" th:text="${#dates.format(review.insertDate, 'yyyy/MM/dd HH:mm')}"></span>
 				</div>
 				<div class="review_rating" style="color: #f39c12;">
 					<span th:each="i : ${#numbers.sequence(1, 5)}" th:text="${review.rating >= i ? '★' : '☆'}"></span>
 					<span th:text="${review.rating}"></span>
 				</div>
-				<div class="review_comment" th:text="${review.comment}" style="margin-top: 5px; white-space: pre-wrap;"></div>
+				<div class="review_comment" th:text="${review.reviewComment}" style="margin-top: 5px; white-space: pre-wrap;"></div>
 
 				<div class="review_actions" th:if="${session.user != null and (session.user.id == review.user.id or session.user.authority == 1)}" style="margin-top: 10px; text-align: right;">
 					<form th:action="@{/client/review/delete/{id}(id=${review.id})}" method="post" onsubmit="return confirm('このレビューを削除してもよろしいですか？');">

@@ -13,10 +13,10 @@ import jakarta.validation.constraints.Size;
 public class ReviewForm {
 
 	/**
-	 * 注文ID
+	 * 注文商品ID
 	 */
 	@NotNull
-	private Integer orderId;
+	private Integer orderItemId;
 
 	/**
 	 * 商品ID
@@ -36,22 +36,22 @@ public class ReviewForm {
 	 * コメント（任意、最大2000文字）
 	 */
 	@Size(max = 2000)
-	private String comment;
+	private String reviewComment;
 
 	/**
-	 * 注文IDの取得
-	 * @return 注文ID
+	 * 注文商品IDの取得
+	 * @return 注文商品ID
 	 */
-	public Integer getOrderId() {
-		return orderId;
+	public Integer getOrderItemId() {
+		return orderItemId;
 	}
 
 	/**
-	 * 注文IDのセット
-	 * @param orderId 注文ID
+	 * 注文商品IDのセット
+	 * @param orderItemId 注文商品ID
 	 */
-	public void setOrderId(Integer orderId) {
-		this.orderId = orderId;
+	public void setOrderItemId(Integer orderItemId) {
+		this.orderItemId = orderItemId;
 	}
 
 	/**
@@ -90,15 +90,15 @@ public class ReviewForm {
 	 * コメントの取得
 	 * @return コメント
 	 */
-	public String getComment() {
-		return comment;
+	public String getReviewComment() {
+		return reviewComment;
 	}
 
 	/**
 	 * コメントのセット
-	 * @param comment コメント
+	 * @param reviewComment コメント
 	 */
-	public void setComment(String comment) {
-		this.comment = comment;
+	public void setReviewComment(String reviewComment) {
+		this.reviewComment = reviewComment;
 	}
 }

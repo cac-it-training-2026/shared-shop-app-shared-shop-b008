@@ -65,12 +65,12 @@
 				<article class="review_item" th:each="review : ${latestReviews}" style="border-bottom: 1px solid #eee; padding: 10px 0;">
 					<div style="display: flex; justify-content: space-between;">
 						<span th:text="${review.user.name} + ' さん'" style="font-weight: bold;"></span>
-						<span th:text="${#dates.format(review.createdDate, 'yyyy/MM/dd')}" style="color: #666; font-size: 0.9em;"></span>
+						<span th:text="${#dates.format(review.insertDate, 'yyyy/MM/dd')}" style="color: #666; font-size: 0.9em;"></span>
 					</div>
 					<div style="color: #f39c12;">
 						<span th:each="i : ${#numbers.sequence(1, 5)}" th:text="${review.rating >= i ? '★' : '☆'}"></span>
 					</div>
-					<div th:text="${review.comment}" style="margin-top: 5px; white-space: pre-wrap;"></div>
+					<div th:text="${review.reviewComment}" style="margin-top: 5px; white-space: pre-wrap;"></div>
 				</article>
 			</div>
 			<div style="margin-top: 15px; text-align: center;">

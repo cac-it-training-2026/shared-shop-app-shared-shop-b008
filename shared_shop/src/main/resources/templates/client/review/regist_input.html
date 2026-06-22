@@ -27,7 +27,7 @@
 				<li th:each="err : ${#fields.errors('*')}" th:text="${err}"></li>
 			</ul>
 
-			<input type="hidden" th:field="*{orderId}" />
+			<input type="hidden" th:field="*{orderItemId}" />
 			<input type="hidden" th:field="*{itemId}" />
 
 			<dl class="info_list">
@@ -43,7 +43,7 @@
 				</dd>
 				<dt>コメント（任意）</dt>
 				<dd>
-					<textarea th:field="*{comment}" rows="5" cols="50" placeholder="商品の感想を入力してください"></textarea>
+					<textarea th:field="*{reviewComment}" rows="5" cols="50" placeholder="商品の感想を入力してください"></textarea>
 				</dd>
 			</dl>
 			<div class="detail_button_area">

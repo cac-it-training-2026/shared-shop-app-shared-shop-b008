@@ -1,28 +1,28 @@
 package jp.co.sss.shop.controller.client.review;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-
-import jakarta.servlet.http.HttpSession;
-import jp.co.sss.shop.repository.ItemRepository;
-import jp.co.sss.shop.repository.OrderRepository;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import jp.co.sss.shop.bean.UserBean;
 import jp.co.sss.shop.entity.Item;
-import jakarta.validation.Valid;
-import java.util.List;
-import jp.co.sss.shop.entity.Order;
+import jp.co.sss.shop.entity.OrderItem;
 import jp.co.sss.shop.entity.Review;
 import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.form.ReviewForm;
+import jp.co.sss.shop.repository.ItemRepository;
+import jp.co.sss.shop.repository.OrderItemRepository;
 import jp.co.sss.shop.repository.ReviewRepository;
-import org.springframework.validation.BindingResult;
 import jp.co.sss.shop.service.BeanTools;
 import jp.co.sss.shop.util.Constant;
 
@@ -47,10 +47,10 @@ public class ReviewController {
 	ItemRepository itemRepository;
 
 	/**
-	 * 注文情報リポジトリ
+	 * 注文商品情報リポジトリ
 	 */
 	@Autowired
-	OrderRepository orderRepository;
+	OrderItemRepository orderItemRepository;
 
 	/**
 	 * Entity、Form、Bean間のデータコピーサービス
@@ -67,39 +67,38 @@ public class ReviewController {
 	/**
 	 * レビュー入力画面表示
 	 *
-	 * @param orderId 注文ID
-	 * @param itemId  商品ID
-	 * @param model   Viewとの値受渡し
+	 * @param orderItemId 注文商品ID
+	 * @param itemId      商品ID
+	 * @param model       Viewとの値受渡し
 	 * @return "client/review/regist_input" レビュー入力画面
 	 */
-	@RequestMapping(path = "/client/review/regist/input/{orderId}/{itemId}", method = RequestMethod.GET)
-	public String registInput(@PathVariable Integer orderId, @PathVariable Integer itemId, Model model) {
+	@RequestMapping(path = "/client/review/regist/input/{orderItemId}/{itemId}", method = RequestMethod.GET)
+	public String registInput(@PathVariable Integer orderItemId, @PathVariable Integer itemId, Model model) {
 
 		UserBean userBean = (UserBean) session.getAttribute("user");
 		if (userBean == null) {
 			return "redirect:/login";
 		}
 
-		// 購入済みかつ発送済みであることを検証
-		Order order = orderRepository.findByIdAndUserId(orderId, userBean.getId());
-		if (order == null || order.getStatus() == null || order.getStatus() != 1) {
+		// 注文商品情報を取得
+		OrderItem orderItem = orderItemRepository.findById(orderItemId).orElse(null);
+		if (orderItem == null || !orderItem.getItem().getId().equals(itemId)
+				|| !orderItem.getOrder().getUser().getId().equals(userBean.getId())) {
 			return "redirect:/client/order/list";
 		}
 
-		// 対象商品が含まれているか確認
-		boolean hasItem = order.getOrderItemsList().stream()
-				.anyMatch(oi -> oi.getItem().getId().equals(itemId));
-		if (!hasItem) {
-			return "redirect:/client/order/detail/" + orderId;
+		// 発送済みであることを検証
+		if (orderItem.getOrder().getStatus() == null || orderItem.getOrder().getStatus() != 1) {
+			return "redirect:/client/order/detail/" + orderItem.getOrder().getId();
 		}
 
 		Item item = itemRepository.findByIdAndDeleteFlag(itemId, Constant.NOT_DELETED);
 		if (item == null) {
-			return "redirect:/client/order/detail/" + orderId;
+			return "redirect:/client/order/detail/" + orderItem.getOrder().getId();
 		}
 
 		ReviewForm form = new ReviewForm();
-		form.setOrderId(orderId);
+		form.setOrderItemId(orderItemId);
 		form.setItemId(itemId);
 		form.setRating(5); // デフォルト評価
 
@@ -132,14 +131,16 @@ public class ReviewController {
 		}
 
 		// 再度検証
-		Order order = orderRepository.findByIdAndUserId(form.getOrderId(), userBean.getId());
-		if (order == null || order.getStatus() == null || order.getStatus() != 1) {
+		OrderItem orderItem = orderItemRepository.findById(form.getOrderItemId()).orElse(null);
+		if (orderItem == null || !orderItem.getItem().getId().equals(form.getItemId())
+				|| !orderItem.getOrder().getUser().getId().equals(userBean.getId())
+				|| orderItem.getOrder().getStatus() == null || orderItem.getOrder().getStatus() != 1) {
 			return "redirect:/client/order/list";
 		}
 
 		Item item = itemRepository.findByIdAndDeleteFlag(form.getItemId(), Constant.NOT_DELETED);
 		if (item == null) {
-			return "redirect:/client/order/detail/" + form.getOrderId();
+			return "redirect:/client/order/detail/" + orderItem.getOrder().getId();
 		}
 
 		Review review = new Review();
@@ -147,9 +148,9 @@ public class ReviewController {
 		user.setId(userBean.getId());
 		review.setUser(user);
 		review.setItem(item);
-		review.setOrder(order);
+		review.setOrderItem(orderItem);
 		review.setRating(form.getRating());
-		review.setComment(form.getComment());
+		review.setReviewComment(form.getReviewComment());
 
 		reviewRepository.save(review);
 
@@ -177,11 +178,11 @@ public class ReviewController {
 
 		List<Review> reviews;
 		if (sortType == 2) {
-			reviews = reviewRepository.findByItemIdOrderByRatingDescCreatedDateDesc(itemId);
+			reviews = reviewRepository.findByItemIdOrderByRatingDescInsertDateDesc(itemId);
 		} else if (sortType == 3) {
-			reviews = reviewRepository.findByItemIdOrderByRatingAscCreatedDateDesc(itemId);
+			reviews = reviewRepository.findByItemIdOrderByRatingAscInsertDateDesc(itemId);
 		} else {
-			reviews = reviewRepository.findByItemIdOrderByCreatedDateDesc(itemId);
+			reviews = reviewRepository.findByItemIdOrderByInsertDateDesc(itemId);
 		}
 
 		Double averageRating = reviewRepository.getAverageRatingByItemId(itemId);
