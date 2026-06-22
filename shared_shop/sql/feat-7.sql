@@ -1,21 +1,22 @@
 -- Issue #7: 商品レビュー機能追加
 -- ordersテーブルに注文ステータスカラムを追加
 -- 0:未発送、1:発送済み。既存データはレビュー可能にするため1で初期化。
-ALTER TABLE orders ADD status NUMBER(1) DEFAULT 1 NOT NULL;
+ALTER TABLE orders ADD status NUMBER(1,0) DEFAULT 1 NOT NULL;
 
--- reviewsテーブルの作成 (ユーザー指定の定義に従う)
-CREATE TABLE reviews (
-    id NUMBER(6,0) PRIMARY KEY,
-    user_id NUMBER(6,0) NOT NULL,
-    item_id NUMBER(6,0) NOT NULL,
-    order_item_id NUMBER(6,0) NOT NULL,
-    rating NUMBER(1,0) NOT NULL,
-    review_comment VARCHAR2(2000),
-    insert_date DATE DEFAULT SYSDATE NOT NULL,
-    CONSTRAINT fk_reviews_user FOREIGN KEY (user_id) REFERENCES users(id),
-    CONSTRAINT fk_reviews_item FOREIGN KEY (item_id) REFERENCES items(id),
-    CONSTRAINT fk_reviews_order_item FOREIGN KEY (order_item_id) REFERENCES order_items(id),
-    CONSTRAINT check_review_rating CHECK (rating BETWEEN 1 AND 5)
+-- reviewsテーブルの作成 (提供されたDDL定義に従う)
+CREATE TABLE REVIEWS (
+    ID NUMBER(10,0),
+    USER_ID NUMBER(10,0) NOT NULL ENABLE,
+    ITEM_ID NUMBER(10,0) NOT NULL ENABLE,
+    ORDER_ITEM_ID NUMBER(10,0) NOT NULL ENABLE,
+    RATING NUMBER(1,0) NOT NULL ENABLE,
+    REVIEW_COMMENT VARCHAR2(2000),
+    INSERT_DATE TIMESTAMP (6) DEFAULT SYSTIMESTAMP NOT NULL ENABLE,
+    CONSTRAINT CHECK_REVIEW_RATING CHECK (RATING BETWEEN 1 AND 5) ENABLE,
+    PRIMARY KEY (ID),
+    CONSTRAINT FK_REVIEWS_USER FOREIGN KEY (USER_ID) REFERENCES USERS(ID),
+    CONSTRAINT FK_REVIEWS_ITEM FOREIGN KEY (ITEM_ID) REFERENCES ITEMS(ID),
+    CONSTRAINT FK_REVIEWS_ORDER_ITEM FOREIGN KEY (ORDER_ITEM_ID) REFERENCES ORDER_ITEMS(ID)
 );
 
 -- reviewsテーブル用シーケンスの作成
@@ -23,5 +24,5 @@ CREATE SEQUENCE seq_reviews START WITH 1 INCREMENT BY 1;
 
 -- ロールバック用SQL
 -- DROP SEQUENCE seq_reviews;
--- DROP TABLE reviews;
+-- DROP TABLE REVIEWS;
 -- ALTER TABLE orders DROP COLUMN status;

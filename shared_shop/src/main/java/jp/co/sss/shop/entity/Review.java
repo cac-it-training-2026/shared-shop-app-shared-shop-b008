@@ -1,6 +1,6 @@
 package jp.co.sss.shop.entity;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -65,7 +65,7 @@ public class Review {
 	 * 登録日付
 	 */
 	@Column(name = "insert_date", insertable = false, updatable = false)
-	private Date insertDate;
+	private Timestamp insertDate;
 
 	/**
 	 * レビューIDの取得
@@ -167,7 +167,7 @@ public class Review {
 	 * 登録日付の取得
 	 * @return 登録日付
 	 */
-	public Date getInsertDate() {
+	public Timestamp getInsertDate() {
 		return insertDate;
 	}
 
@@ -175,7 +175,7 @@ public class Review {
 	 * 登録日付のセット
 	 * @param insertDate 登録日付
 	 */
-	public void setInsertDate(Date insertDate) {
+	public void setInsertDate(Timestamp insertDate) {
 		this.insertDate = insertDate;
 	}
 }
