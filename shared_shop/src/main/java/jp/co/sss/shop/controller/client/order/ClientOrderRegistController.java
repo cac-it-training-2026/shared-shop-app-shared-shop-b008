@@ -9,6 +9,7 @@ import java.util.Set;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
@@ -56,7 +57,7 @@ public class ClientOrderRegistController {
 	private static final String ORDER_FORM = "orderForm";
 
 	private static final String[] ORDER_FORM_FIELD_ORDER = {
-			"postalCode", "address", "name", "phoneNumber"
+			"postalCode", "address", "name", "phoneNumber", "deliveryDate"
 	};
 
 	/**
@@ -223,6 +224,18 @@ public class ClientOrderRegistController {
 			form.setPayMethod(lastOrderForm.getPayMethod());
 		}
 
+		// 配送希望日のバリデーション
+		if (form.getDeliveryDate() != null) {
+			java.time.LocalDate deliveryDate = form.getDeliveryDate().toLocalDate();
+			java.time.LocalDate today = java.time.LocalDate.now();
+			java.time.LocalDate minDate = today.plusDays(3);
+			java.time.LocalDate maxDate = today.plusDays(14);
+
+			if (deliveryDate.isBefore(minDate) || deliveryDate.isAfter(maxDate)) {
+				result.rejectValue("deliveryDate", "orderForm.deliveryDate.invalid");
+			}
+		}
+
 		if (result.hasErrors()) {
 			clearInvalidAddressFields(form, result);
 			session.setAttribute(ORDER_FORM, form);
@@ -371,6 +384,7 @@ public class ClientOrderRegistController {
 	 * @see #createOrder(OrderForm)
 	 * @see #canOrder(List)
 	 */
+	@Transactional
 	@RequestMapping(path = "/client/order/complete", method = RequestMethod.POST)
 	public String orderComplete() {
 		
@@ -462,6 +476,7 @@ public class ClientOrderRegistController {
 		order.setName(orderForm.getName());
 		order.setPhoneNumber(orderForm.getPhoneNumber());
 		order.setPayMethod(orderForm.getPayMethod());
+		order.setDeliveryDate(orderForm.getDeliveryDate());
 
 		// 注文者の会員情報をOrderへ紐付ける。
 		// ここでは会員IDだけを持つUser Entityを作成して設定している。
@@ -478,17 +493,11 @@ public class ClientOrderRegistController {
 			invalidFields.add(fieldError.getField());
 		}
 
-		if (invalidFields.contains("postalCode")) {
-			form.setPostalCode("");
-		}
-		if (invalidFields.contains("address")) {
-			form.setAddress("");
-		}
-		if (invalidFields.contains("name")) {
-			form.setName("");
-		}
 		if (invalidFields.contains("phoneNumber")) {
 			form.setPhoneNumber("");
+		}
+		if (invalidFields.contains("deliveryDate")) {
+			form.setDeliveryDate(null);
 		}
 	}
 

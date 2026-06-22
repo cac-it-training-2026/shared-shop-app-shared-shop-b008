@@ -71,6 +71,10 @@
 				<th>[[#{data.address.phonenumber}]]</th>
 				<td th:text="${orderForm.phoneNumber}"></td>
 			</tr>
+			<tr>
+				<th>[[#{data.delivery.date}]]</th>
+				<td th:text="${orderForm.deliveryDate != null} ? ${orderForm.deliveryDate} : #{data.delivery.date.none}"></td>
+			</tr>
 		</table>
 		<table class="detail_table pay">
 			<caption class="table_caption">[[#{paymethod.str}]]</caption>

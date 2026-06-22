@@ -53,6 +53,11 @@ public class OrderBean {
 	private String userName;
 
 	/**
+	 * 配送希望日
+	 */
+	private String deliveryDate;
+
+	/**
 	 * 注文IDの取得
 	 * @return 注文ID
 	 */
@@ -194,6 +199,22 @@ public class OrderBean {
 	 */
 	public void setUserName(String userName) {
 		this.userName = userName;
+	}
+
+	/**
+	 * 配送希望日の取得
+	 * @return 配送希望日
+	 */
+	public String getDeliveryDate() {
+		return deliveryDate;
+	}
+
+	/**
+	 * 配送希望日のセット
+	 * @param deliveryDate 配送希望日
+	 */
+	public void setDeliveryDate(String deliveryDate) {
+		this.deliveryDate = deliveryDate;
 	}
 
 }
