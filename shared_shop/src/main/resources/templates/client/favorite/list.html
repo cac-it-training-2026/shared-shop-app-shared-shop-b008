@@ -14,15 +14,14 @@
 	<th:block th:if="${items != null and !#lists.isEmpty(items)}">
 		<div class="item_list">
 			<div class="item" th:each="item : ${items}">
+				<div class="item_name" th:text="${item.name}"></div>
 				<a th:href="@{/client/item/detail/{id}(id=${item.id})}">
 					<img th:if="${item.image != null}" th:src="@{/images/{image}(image=${item.image})}" />
 					<img th:if="${item.image == null}" th:src="@{/images/common/no_image.jpg}" />
 				</a>
-				<div class="item_info">
-					<p>
-						<a th:href="@{/client/item/detail/{id}(id=${item.id})}" th:text="${item.name}"></a>
-					</p>
-					<p>
+				<!--/* お気に入り解除ボタンは画像の前面に配置し、クリック可能にする */-->
+				<div class="favorite_delete_area">
+					<p class="item_price">
 						<span th:text="#{data.item.price}"></span>：
 						<span th:text="${item.price}"></span>
 					</p>
