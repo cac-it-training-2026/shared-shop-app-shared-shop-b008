@@ -106,7 +106,19 @@ public class ClientReviewController {
 		}
 
 		// ログインユーザー情報の取得
-		UserBean userBean = (UserBean) session.getAttribute("user");
+		UserBean user = (UserBean) session.getAttribute("user");
+
+		// 注文商品情報の取得と権限チェック
+		Optional<OrderItem> orderItemOpt = orderItemRepository.findById(form.getOrderItemId());
+		if (orderItemOpt.isEmpty()) {
+			return "redirect:/syserror";
+		}
+		OrderItem orderItem = orderItemOpt.get();
+
+		// 購入者本人の注文であることを確認 (セキュリティ対策)
+		if (!orderItem.getOrder().getUser().getId().equals(user.getId())) {
+			return "redirect:/syserror";
+		}
 
 		// 既にレビュー済みでないか再確認
 		Review existingReview = reviewRepository.findByOrderItemId(form.getOrderItemId());
@@ -116,10 +128,9 @@ public class ClientReviewController {
 
 		// エンティティに詰め替えて保存
 		Review review = new Review();
-		OrderItem orderItem = orderItemRepository.getReferenceById(form.getOrderItemId());
 		review.setOrderItem(orderItem);
 		review.setItem(orderItem.getItem());
-		review.setUser(orderItem.getOrder().getUser()); // userBeanから取っても良いが、不整合防止のためDBから
+		review.setUser(orderItem.getOrder().getUser());
 		review.setRating(form.getRating());
 		review.setReviewComment(form.getReviewComment());
 
