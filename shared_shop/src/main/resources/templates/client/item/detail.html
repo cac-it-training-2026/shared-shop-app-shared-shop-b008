@@ -33,6 +33,14 @@
 			</dl>
 		</div>
 		<div class="detail_button_area">
+			<th:block th:if="${session.user != null and session.user.authority == 2}">
+				<form th:if="${!isFavorite}" th:action="@{/client/favorite/regist/{itemId}(itemId=*{id})}" method="post" class="user_info_form">
+					<input type="submit" value="お気に入り登録" class="send_button" />
+				</form>
+				<form th:if="${isFavorite}" th:action="@{/client/favorite/delete/{itemId}(itemId=*{id})}" method="post" class="user_info_form">
+					<input type="submit" value="お気に入り解除" class="send_button" />
+				</form>
+			</th:block>
 			<form th:action="@{/client/basket/add}" method="post" class="user_info_form" th:if="*{stock > 0}">
 				<input type="hidden" th:field="*{id}" />
 				<input type="submit" value="買い物かごに入れる" class="send_button" />

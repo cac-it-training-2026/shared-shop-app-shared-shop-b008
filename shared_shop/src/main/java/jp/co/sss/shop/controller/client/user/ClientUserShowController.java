@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpSession;
 
 import jp.co.sss.shop.bean.UserBean;
 import jp.co.sss.shop.entity.User;
+import jp.co.sss.shop.repository.LoginHistoryRepository;
 import jp.co.sss.shop.util.Constant;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,12 @@ public class ClientUserShowController {
 	 */
 	@Autowired
 	UserRepository userRepository;
+
+	/**
+	 * ログイン履歴情報リポジトリ
+	 */
+	@Autowired
+	LoginHistoryRepository loginHistoryRepository;
 
 	/**
 	 * セッション
@@ -58,6 +65,9 @@ public class ClientUserShowController {
 		UserBean userBean = new UserBean();
 		BeanUtils.copyProperties(user, userBean);
 		model.addAttribute("userBean", userBean);
+
+		// 最新3件のログイン履歴を取得し、Modelに追加する
+		model.addAttribute("loginHistories", loginHistoryRepository.findTop3ByUserIdOrderByLoginDateTimeDesc(loginUser.getId()));
 
 		// 詳細画面表示時に会員変更・退会用フォームを初期化する。
 		session.removeAttribute("userForm");

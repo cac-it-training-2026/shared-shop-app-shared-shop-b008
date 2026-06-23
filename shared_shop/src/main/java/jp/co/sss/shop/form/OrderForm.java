@@ -1,7 +1,6 @@
 package jp.co.sss.shop.form;
 
 import java.io.Serializable;
-import java.sql.Date;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -60,7 +59,20 @@ public class OrderForm implements Serializable {
 	/**
 	 * 配送希望日
 	 */
-	private Date deliveryDate;
+	@NotBlank(message = "{orderForm.deliveryDate.notblank}")
+	@Pattern(regexp = "^[0-9]{4}-[0-9]{2}-[0-9]{2}$", message = "{orderForm.deliveryDate.invalid_format}")
+	private String deliveryDate;
+	/** 利用する会員保有クーポンID */
+	private Integer couponId;
+
+	/** 注文確認時のクーポン名称 */
+	private String couponName;
+
+	/** 注文確認時のクーポン割引率 */
+	private Integer couponDiscountRate;
+
+	/** 注文確認時のクーポン割引額 */
+	private Integer couponDiscountAmount = 0;
 
 	/**
 	 * 注文するユーザIDの取得
@@ -162,7 +174,7 @@ public class OrderForm implements Serializable {
 	 * 配送希望日の取得
 	 * @return 配送希望日
 	 */
-	public Date getDeliveryDate() {
+	public String getDeliveryDate() {
 		return deliveryDate;
 	}
 
@@ -170,8 +182,40 @@ public class OrderForm implements Serializable {
 	 * 配送希望日のセット
 	 * @param deliveryDate 配送希望日
 	 */
-	public void setDeliveryDate(Date deliveryDate) {
+	public void setDeliveryDate(String deliveryDate) {
 		this.deliveryDate = deliveryDate;
+	}
+
+	public Integer getCouponId() {
+		return couponId;
+	}
+
+	public void setCouponId(Integer couponId) {
+		this.couponId = couponId;
+	}
+
+	public String getCouponName() {
+		return couponName;
+	}
+
+	public void setCouponName(String couponName) {
+		this.couponName = couponName;
+	}
+
+	public Integer getCouponDiscountRate() {
+		return couponDiscountRate;
+	}
+
+	public void setCouponDiscountRate(Integer couponDiscountRate) {
+		this.couponDiscountRate = couponDiscountRate;
+	}
+
+	public Integer getCouponDiscountAmount() {
+		return couponDiscountAmount;
+	}
+
+	public void setCouponDiscountAmount(Integer couponDiscountAmount) {
+		this.couponDiscountAmount = couponDiscountAmount;
 	}
 
 }
