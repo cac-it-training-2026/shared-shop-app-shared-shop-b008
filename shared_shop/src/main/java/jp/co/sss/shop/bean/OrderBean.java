@@ -57,6 +57,16 @@ public class OrderBean {
 	 */
 	private String deliveryDate;
 
+	/**
+	 * 注文取消フラグ
+	 */
+	private Integer cancelFlag;
+
+	/**
+	 * 注文取消日
+	 */
+	private String cancelDate;
+
 	/** 注文時点のクーポン名称 */
 	private String couponName;
 
@@ -224,6 +234,22 @@ public class OrderBean {
 	 */
 	public void setDeliveryDate(String deliveryDate) {
 		this.deliveryDate = deliveryDate;
+	}
+
+	public Integer getCancelFlag() {
+		return cancelFlag;
+	}
+
+	public void setCancelFlag(Integer cancelFlag) {
+		this.cancelFlag = cancelFlag;
+	}
+
+	public String getCancelDate() {
+		return cancelDate;
+	}
+
+	public void setCancelDate(String cancelDate) {
+		this.cancelDate = cancelDate;
 	}
 
 	public String getCouponName() {
