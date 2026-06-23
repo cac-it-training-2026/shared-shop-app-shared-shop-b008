@@ -5,6 +5,10 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,15 +29,19 @@ import jakarta.validation.Valid;
 import jp.co.sss.shop.bean.BasketBean;
 import jp.co.sss.shop.bean.OrderItemBean;
 import jp.co.sss.shop.bean.UserBean;
+import jp.co.sss.shop.bean.UserCouponBean;
+import jp.co.sss.shop.entity.CouponType;
 import jp.co.sss.shop.entity.Item;
 import jp.co.sss.shop.entity.Order;
 import jp.co.sss.shop.entity.OrderItem;
 import jp.co.sss.shop.entity.User;
+import jp.co.sss.shop.entity.UserCoupon;
 import jp.co.sss.shop.form.OrderForm;
 import jp.co.sss.shop.repository.ItemRepository;
 import jp.co.sss.shop.repository.OrderItemRepository;
 import jp.co.sss.shop.repository.OrderRepository;
 import jp.co.sss.shop.repository.UserRepository;
+import jp.co.sss.shop.repository.UserCouponRepository;
 import jp.co.sss.shop.service.BeanTools;
 import jp.co.sss.shop.service.PriceCalc;
 import jp.co.sss.shop.util.Constant;
@@ -70,6 +78,11 @@ public class ClientOrderRegistController {
 	 */
 	private static final String ITEM_NAME_LIST_ZERO = "itemNameListZero";
 
+	private static final int ACTIVE_COUPON_TYPE = 1;
+	private static final ZoneId JAPAN_ZONE = ZoneId.of("Asia/Tokyo");
+	private static final DateTimeFormatter COUPON_DATE_FORMAT =
+			DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
+
 	/**
 	 * 商品情報リポジトリ
 	 */
@@ -93,6 +106,12 @@ public class ClientOrderRegistController {
 	 */
 	@Autowired
 	UserRepository userRepository;
+
+	/**
+	 * 会員保有クーポンリポジトリ
+	 */
+	@Autowired
+	UserCouponRepository userCouponRepository;
 
 	/**
 	 * Entity、Form、Bean間のデータコピーサービス
@@ -269,6 +288,7 @@ public class ClientOrderRegistController {
 	 * @return "client/order/payment_input" 支払方法選択画面
 	 * @throws RuntimeException 注文情報がセッションに存在しない場合
 	 */
+	@Transactional
 	@RequestMapping(path = "/client/order/payment/input", method = RequestMethod.GET)
 	public String paymentInput(Model model) {
 		OrderForm orderForm = (OrderForm) session.getAttribute(ORDER_FORM);
@@ -283,6 +303,26 @@ public class ClientOrderRegistController {
 		// 住所入力から初めて遷移した場合はデフォルト支払方法、
 		// 戻る操作などで再表示された場合は前回選択された支払方法が表示される。
 		model.addAttribute("payMethod", orderForm.getPayMethod());
+
+		UserBean loginUser = (UserBean) session.getAttribute("user");
+		if (loginUser == null) {
+			return "redirect:/login";
+		}
+
+		Timestamp now = currentTimestamp();
+		userCouponRepository.deleteExpired(now);
+		Integer total = calculateCurrentBasketTotal();
+		List<UserCoupon> coupons = userCouponRepository.findAvailableByUserId(loginUser.getId(), now);
+		model.addAttribute("total", total);
+		model.addAttribute("couponBeans", toCouponBeans(coupons, total));
+		model.addAttribute("selectedCouponId", orderForm.getCouponId());
+		model.addAttribute("couponDiscountAmount", safeDiscountAmount(orderForm));
+		model.addAttribute("discountedTotal", Math.max(0, total - safeDiscountAmount(orderForm)));
+		Object couponError = session.getAttribute("couponError");
+		if (couponError != null) {
+			model.addAttribute("couponError", couponError);
+			session.removeAttribute("couponError");
+		}
 		return "client/order/payment_input";
 	}
 
@@ -296,7 +336,9 @@ public class ClientOrderRegistController {
 	 * @throws RuntimeException セッション情報が取得できない場合
 	 */
 	@RequestMapping(path = "/client/order/check", method = RequestMethod.POST)
-	public String orderCheck(@RequestParam Integer payMethod) {
+	public String orderCheck(
+			@RequestParam Integer payMethod,
+			@RequestParam(required = false) Integer couponId) {
 		
 		// 選択された支払方法を注文入力フォームへ設定し、セッションへ保存する。
 		// 1. セッションからORDER_FORMキーでOrderFormを取得する。
@@ -308,13 +350,33 @@ public class ClientOrderRegistController {
 	    }
 		
 		// 3. 取得できたOrderFormに、画面で選択されたpayMethodをsetPayMethodで設定する。
+		if (payMethod == null || payMethod < 1 || payMethod > 5) {
+			return "redirect:/syserror";
+		}
 		orderForm.setPayMethod(payMethod);
+
+		UserBean loginUser = (UserBean) session.getAttribute("user");
+		if (loginUser == null) {
+			return "redirect:/login";
+		}
+		Integer total = calculateCurrentBasketTotal();
+		if (!setSelectedCoupon(orderForm, couponId, loginUser.getId(), total)) {
+			session.setAttribute("couponError", "選択したクーポンは利用できません。利用条件をご確認ください。");
+			return "redirect:/client/order/payment/input";
+		}
 		
 		// 4. 更新後のOrderFormを再度セッションへ保存する。
 		session.setAttribute(ORDER_FORM, orderForm);
 		
 		// 5. 注文確認画面表示用のGETメソッドへリダイレクトする。
 		return "redirect:/client/order/check";
+	}
+
+	/**
+	 * 既存のController単体テストとの互換性を保つためのクーポン未使用呼び出しです。
+	 */
+	public String orderCheck(Integer payMethod) {
+		return orderCheck(payMethod, null);
 	}
 
 	/**
@@ -354,9 +416,20 @@ public class ClientOrderRegistController {
 		// 5. OrderItemBeanリストがnullではなく空でもない場合、priceCalcで小計込みの合計金額を計算する。
 		if (orderItemBeans != null && !orderItemBeans.isEmpty()) {
 			Integer total = priceCalc.orderItemBeanPriceTotalUseSubtotal(orderItemBeans);
+			UserBean loginUser = (UserBean) session.getAttribute("user");
+			if (loginUser == null) {
+				return "redirect:/login";
+			}
+			if (!setSelectedCoupon(orderForm, orderForm.getCouponId(), loginUser.getId(), total)) {
+				session.setAttribute("couponError",
+						"注文内容の変更により、選択したクーポンが利用できなくなりました。");
+				return "redirect:/client/order/payment/input";
+			}
 			
 			// totalをModelへ追加
 			model.addAttribute("total", total);
+			model.addAttribute("couponDiscountAmount", safeDiscountAmount(orderForm));
+			model.addAttribute("discountedTotal", Math.max(0, total - safeDiscountAmount(orderForm)));
 			}
 		
 		// 6. orderItemBeansをModelへ追加し、注文確認画面へ渡す。
@@ -414,9 +487,32 @@ public class ClientOrderRegistController {
 			// 4. 注文不可の場合は注文確認画面へ戻す
 			return "redirect:/client/order/check";
 		}
+
+		UserBean loginUser = (UserBean) session.getAttribute("user");
+		if (loginUser == null || !loginUser.getId().equals(orderForm.getId())) {
+			return "redirect:/login";
+		}
+
+		Integer latestTotal = calculateCurrentBasketTotal();
+		UserCoupon selectedCoupon = null;
+		if (orderForm.getCouponId() != null) {
+			selectedCoupon = userCouponRepository.findByIdAndUserIdForUpdate(
+					orderForm.getCouponId(), loginUser.getId());
+			if (!isCouponUsable(selectedCoupon, latestTotal, currentTimestamp())) {
+				clearCoupon(orderForm);
+				session.setAttribute(ORDER_FORM, orderForm);
+				session.setAttribute("couponError",
+						"選択したクーポンの有効期限または利用条件が変わったため、再度選択してください。");
+				return "redirect:/client/order/payment/input";
+			}
+			applyCoupon(orderForm, selectedCoupon, latestTotal);
+		}
 		
 		// 5. createOrder(orderForm)を呼び出し、届け先・支払方法・会員情報を持つOrder Entityを生成する。
 		Order order = createOrder(orderForm);
+		if (selectedCoupon != null) {
+			order.setCouponType(selectedCoupon.getCouponType());
+		}
 		
 		// 6. orderRepository.save(order)で注文情報を登録し、保存後のOrderを取得する。
 		order = orderRepository.save(order);
@@ -441,6 +537,10 @@ public class ClientOrderRegistController {
 			// 9. 注文数分だけItemの在庫数を減らし、itemRepository.save(item)で在庫を更新する。
 			item.setStock(item.getStock() - basketBean.getOrderNum());
 			itemRepository.save(item);
+		}
+
+		if (selectedCoupon != null) {
+			userCouponRepository.delete(selectedCoupon);
 		}
 		
 		// 10. 注文登録後は、セッションからORDER_FORMとBASKET_BEANSを削除する。
@@ -484,10 +584,12 @@ public class ClientOrderRegistController {
 		order.setName(orderForm.getName());
 		order.setPhoneNumber(orderForm.getPhoneNumber());
 		order.setPayMethod(orderForm.getPayMethod());
-
 		if (orderForm.getDeliveryDate() != null && !orderForm.getDeliveryDate().isEmpty()) {
 			order.setDeliveryDate(java.sql.Date.valueOf(orderForm.getDeliveryDate()));
 		}
+		order.setCouponName(orderForm.getCouponName());
+		order.setCouponDiscountRate(orderForm.getCouponDiscountRate());
+		order.setCouponDiscountAmount(safeDiscountAmount(orderForm));
 
 		// 注文者の会員情報をOrderへ紐付ける。
 		// ここでは会員IDだけを持つUser Entityを作成して設定している。
@@ -496,6 +598,104 @@ public class ClientOrderRegistController {
 		user.setId(orderForm.getId());
 		order.setUser(user);
 		return order;
+	}
+
+	private boolean setSelectedCoupon(
+			OrderForm orderForm, Integer couponId, Integer userId, Integer total) {
+		if (couponId == null) {
+			clearCoupon(orderForm);
+			return true;
+		}
+		UserCoupon coupon = userCouponRepository.findAvailableByIdAndUserId(
+				couponId, userId, currentTimestamp());
+		if (!isCouponUsable(coupon, total, currentTimestamp())) {
+			clearCoupon(orderForm);
+			return false;
+		}
+		applyCoupon(orderForm, coupon, total);
+		return true;
+	}
+
+	private boolean isCouponUsable(UserCoupon coupon, Integer total, Timestamp now) {
+		if (coupon == null || coupon.getCouponType() == null || coupon.getExpiresAt() == null) {
+			return false;
+		}
+		CouponType type = coupon.getCouponType();
+		return Integer.valueOf(ACTIVE_COUPON_TYPE).equals(type.getActiveFlag())
+				&& coupon.getExpiresAt().after(now)
+				&& total != null
+				&& total >= type.getMinimumOrderAmount();
+	}
+
+	private void applyCoupon(OrderForm orderForm, UserCoupon coupon, Integer total) {
+		CouponType type = coupon.getCouponType();
+		orderForm.setCouponId(coupon.getId());
+		orderForm.setCouponName(type.getName());
+		orderForm.setCouponDiscountRate(type.getDiscountRate());
+		orderForm.setCouponDiscountAmount(calculateCouponDiscount(total, type.getDiscountRate()));
+	}
+
+	private int calculateCouponDiscount(Integer total, Integer discountRate) {
+		if (total == null || discountRate == null || total <= 0 || discountRate <= 0) {
+			return 0;
+		}
+		return total * discountRate / 100;
+	}
+
+	private void clearCoupon(OrderForm orderForm) {
+		orderForm.setCouponId(null);
+		orderForm.setCouponName(null);
+		orderForm.setCouponDiscountRate(null);
+		orderForm.setCouponDiscountAmount(0);
+	}
+
+	private int safeDiscountAmount(OrderForm orderForm) {
+		return orderForm.getCouponDiscountAmount() == null ? 0 : orderForm.getCouponDiscountAmount();
+	}
+
+	private Integer calculateCurrentBasketTotal() {
+		int total = 0;
+		List<BasketBean> basketBeans = getBasketBeans();
+		if (basketBeans == null) {
+			return total;
+		}
+		for (BasketBean basketBean : basketBeans) {
+			Item item = itemRepository.findByIdAndDeleteFlag(basketBean.getId(), Constant.NOT_DELETED);
+			if (item != null && item.getPrice() != null && basketBean.getOrderNum() != null
+					&& basketBean.getOrderNum() > 0) {
+				total += item.getPrice() * basketBean.getOrderNum();
+			}
+		}
+		return total;
+	}
+
+	private List<UserCouponBean> toCouponBeans(List<UserCoupon> coupons, Integer total) {
+		List<UserCouponBean> beans = new ArrayList<UserCouponBean>();
+		for (UserCoupon coupon : coupons) {
+			CouponType type = coupon.getCouponType();
+			UserCouponBean bean = new UserCouponBean();
+			bean.setId(coupon.getId());
+			bean.setName(type.getName());
+			bean.setDiscountRate(type.getDiscountRate());
+			bean.setMinimumOrderAmount(type.getMinimumOrderAmount());
+			bean.setAcquiredAt(formatCouponDate(coupon.getAcquiredAt()));
+			bean.setExpiresAt(formatCouponDate(coupon.getExpiresAt()));
+			boolean available = total >= type.getMinimumOrderAmount();
+			bean.setAvailable(available);
+			if (!available) {
+				bean.setUnavailableReason("ご注文金額が最低利用金額に達していません。");
+			}
+			beans.add(bean);
+		}
+		return beans;
+	}
+
+	private String formatCouponDate(Timestamp timestamp) {
+		return timestamp == null ? "" : timestamp.toLocalDateTime().format(COUPON_DATE_FORMAT);
+	}
+
+	private Timestamp currentTimestamp() {
+		return Timestamp.valueOf(LocalDateTime.now(JAPAN_ZONE));
 	}
 
 	private void clearInvalidAddressFields(OrderForm form, BindingResult result) {

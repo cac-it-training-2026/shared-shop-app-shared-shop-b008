@@ -2,15 +2,21 @@ package jp.co.sss.shop.controller.login;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import java.sql.Timestamp;
+
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import jp.co.sss.shop.bean.UserBean;
+import jp.co.sss.shop.entity.LoginHistory;
+import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.form.LoginForm;
+import jp.co.sss.shop.repository.LoginHistoryRepository;
 import jp.co.sss.shop.repository.UserRepository;
 import jp.co.sss.shop.util.Constant;
 
@@ -27,6 +33,12 @@ public class LoginController {
 	 */
 	@Autowired
 	UserRepository userRepository;
+
+	/**
+	 * ログイン履歴情報
+	 */
+	@Autowired
+	LoginHistoryRepository loginHistoryRepository;
 
 	/**
 	 * セッション情報
@@ -59,7 +71,7 @@ public class LoginController {
 			運用管理者、システム管理者の場合 "redirect:/adminmenu"管理者メニュー表示処理
 	 */
 	@RequestMapping(path = "/login", method = RequestMethod.POST)
-	public String doLogin(@Valid @ModelAttribute LoginForm form, BindingResult result) {
+	public String doLogin(@Valid @ModelAttribute LoginForm form, BindingResult result, HttpServletRequest request) {
 
 		String returnStr = "login";
 		if (result.hasErrors()) {
@@ -69,8 +81,20 @@ public class LoginController {
 			returnStr = "login";
 
 		} else {
+			// ログイン成功時、ログイン履歴を保存する
+			UserBean userBean = (UserBean) session.getAttribute("user");
+			User user = new User();
+			user.setId(userBean.getId());
+
+			LoginHistory loginHistory = new LoginHistory();
+			loginHistory.setUser(user);
+			loginHistory.setLoginDateTime(new Timestamp(System.currentTimeMillis()));
+			loginHistory.setIpAddress(request.getRemoteAddr());
+
+			loginHistoryRepository.save(loginHistory);
+
 			//セッションスコープから権限を取り出す
-			Integer authority = ((UserBean) session.getAttribute("user")).getAuthority();
+			Integer authority = userBean.getAuthority();
 			if (authority.intValue() == Constant.AUTH_CLIENT) {
 				// 一般会員ログインした場合、トップ画面表示処理にリダイレクト
 				returnStr = "redirect:/";

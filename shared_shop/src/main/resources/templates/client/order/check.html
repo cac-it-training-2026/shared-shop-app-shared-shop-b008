@@ -51,8 +51,18 @@
 			<td class="total">[[#{data.total}]]</td>
 			<td class="total" th:text="${total}"></td>
 		</tr>
-	</table>
-	<div class="user_info_form_area">
+		</table>
+		<table class="detail_table coupon_order_summary">
+			<caption class="table_caption">クーポン・お支払い金額</caption>
+			<tr><th>商品合計</th><td th:text="${#numbers.formatInteger(total, 1, 'COMMA')} + '円'"></td></tr>
+			<tr>
+				<th>利用クーポン</th>
+				<td th:text="${orderForm.couponId != null} ? ${orderForm.couponName} : '利用しない'"></td>
+			</tr>
+			<tr><th>クーポン割引（節約額）</th><td th:text="'-' + ${#numbers.formatInteger(couponDiscountAmount, 1, 'COMMA')} + '円'"></td></tr>
+			<tr class="discounted_total"><th>割引後合計</th><td th:text="${#numbers.formatInteger(discountedTotal, 1, 'COMMA')} + '円'"></td></tr>
+		</table>
+		<div class="user_info_form_area">
 		<table class="detail_table address">
 			<caption class="table_caption">[[#{data.address}]]</caption>
 			<tr>
@@ -73,7 +83,7 @@
 			</tr>
 			<tr>
 				<th>[[#{data.delivery.date}]]</th>
-				<td th:text="${orderForm.deliveryDate != null && orderForm.deliveryDate != ''} ? ${orderForm.deliveryDate} : #{data.delivery.date.none}"></td>
+				<td th:text="${orderForm.deliveryDate != null} ? ${orderForm.deliveryDate} : #{data.delivery.date.none}"></td>
 			</tr>
 		</table>
 		<table class="detail_table pay">

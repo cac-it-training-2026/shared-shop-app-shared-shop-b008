@@ -62,6 +62,17 @@ public class OrderForm implements Serializable {
 	@NotBlank(message = "{orderForm.deliveryDate.notblank}")
 	@Pattern(regexp = "^[0-9]{4}-[0-9]{2}-[0-9]{2}$", message = "{orderForm.deliveryDate.invalid_format}")
 	private String deliveryDate;
+	/** 利用する会員保有クーポンID */
+	private Integer couponId;
+
+	/** 注文確認時のクーポン名称 */
+	private String couponName;
+
+	/** 注文確認時のクーポン割引率 */
+	private Integer couponDiscountRate;
+
+	/** 注文確認時のクーポン割引額 */
+	private Integer couponDiscountAmount = 0;
 
 	/**
 	 * 注文するユーザIDの取得
@@ -173,6 +184,38 @@ public class OrderForm implements Serializable {
 	 */
 	public void setDeliveryDate(String deliveryDate) {
 		this.deliveryDate = deliveryDate;
+	}
+
+	public Integer getCouponId() {
+		return couponId;
+	}
+
+	public void setCouponId(Integer couponId) {
+		this.couponId = couponId;
+	}
+
+	public String getCouponName() {
+		return couponName;
+	}
+
+	public void setCouponName(String couponName) {
+		this.couponName = couponName;
+	}
+
+	public Integer getCouponDiscountRate() {
+		return couponDiscountRate;
+	}
+
+	public void setCouponDiscountRate(Integer couponDiscountRate) {
+		this.couponDiscountRate = couponDiscountRate;
+	}
+
+	public Integer getCouponDiscountAmount() {
+		return couponDiscountAmount;
+	}
+
+	public void setCouponDiscountAmount(Integer couponDiscountAmount) {
+		this.couponDiscountAmount = couponDiscountAmount;
 	}
 
 }
