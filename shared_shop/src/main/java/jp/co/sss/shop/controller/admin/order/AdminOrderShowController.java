@@ -80,9 +80,10 @@ public class AdminOrderShowController {
 			//PriceCalcクラスのorderItemPriceTotalメソッドを使用して合計金額を算出
 			int total = priceCalc.orderItemPriceTotal(orderItemList);
 			int couponDiscount = order.getCouponDiscountAmount() == null ? 0 : order.getCouponDiscountAmount();
+			int pointDiscount = order.getUsePoint() == null ? 0 : order.getUsePoint();
 
 			//合計金額のセット
-			orderBean.setTotal(Math.max(0, total - couponDiscount));
+			orderBean.setTotal(Math.max(0, total - couponDiscount - pointDiscount));
 
 			orderBeanList.add(orderBean);
 		}

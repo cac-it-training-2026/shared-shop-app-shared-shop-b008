@@ -115,6 +115,9 @@ public class BeanTools {
 			bean.setDeliveryDate(entity.getDeliveryDate().toString());
 		}
 
+		bean.setUsePoint(entity.getUsePoint());
+		bean.setEarnedPoint(entity.getEarnedPoint());
+
 		return bean;
 	}
 

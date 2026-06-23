@@ -89,6 +89,14 @@ public class Order {
 	@Column
 	private Integer couponDiscountAmount;
 
+	/** 利用ポイント */
+	@Column
+	private Integer usePoint = 0;
+
+	/** 付与ポイント */
+	@Column
+	private Integer earnedPoint = 0;
+
 	/**
 	 * 会員情報
 	 */
@@ -260,6 +268,22 @@ public class Order {
 
 	public void setCouponDiscountAmount(Integer couponDiscountAmount) {
 		this.couponDiscountAmount = couponDiscountAmount;
+	}
+
+	public Integer getUsePoint() {
+		return usePoint;
+	}
+
+	public void setUsePoint(Integer usePoint) {
+		this.usePoint = usePoint;
+	}
+
+	public Integer getEarnedPoint() {
+		return earnedPoint;
+	}
+
+	public void setEarnedPoint(Integer earnedPoint) {
+		this.earnedPoint = earnedPoint;
 	}
 
 	/**

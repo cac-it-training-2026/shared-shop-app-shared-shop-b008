@@ -78,7 +78,8 @@ public class ClientOrderShowController {
 			// PriceCalc共通クラスを使って合計金額を計算する
 			int total = priceCalc.orderItemPriceTotal(order.getOrderItemsList());
 			int couponDiscount = order.getCouponDiscountAmount() == null ? 0 : order.getCouponDiscountAmount();
-			bean.setTotal(Math.max(0, total - couponDiscount));
+			int pointDiscount = order.getUsePoint() == null ? 0 : order.getUsePoint();
+			bean.setTotal(Math.max(0, total - couponDiscount - pointDiscount));
 
 			orderBeans.add(bean);
 		}

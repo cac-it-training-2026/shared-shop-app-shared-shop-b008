@@ -562,6 +562,14 @@ public class ClientOrderRegistController {
 		if (selectedCoupon != null) {
 			order.setCouponType(selectedCoupon.getCouponType());
 		}
+
+		// 注文情報のポイント利用・付与履歴をセット
+		int usePoint = orderForm.getUsePoint() != null ? orderForm.getUsePoint() : 0;
+		int totalAfterCoupon = latestTotal - safeDiscountAmount(orderForm);
+		int totalAfterPoint = Math.max(0, totalAfterCoupon - usePoint);
+		int earnedPoint = (int) Math.floor(totalAfterPoint * 0.01);
+		order.setUsePoint(usePoint);
+		order.setEarnedPoint(earnedPoint);
 		
 		// 6. orderRepository.save(order)で注文情報を登録し、保存後のOrderを取得する。
 		order = orderRepository.save(order);
@@ -594,11 +602,6 @@ public class ClientOrderRegistController {
 
 		// ポイント更新
 		User user = userRepository.findByIdAndDeleteFlag(loginUser.getId(), Constant.NOT_DELETED);
-		int usePoint = orderForm.getUsePoint() != null ? orderForm.getUsePoint() : 0;
-		int totalAfterCoupon = latestTotal - safeDiscountAmount(orderForm);
-		int totalAfterPoint = Math.max(0, totalAfterCoupon - usePoint);
-		int earnedPoint = (int) Math.floor(totalAfterPoint * 0.01);
-
 		user.setPoint(user.getPoint() - usePoint + earnedPoint);
 		userRepository.save(user);
 		
