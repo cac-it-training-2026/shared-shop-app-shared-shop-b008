@@ -1,7 +1,6 @@
 package jp.co.sss.shop.form;
 
 import java.io.Serializable;
-import java.sql.Date;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -60,8 +59,9 @@ public class OrderForm implements Serializable {
 	/**
 	 * 配送希望日
 	 */
-	private Date deliveryDate;
-
+	@NotBlank(message = "{orderForm.deliveryDate.notblank}")
+	@Pattern(regexp = "^[0-9]{4}-[0-9]{2}-[0-9]{2}$", message = "{orderForm.deliveryDate.invalid_format}")
+	private String deliveryDate;
 	/** 利用する会員保有クーポンID */
 	private Integer couponId;
 
@@ -177,7 +177,7 @@ public class OrderForm implements Serializable {
 	 * 配送希望日の取得
 	 * @return 配送希望日
 	 */
-	public Date getDeliveryDate() {
+	public String getDeliveryDate() {
 		return deliveryDate;
 	}
 
@@ -185,7 +185,7 @@ public class OrderForm implements Serializable {
 	 * 配送希望日のセット
 	 * @param deliveryDate 配送希望日
 	 */
-	public void setDeliveryDate(Date deliveryDate) {
+	public void setDeliveryDate(String deliveryDate) {
 		this.deliveryDate = deliveryDate;
 	}
 
