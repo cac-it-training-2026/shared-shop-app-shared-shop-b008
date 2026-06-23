@@ -1,11 +1,10 @@
 package jp.co.sss.shop.controller.login;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.sql.Timestamp;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -14,8 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.validation.BindingResult;
 
 import jp.co.sss.shop.bean.UserBean;
@@ -25,8 +23,6 @@ import jp.co.sss.shop.repository.LoginHistoryRepository;
 import jp.co.sss.shop.repository.UserRepository;
 
 public class LoginControllerHistoryTest {
-
-    private MockMvc mockMvc;
 
     @Mock
     private UserRepository userRepository;
@@ -43,7 +39,6 @@ public class LoginControllerHistoryTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(loginController).build();
     }
 
     @Test
@@ -58,13 +53,15 @@ public class LoginControllerHistoryTest {
         userBean.setAuthority(2); // Client
 
         when(session.getAttribute("user")).thenReturn(userBean);
+        BindingResult result = org.mockito.Mockito.mock(BindingResult.class);
+        when(result.hasErrors()).thenReturn(false);
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRemoteAddr("127.0.0.1");
 
         // Act & Assert
-        mockMvc.perform(post("/login")
-                .flashAttr("loginForm", form))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"));
+        String returnPath = loginController.doLogin(form, result, request);
 
+        assertEquals("redirect:/", returnPath);
         verify(loginHistoryRepository, times(1)).save(any(LoginHistory.class));
     }
 }

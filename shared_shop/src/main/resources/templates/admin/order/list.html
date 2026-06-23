@@ -20,6 +20,7 @@
 				<th>[[#{data.id}]]</th>
 				<th>[[#{user}+#{userForm.name}]]</th>
 				<th>[[#{data.order.date}]]</th>
+				<th>[[#{data.delivery.date}]]</th>
 				<th>[[#{data.paymethod}]]</th>
 				<th>[[#{data.total.price}]]</th>
 			</tr>
@@ -30,6 +31,7 @@
 					<a th:href="@{/admin/order/detail/{id}(id=${order.id})}" th:text="${order.userName}"></a>
 				</td>
 				<td th:text="${order.insertDate}"></td>
+				<td th:text="${order.deliveryDate != null && order.deliveryDate != ''} ? ${order.deliveryDate} : #{data.delivery.date.none}"></td>
 				<td th:switch="${order.payMethod}">
 					<span th:case="1">[[#{paymethod.credit.str}]]</span>
 					<span th:case="2">[[#{paymethod.bank.str}]]</span>

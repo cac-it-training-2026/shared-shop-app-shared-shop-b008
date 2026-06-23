@@ -37,6 +37,14 @@
 					<label><span class="input_title">[[#{orderForm.phoneNumber}]]</span></label>
 					<input type="text" th:field="*{phoneNumber}" />
 				</li>
+				<li>
+					<label><span class="input_title">[[#{data.delivery.date}]]</span></label>
+					<input type="date" th:field="*{deliveryDate}" />
+					<p th:text="#{msg.order.delivery.date.hint}"></p>
+					<ul th:if="${#fields.hasErrors('deliveryDate')}" class="error_list">
+						<li th:each="err : ${#fields.errors('deliveryDate')}" th:text="${err}"></li>
+					</ul>
+				</li>
 			</ul>
 			<input type="hidden" th:field="*{id}" />
 			<input type="hidden" th:field="*{payMethod}" />
