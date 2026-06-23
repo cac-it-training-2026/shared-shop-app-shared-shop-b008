@@ -57,34 +57,6 @@
 				</li>
 			</ul>
 
-			<section class="coupon_payment_area">
-				<h3>クーポンを利用する</h3>
-				<p class="coupon_error" th:if="${couponError != null}" th:text="${couponError}"></p>
-				<div class="payment_total_row">
-					<span>商品合計</span>
-					<strong id="orderTotal" th:attr="data-total=${total}"
-						th:text="|${#numbers.formatInteger(total, 1, 'COMMA')}円|"></strong>
-				</div>
-				<label for="couponId">利用するクーポン</label>
-				<select id="couponId" name="couponId" onchange="updateCouponPreview()">
-					<option value="" data-rate="0">クーポンを利用しない</option>
-					<option th:each="coupon : ${couponBeans}"
-						th:value="${coupon.id}"
-						th:attr="data-rate=${coupon.discountRate}"
-						th:disabled="${!coupon.available}"
-						th:selected="${selectedCouponId != null and selectedCouponId == coupon.id}"
-						th:text="|${coupon.name}（${#numbers.formatInteger(coupon.minimumOrderAmount, 1, 'COMMA')}円以上）${coupon.available ? '' : '― ご注文金額が不足しています'}|">
-					</option>
-				</select>
-				<p class="coupon_empty" th:if="${#lists.isEmpty(couponBeans)}" th:text="#{msg.coupon.payment.none}"></p>
-				<div class="coupon_preview" aria-live="polite">
-					<p><span>クーポン割引（節約額）</span><strong id="couponDiscount"
-						th:text="'-' + ${#numbers.formatInteger(couponDiscountAmount, 1, 'COMMA')} + '円'"></strong></p>
-					<p class="discounted_total"><span>割引後合計</span><strong id="discountedTotal"
-						th:text="${#numbers.formatInteger(discountedTotal, 1, 'COMMA')} + '円'"></strong></p>
-				</div>
-			</section>
-
 			<input type="submit" class="send_button" value="次へ" />
 
 		</form>
@@ -92,16 +64,6 @@
 			<input type="submit" class="back_button" value="戻る" />
 		</form>
 	</div>
-	<script>
-		function updateCouponPreview() {
-			const total = Number(document.getElementById('orderTotal').dataset.total);
-			const select = document.getElementById('couponId');
-			const rate = Number(select.options[select.selectedIndex].dataset.rate || 0);
-			const discount = Math.floor(total * rate / 100);
-			document.getElementById('couponDiscount').textContent = '-' + discount.toLocaleString('ja-JP') + '円';
-			document.getElementById('discountedTotal').textContent = (total - discount).toLocaleString('ja-JP') + '円';
-		}
-	</script>
 </body>
 
 </html>

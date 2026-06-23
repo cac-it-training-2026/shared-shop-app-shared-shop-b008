@@ -75,15 +75,6 @@ public class FilterConfig {
 	}
 
 	/**
-	 * カテゴリ一覧取得用フィルタ
-	 * @return フィルタ
-	 */
-	@Bean
-	public CategoryListMakeFilter categoryListMakeFilter() {
-		return new CategoryListMakeFilter();
-	}
-
-	/**
 	 * カテゴリ一覧取得用フィルタの設定
 	 *
 	 * @return フィルタ設定情報
@@ -92,7 +83,7 @@ public class FilterConfig {
 	public FilterRegistrationBean<CategoryListMakeFilter> configCategoryListMakeFilter() {
 		FilterRegistrationBean<CategoryListMakeFilter> bean = new FilterRegistrationBean<CategoryListMakeFilter>();
 
-		bean.setFilter(categoryListMakeFilter());
+		bean.setFilter(new CategoryListMakeFilter());
 		bean.setOrder(5);
 		return bean;
 	}
