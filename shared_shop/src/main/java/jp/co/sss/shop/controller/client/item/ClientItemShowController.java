@@ -12,10 +12,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+
 import jp.co.sss.shop.bean.ItemBean;
+import jp.co.sss.shop.bean.ReviewBean;
 import jp.co.sss.shop.entity.Item;
+import jp.co.sss.shop.entity.Review;
 import jp.co.sss.shop.repository.CategoryRepository;
 import jp.co.sss.shop.repository.ItemRepository;
+import jp.co.sss.shop.repository.ReviewRepository;
 import jp.co.sss.shop.service.BeanTools;
 import jp.co.sss.shop.util.Constant;
 
@@ -195,14 +200,21 @@ public class ClientItemShowController {
 	}
 
 	/**
+	 * レビュー情報
+	 */
+	@Autowired
+	ReviewRepository reviewRepository;
+
+	/**
 	 * 詳細表示処理
 	 *
 	 * @param id      表示対象ID
+	 * @param reviewSortType レビューの表示順種別(1:新着順、2:高評価順、3:低評価順)
 	 * @param model   Viewとの値受渡し
 	 * @return "client/item/detail" 詳細画面 表示
 	 */
 	@RequestMapping(path = "/client/item/detail/{id}")
-	public String showItem(@PathVariable int id, Model model) {
+	public String showItem(@PathVariable int id, @RequestParam(name = "reviewSortType", defaultValue = "1") Integer reviewSortType, Model model) {
 
 		// 商品IDに該当する商品情報を取得する
 		Item item = itemRepository.findByIdAndDeleteFlag(id, Constant.NOT_DELETED);
@@ -215,6 +227,35 @@ public class ClientItemShowController {
 
 		// 商品情報をViewへ渡す
 		model.addAttribute("item", itemBean);
+
+		// レビュー一覧を取得
+		List<Review> reviewList;
+		if (reviewSortType == 2) {
+			// 高評価順
+			reviewList = reviewRepository.findByItemIdOrderByRatingDescInsertDateDesc(id);
+		} else if (reviewSortType == 3) {
+			// 低評価順
+			reviewList = reviewRepository.findByItemIdOrderByRatingAscInsertDateDesc(id);
+		} else {
+			// 新着順
+			reviewList = reviewRepository.findByItemIdOrderByInsertDateDesc(id);
+		}
+
+		// レビュー情報をBeanに変換
+		List<ReviewBean> reviewBeanList = new ArrayList<>();
+		for (Review review : reviewList) {
+			ReviewBean reviewBean = new ReviewBean();
+			reviewBean.setId(review.getId());
+			reviewBean.setUserName(review.getUser().getName());
+			reviewBean.setRating(review.getRating());
+			reviewBean.setReviewComment(review.getReviewComment());
+			reviewBean.setInsertDate(review.getInsertDate().toString());
+			reviewBean.setUserId(review.getUser().getId());
+			reviewBeanList.add(reviewBean);
+		}
+
+		model.addAttribute("reviews", reviewBeanList);
+		model.addAttribute("reviewSortType", reviewSortType);
 
 		return "client/item/detail";
 	}

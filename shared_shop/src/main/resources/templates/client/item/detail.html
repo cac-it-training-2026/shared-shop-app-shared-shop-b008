@@ -41,6 +41,44 @@
 				<input type="submit" value="戻る" class="back_button" />
 			</form>
 		</div>
+
+		<hr />
+
+		<div class="review_area">
+			<h3 class="title">カスタマーレビュー</h3>
+			<div class="review_sort_area">
+				並び替え：
+				<span th:if="${reviewSortType == 1}">新着順</span>
+				<a th:if="${reviewSortType != 1}" th:href="@{/client/item/detail/{id}(id=*{id}, reviewSortType=1)}">新着順</a>
+				|
+				<span th:if="${reviewSortType == 2}">高評価順</span>
+				<a th:if="${reviewSortType != 2}" th:href="@{/client/item/detail/{id}(id=*{id}, reviewSortType=2)}">高評価順</a>
+				|
+				<span th:if="${reviewSortType == 3}">低評価順</span>
+				<a th:if="${reviewSortType != 3}" th:href="@{/client/item/detail/{id}(id=*{id}, reviewSortType=3)}">低評価順</a>
+			</div>
+
+			<div th:if="${#lists.isEmpty(reviews)}">
+				<p>この商品へのレビューはまだありません。</p>
+			</div>
+
+			<div th:if="${!#lists.isEmpty(reviews)}" th:each="review : ${reviews}" class="review_item">
+				<div class="review_header">
+					<span class="review_rating" th:text="${'★' + review.rating}"></span>
+					<span class="review_user" th:text="${review.userName}"></span>
+					<span class="review_date" th:text="${review.insertDate}"></span>
+				</div>
+				<div class="review_comment">
+					<p th:text="${review.reviewComment}"></p>
+				</div>
+				<div class="review_action" th:if="${session.user != null and (session.user.id == review.userId or session.user.authority == T(jp.co.sss.shop.util.Constant).AUTH_ADMIN)}">
+					<form th:action="@{/client/review/delete/{id}(id=${review.id})}" method="post">
+						<input type="submit" value="削除" class="delete_button" onclick="return confirm('レビューを削除しますか？')" />
+					</form>
+				</div>
+				<hr />
+			</div>
+		</div>
 	</div>
 
 </body>
