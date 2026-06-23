@@ -17,6 +17,7 @@ import jp.co.sss.shop.bean.UserBean;
 import jp.co.sss.shop.entity.CouponType;
 import jp.co.sss.shop.entity.Item;
 import jp.co.sss.shop.entity.Order;
+import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.entity.UserCoupon;
 import jp.co.sss.shop.form.OrderForm;
 import jp.co.sss.shop.repository.ItemRepository;
@@ -62,6 +63,9 @@ class ClientOrderRegistControllerTest {
     @Mock
     private PriceCalc priceCalc;
 
+    @Mock
+    private org.springframework.context.MessageSource messageSource;
+
     private MockHttpSession session;
 
     @BeforeEach
@@ -69,6 +73,7 @@ class ClientOrderRegistControllerTest {
         MockitoAnnotations.openMocks(this);
         session = new MockHttpSession();
         controller.session = session;
+        when(messageSource.getMessage(anyString(), any(), any())).thenReturn("error message");
     }
 
     @Test
@@ -100,6 +105,11 @@ class ClientOrderRegistControllerTest {
         Order order = new Order();
         order.setId(100);
         when(orderRepository.save(any(Order.class))).thenReturn(order);
+
+        User user = new User();
+        user.setId(1);
+        user.setPoint(500);
+        when(userRepository.findByIdAndDeleteFlag(1, Constant.NOT_DELETED)).thenReturn(user);
 
         String view = controller.orderComplete();
 
@@ -136,7 +146,7 @@ class ClientOrderRegistControllerTest {
 		coupon.setExpiresAt(java.sql.Timestamp.valueOf(java.time.LocalDateTime.now().plusDays(1)));
 		when(userCouponRepository.findAvailableByIdAndUserId(eq(9), eq(1), any())).thenReturn(coupon);
 
-		String view = controller.orderCheck(1, 9);
+		String view = controller.orderCheck(1, 9, 0);
 
 		assertEquals("redirect:/client/order/check", view);
 		assertEquals(9, orderForm.getCouponId());
@@ -168,7 +178,7 @@ class ClientOrderRegistControllerTest {
 		coupon.setExpiresAt(java.sql.Timestamp.valueOf(java.time.LocalDateTime.now().plusDays(1)));
 		when(userCouponRepository.findAvailableByIdAndUserId(eq(9), eq(1), any())).thenReturn(coupon);
 
-		String view = controller.orderCheck(1, 9);
+		String view = controller.orderCheck(1, 9, 0);
 
 		assertEquals("redirect:/client/order/payment/input", view);
 		assertNull(orderForm.getCouponId());
@@ -226,6 +236,59 @@ class ClientOrderRegistControllerTest {
 
         assertEquals("redirect:/client/order/payment/input", view);
         assertNull(result.getFieldError("deliveryDate"));
+    }
+
+    @Test
+    void orderCheck_NegativePoint_ReturnsError() {
+        OrderForm orderForm = new OrderForm();
+        orderForm.setId(1);
+        session.setAttribute("orderForm", orderForm);
+        UserBean loginUser = new UserBean();
+        loginUser.setId(1);
+        session.setAttribute("user", loginUser);
+
+        String view = controller.orderCheck(1, null, -100);
+
+        assertEquals("redirect:/client/order/payment/input", view);
+        assertEquals("error message", session.getAttribute("pointError"));
+    }
+
+    @Test
+    void orderCheck_PointBelow100_ReturnsError() {
+        OrderForm orderForm = new OrderForm();
+        orderForm.setId(1);
+        session.setAttribute("orderForm", orderForm);
+        UserBean loginUser = new UserBean();
+        loginUser.setId(1);
+        session.setAttribute("user", loginUser);
+
+        User user = new User();
+        user.setPoint(500);
+        when(userRepository.findByIdAndDeleteFlag(1, Constant.NOT_DELETED)).thenReturn(user);
+
+        String view = controller.orderCheck(1, null, 50);
+
+        assertEquals("redirect:/client/order/payment/input", view);
+        assertEquals("error message", session.getAttribute("pointError"));
+    }
+
+    @Test
+    void orderCheck_PointExceedsHold_ReturnsError() {
+        OrderForm orderForm = new OrderForm();
+        orderForm.setId(1);
+        session.setAttribute("orderForm", orderForm);
+        UserBean loginUser = new UserBean();
+        loginUser.setId(1);
+        session.setAttribute("user", loginUser);
+
+        User user = new User();
+        user.setPoint(500);
+        when(userRepository.findByIdAndDeleteFlag(1, Constant.NOT_DELETED)).thenReturn(user);
+
+        String view = controller.orderCheck(1, null, 600);
+
+        assertEquals("redirect:/client/order/payment/input", view);
+        assertEquals("error message", session.getAttribute("pointError"));
     }
 
     @Test

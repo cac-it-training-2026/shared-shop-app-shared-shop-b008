@@ -95,6 +95,12 @@ public class User {
 	private Timestamp lockReleaseTime;
 
 	/**
+	 * ポイント
+	 */
+	@Column
+	private Integer point = 0;
+
+	/**
 	 * 会員IDの取得
 	 * @return 会員ID
 	 */
@@ -284,5 +290,21 @@ public class User {
 	 */
 	public void setLockReleaseTime(Timestamp lockReleaseTime) {
 		this.lockReleaseTime = lockReleaseTime;
+	}
+
+	/**
+	 * ポイントの取得
+	 * @return ポイント
+	 */
+	public Integer getPoint() {
+		return point;
+	}
+
+	/**
+	 * ポイントのセット
+	 * @param point ポイント
+	 */
+	public void setPoint(Integer point) {
+		this.point = point;
 	}
 }
