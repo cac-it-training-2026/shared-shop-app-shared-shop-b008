@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -80,6 +79,7 @@ class ClientOrderRegistControllerTest {
         orderForm.setName("Test Name");
         orderForm.setPhoneNumber("09012345678");
         orderForm.setPayMethod(1);
+        orderForm.setDeliveryDate("2026-06-25");
         session.setAttribute("orderForm", orderForm);
 
 		UserBean loginUser = new UserBean();
@@ -182,7 +182,7 @@ class ClientOrderRegistControllerTest {
 
         OrderForm form = new OrderForm();
         LocalDate today = LocalDate.now();
-        form.setDeliveryDate(Date.valueOf(today.plusDays(2))); // 2 days later (invalid)
+        form.setDeliveryDate(today.plusDays(2).toString()); // 2 days later (invalid)
 
         BindingResult result = new BeanPropertyBindingResult(form, "orderForm");
 
@@ -200,7 +200,7 @@ class ClientOrderRegistControllerTest {
 
         OrderForm form = new OrderForm();
         LocalDate today = LocalDate.now();
-        form.setDeliveryDate(Date.valueOf(today.plusDays(15))); // 15 days later (invalid)
+        form.setDeliveryDate(today.plusDays(15).toString()); // 15 days later (invalid)
 
         BindingResult result = new BeanPropertyBindingResult(form, "orderForm");
 
@@ -218,7 +218,7 @@ class ClientOrderRegistControllerTest {
 
         OrderForm form = new OrderForm();
         LocalDate today = LocalDate.now();
-        form.setDeliveryDate(Date.valueOf(today.plusDays(3))); // 3 days later (valid)
+        form.setDeliveryDate(today.plusDays(3).toString()); // 3 days later (valid)
 
         BindingResult result = new BeanPropertyBindingResult(form, "orderForm");
 
@@ -229,12 +229,14 @@ class ClientOrderRegistControllerTest {
     }
 
     @Test
-    void addressInputCheck_DeliveryDate_Null_Valid() {
+    void addressInputCheck_DeliveryDate_Empty_Valid_From_BusinessCheck() {
+        // Note: NotBlank validation is handled by @Valid in Spring, not by manual check in this method.
+        // In this unit test, we're calling addressInputCheck manually.
         OrderForm lastForm = new OrderForm();
         session.setAttribute("orderForm", lastForm);
 
         OrderForm form = new OrderForm();
-        form.setDeliveryDate(null); // Not specified (valid)
+        form.setDeliveryDate(""); // Not specified
 
         BindingResult result = new BeanPropertyBindingResult(form, "orderForm");
 
@@ -242,5 +244,22 @@ class ClientOrderRegistControllerTest {
 
         assertEquals("redirect:/client/order/payment/input", view);
         assertNull(result.getFieldError("deliveryDate"));
+    }
+
+    @Test
+    void addressInputCheck_DeliveryDate_InvalidFormat() {
+        OrderForm lastForm = new OrderForm();
+        session.setAttribute("orderForm", lastForm);
+
+        OrderForm form = new OrderForm();
+        form.setDeliveryDate("2026/06/25"); // Invalid format
+
+        BindingResult result = new BeanPropertyBindingResult(form, "orderForm");
+
+        String view = controller.addressInputCheck(form, result);
+
+        assertEquals("redirect:/client/order/address/input", view);
+        assertTrue(result.hasFieldErrors("deliveryDate"));
+        assertEquals("orderForm.deliveryDate.invalid_format", result.getFieldError("deliveryDate").getCode());
     }
 }
