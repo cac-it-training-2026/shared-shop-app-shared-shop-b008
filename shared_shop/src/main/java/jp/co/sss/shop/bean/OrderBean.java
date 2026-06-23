@@ -76,6 +76,12 @@ public class OrderBean {
 	/** 注文時点のクーポン割引額 */
 	private Integer couponDiscountAmount;
 
+	/** 利用ポイント */
+	private Integer usePoint;
+
+	/** 付与ポイント */
+	private Integer earnedPoint;
+
 	/**
 	 * 注文IDの取得
 	 * @return 注文ID
@@ -274,6 +280,22 @@ public class OrderBean {
 
 	public void setCouponDiscountAmount(Integer couponDiscountAmount) {
 		this.couponDiscountAmount = couponDiscountAmount;
+	}
+
+	public Integer getUsePoint() {
+		return usePoint;
+	}
+
+	public void setUsePoint(Integer usePoint) {
+		this.usePoint = usePoint;
+	}
+
+	public Integer getEarnedPoint() {
+		return earnedPoint;
+	}
+
+	public void setEarnedPoint(Integer earnedPoint) {
+		this.earnedPoint = earnedPoint;
 	}
 
 }

@@ -118,6 +118,9 @@ public class BeanTools {
 			bean.setCancelDate(entity.getCancelDate().toString());
 		}
 
+		bean.setUsePoint(entity.getUsePoint());
+		bean.setEarnedPoint(entity.getEarnedPoint());
+
 		return bean;
 	}
 

@@ -126,6 +126,12 @@ public class ClientOrderRegistController {
 	PriceCalc priceCalc;
 
 	/**
+	 * メッセージソース
+	 */
+	@Autowired
+	org.springframework.context.MessageSource messageSource;
+
+	/**
 	 * セッション
 	 */
 	@Autowired
@@ -323,6 +329,18 @@ public class ClientOrderRegistController {
 			model.addAttribute("couponError", couponError);
 			session.removeAttribute("couponError");
 		}
+
+		// 会員の最新情報を取得して保有ポイントをモデルに追加
+		User user = userRepository.findByIdAndDeleteFlag(loginUser.getId(), Constant.NOT_DELETED);
+		model.addAttribute("point", user.getPoint());
+		model.addAttribute("usePoint", orderForm.getUsePoint());
+		model.addAttribute("discountedTotal", Math.max(0, total - safeDiscountAmount(orderForm)));
+		Object pointError = session.getAttribute("pointError");
+		if (pointError != null) {
+			model.addAttribute("pointError", pointError);
+			session.removeAttribute("pointError");
+		}
+
 		return "client/order/payment_input";
 	}
 
@@ -338,7 +356,8 @@ public class ClientOrderRegistController {
 	@RequestMapping(path = "/client/order/check", method = RequestMethod.POST)
 	public String orderCheck(
 			@RequestParam Integer payMethod,
-			@RequestParam(required = false) Integer couponId) {
+			@RequestParam(required = false) Integer couponId,
+			@RequestParam(required = false) Integer usePoint) {
 		
 		// 選択された支払方法を注文入力フォームへ設定し、セッションへ保存する。
 		// 1. セッションからORDER_FORMキーでOrderFormを取得する。
@@ -364,6 +383,34 @@ public class ClientOrderRegistController {
 			session.setAttribute("couponError", "選択したクーポンは利用できません。利用条件をご確認ください。");
 			return "redirect:/client/order/payment/input";
 		}
+
+		// ポイントバリデーション
+		if (usePoint == null) {
+			usePoint = 0;
+		}
+		if (usePoint < 0) {
+			session.setAttribute("pointError", messageSource.getMessage("msg.point.invalid.input", null, java.util.Locale.JAPAN));
+			return "redirect:/client/order/payment/input";
+		}
+		if (usePoint > 0) {
+			User user = userRepository.findByIdAndDeleteFlag(loginUser.getId(), Constant.NOT_DELETED);
+			int holdPoint = user.getPoint();
+			int discountedTotal = total - safeDiscountAmount(orderForm);
+
+			if (holdPoint < 100 || usePoint < 100) {
+				session.setAttribute("pointError", messageSource.getMessage("msg.point.minimum.requirement", null, java.util.Locale.JAPAN));
+				return "redirect:/client/order/payment/input";
+			}
+			if (usePoint > holdPoint) {
+				session.setAttribute("pointError", messageSource.getMessage("msg.point.over.hold", null, java.util.Locale.JAPAN));
+				return "redirect:/client/order/payment/input";
+			}
+			if (usePoint > discountedTotal) {
+				session.setAttribute("pointError", messageSource.getMessage("msg.point.over.price", null, java.util.Locale.JAPAN));
+				return "redirect:/client/order/payment/input";
+			}
+		}
+		orderForm.setUsePoint(usePoint);
 		
 		// 4. 更新後のOrderFormを再度セッションへ保存する。
 		session.setAttribute(ORDER_FORM, orderForm);
@@ -373,10 +420,10 @@ public class ClientOrderRegistController {
 	}
 
 	/**
-	 * 既存のController単体テストとの互換性を保つためのクーポン未使用呼び出しです。
+	 * 既存のController単体テストとの互換性を保つためのクーポン・ポイント未使用呼び出しです。
 	 */
 	public String orderCheck(Integer payMethod) {
-		return orderCheck(payMethod, null);
+		return orderCheck(payMethod, null, 0);
 	}
 
 	/**
@@ -429,7 +476,17 @@ public class ClientOrderRegistController {
 			// totalをModelへ追加
 			model.addAttribute("total", total);
 			model.addAttribute("couponDiscountAmount", safeDiscountAmount(orderForm));
-			model.addAttribute("discountedTotal", Math.max(0, total - safeDiscountAmount(orderForm)));
+			int totalAfterCoupon = Math.max(0, total - safeDiscountAmount(orderForm));
+			model.addAttribute("discountedTotal", totalAfterCoupon);
+
+			// ポイント関連の計算
+			int usePoint = orderForm.getUsePoint() != null ? orderForm.getUsePoint() : 0;
+			int totalAfterPoint = Math.max(0, totalAfterCoupon - usePoint);
+			int earnedPoint = (int) Math.floor(totalAfterPoint * 0.01);
+
+			model.addAttribute("usePoint", usePoint);
+			model.addAttribute("totalAfterPoint", totalAfterPoint);
+			model.addAttribute("earnedPoint", earnedPoint);
 			}
 		
 		// 6. orderItemBeansをModelへ追加し、注文確認画面へ渡す。
@@ -513,6 +570,14 @@ public class ClientOrderRegistController {
 		if (selectedCoupon != null) {
 			order.setCouponType(selectedCoupon.getCouponType());
 		}
+
+		// 注文情報のポイント利用・付与履歴をセット
+		int usePoint = orderForm.getUsePoint() != null ? orderForm.getUsePoint() : 0;
+		int totalAfterCoupon = latestTotal - safeDiscountAmount(orderForm);
+		int totalAfterPoint = Math.max(0, totalAfterCoupon - usePoint);
+		int earnedPoint = (int) Math.floor(totalAfterPoint * 0.01);
+		order.setUsePoint(usePoint);
+		order.setEarnedPoint(earnedPoint);
 		
 		// 6. orderRepository.save(order)で注文情報を登録し、保存後のOrderを取得する。
 		order = orderRepository.save(order);
@@ -542,6 +607,11 @@ public class ClientOrderRegistController {
 		if (selectedCoupon != null) {
 			userCouponRepository.delete(selectedCoupon);
 		}
+
+		// ポイント更新
+		User user = userRepository.findByIdAndDeleteFlag(loginUser.getId(), Constant.NOT_DELETED);
+		user.setPoint(user.getPoint() - usePoint + earnedPoint);
+		userRepository.save(user);
 		
 		// 10. 注文登録後は、セッションからORDER_FORMとBASKET_BEANSを削除する。
 		session.removeAttribute(ORDER_FORM);
