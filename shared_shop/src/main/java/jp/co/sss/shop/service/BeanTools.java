@@ -11,10 +11,12 @@ import jp.co.sss.shop.bean.CategoryBean;
 import jp.co.sss.shop.bean.ItemBean;
 import jp.co.sss.shop.bean.OrderBean;
 import jp.co.sss.shop.bean.OrderItemBean;
+import jp.co.sss.shop.bean.ReviewBean;
 import jp.co.sss.shop.entity.Category;
 import jp.co.sss.shop.entity.Item;
 import jp.co.sss.shop.entity.Order;
 import jp.co.sss.shop.entity.OrderItem;
+import jp.co.sss.shop.entity.Review;
 import jp.co.sss.shop.form.ItemForm;
 
 /**
@@ -222,5 +224,41 @@ public class BeanTools {
 			orderItemBeanList.add(orderItemBean);
 		}
 		return orderItemBeanList;
+	}
+
+	/**
+	 * ReviewエンティティからReviewBeanを生成
+	 *
+	 * @param entity レビューエンティティ
+	 * @return レビューBean
+	 */
+	public ReviewBean copyEntityToReviewBean(Review entity) {
+		ReviewBean bean = new ReviewBean();
+		BeanUtils.copyProperties(entity, bean);
+
+		bean.setUserId(entity.getUser().getId());
+		bean.setUserName(entity.getUser().getName());
+		bean.setItemId(entity.getItem().getId());
+		bean.setOrderItemId(entity.getOrderItem().getId());
+
+		if (entity.getInsertDate() != null) {
+			bean.setInsertDate(entity.getInsertDate().toString());
+		}
+
+		return bean;
+	}
+
+	/**
+	 * ReviewエンティティのリストからReviewBeanのリストを生成
+	 *
+	 * @param entityList レビューエンティティのリスト
+	 * @return レビューBeanのリスト
+	 */
+	public List<ReviewBean> copyEntityListToReviewBeanList(List<Review> entityList) {
+		List<ReviewBean> beanList = new ArrayList<>();
+		for (Review entity : entityList) {
+			beanList.add(copyEntityToReviewBean(entity));
+		}
+		return beanList;
 	}
 }

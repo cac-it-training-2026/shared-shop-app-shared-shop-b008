@@ -32,6 +32,11 @@ public class OrderItemBean {
 	private Integer subtotal;
 
 	/**
+	 * レビューID
+	 */
+	private Integer reviewId;
+
+	/**
 	 * 注文商品IDの取得
 	 * @return 注文商品ID
 	 */
@@ -125,5 +130,21 @@ public class OrderItemBean {
 	 */
 	public void setOrderNum(Integer orderNum) {
 		this.orderNum = orderNum;
+	}
+
+	/**
+	 * レビューIDの取得
+	 * @return レビューID
+	 */
+	public Integer getReviewId() {
+		return reviewId;
+	}
+
+	/**
+	 * レビューIDのセット
+	 * @param reviewId レビューID
+	 */
+	public void setReviewId(Integer reviewId) {
+		this.reviewId = reviewId;
 	}
 }

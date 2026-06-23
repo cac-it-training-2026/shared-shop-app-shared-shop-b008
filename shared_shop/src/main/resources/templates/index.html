@@ -20,6 +20,14 @@
 		<!--/* 1件分の商品情報 */-->
 		<div class="item">
 			<div class="item_name" th:text="${item.name}"></div>
+			<div th:if="${item.reviewCount > 0}" class="review_rating">
+				<span th:if="${item.avgRating >= 4.5}">★★★★★</span>
+				<span th:if="${item.avgRating >= 3.5 and item.avgRating < 4.5}">★★★★☆</span>
+				<span th:if="${item.avgRating >= 2.5 and item.avgRating < 3.5}">★★★☆☆</span>
+				<span th:if="${item.avgRating >= 1.5 and item.avgRating < 2.5}">★★☆☆☆</span>
+				<span th:if="${item.avgRating < 1.5}">★☆☆☆☆</span>
+				(<span th:text="${item.reviewCount}"></span>)
+			</div>
 			<a th:href="@{/client/item/detail/}+${item.id}">
 			    <img th:src="@{/images/{image}(image=${item.image})}" th:if="${item.image != null}" />
 			    <img th:src="@{/images/common/no_image.jpg}" th:if="${item.image == null}" />

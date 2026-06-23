@@ -15,7 +15,10 @@ import jp.co.sss.shop.bean.OrderBean;
 import jp.co.sss.shop.bean.OrderItemBean;
 import jp.co.sss.shop.bean.UserBean;
 import jp.co.sss.shop.entity.Order;
+import jp.co.sss.shop.entity.OrderItem;
+import jp.co.sss.shop.entity.Review;
 import jp.co.sss.shop.repository.OrderRepository;
+import jp.co.sss.shop.repository.ReviewRepository;
 import jp.co.sss.shop.service.BeanTools;
 import jp.co.sss.shop.service.PriceCalc;
 
@@ -32,6 +35,12 @@ public class ClientOrderShowController {
 	 */
 	@Autowired
 	OrderRepository orderRepository;
+
+	/**
+	 * レビュー情報リポジトリ
+	 */
+	@Autowired
+	ReviewRepository reviewRepository;
 
 	/**
 	 * Entity、Form、Bean間のデータコピーサービス
@@ -109,7 +118,23 @@ public class ClientOrderShowController {
 		OrderBean bean = beanTools.copyEntityToOrderBean(order);
 
 		// 該当する注文商品Beanリストを取得
-		List<OrderItemBean> orderItemBeans = beanTools.generateOrderItemBeanList(order.getOrderItemsList());
+		List<OrderItemBean> orderItemBeans = new ArrayList<>();
+		for (OrderItem orderItem : order.getOrderItemsList()) {
+			OrderItemBean orderItemBean = new OrderItemBean();
+			orderItemBean.setId(orderItem.getId());
+			orderItemBean.setName(orderItem.getItem().getName());
+			orderItemBean.setPrice(orderItem.getPrice());
+			orderItemBean.setOrderNum(orderItem.getQuantity());
+			orderItemBean.setSubtotal(orderItem.getPrice() * orderItem.getQuantity());
+
+			// レビュー投稿済みかチェック
+			Review review = reviewRepository.findByOrderItemId(orderItem.getId());
+			if (review != null) {
+				orderItemBean.setReviewId(review.getId());
+			}
+
+			orderItemBeans.add(orderItemBean);
+		}
 
 		// 注文時の商品単価から合計金額を算出し表示
 		// PriceCalc共通クラスを使って合計金額を計算する

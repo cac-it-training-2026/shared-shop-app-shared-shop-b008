@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{common/layout_5block :: layout(~{::title},~{::body/content()})}">
+
+<head>
+	<title th:text="#{title.review.regist} + ' | ' + #{shop.title}"> </title>
+	<meta charset="UTF-8" />
+</head>
+
+<body class="user">
+
+	<h2 th:class="title" th:text="#{title.review.regist}"></h2>
+
+	<div class="info_form_area">
+		<div class="item_detail_area">
+			<div class="item_image_area">
+				<img th:if="${item.image != null}" th:src="@{/images/{image}(image=${item.image})}"></img>
+				<img th:if="${item.image == null}" th:src="@{/images/common/no_image.jpg}"></img>
+			</div>
+			<dl class="item_detail_list">
+				<dt>[[#{data.item.name}]]</dt>
+				<dd th:text="${item.name}"></dd>
+				<dt>[[#{data.category}]]</dt>
+				<dd th:text="${item.category.name}"></dd>
+			</dl>
+		</div>
+
+		<form th:action="@{/client/review/regist}" th:method="post" th:object="${reviewForm}" class="user_info_form">
+			<ul th:if="${#fields.hasErrors('*')}" class="error_list">
+				<li th:each="err : ${#fields.errors('*')}" th:text="${err}"></li>
+			</ul>
+
+			<input type="hidden" th:field="*{orderItemId}" />
+			<input type="hidden" th:field="*{itemId}" />
+
+			<table class="info_table">
+				<tr>
+					<th>[[#{data.review.rating}]]</th>
+					<td>
+						<select th:field="*{rating}">
+							<option value="">--選択してください--</option>
+							<option value="5">★★★★★ (5)</option>
+							<option value="4">★★★★☆ (4)</option>
+							<option value="3">★★★☆☆ (3)</option>
+							<option value="2">★★☆☆☆ (2)</option>
+							<option value="1">★☆☆☆☆ (1)</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<th>[[#{data.review.comment}]]</th>
+					<td>
+						<textarea th:field="*{reviewComment}" rows="5" cols="40"></textarea>
+					</td>
+				</tr>
+			</table>
+			<div class="regist_button_area">
+				<input type="submit" value="投稿" class="send_button" />
+			</div>
+		</form>
+		<div class="detail_button_area">
+			<form th:action="@{/client/order/list}" method="get">
+				<input type="submit" value="戻る" class="back_button" />
+			</form>
+		</div>
+	</div>
+
+</body>
+
+</html>

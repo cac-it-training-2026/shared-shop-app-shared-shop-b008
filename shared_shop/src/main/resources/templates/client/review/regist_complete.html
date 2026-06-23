@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{common/layout_5block :: layout(~{::title},~{::body/content()})}">
+
+<head>
+	<title th:text="#{title.review.regist.complete} + ' | ' + #{shop.title}"> </title>
+	<meta charset="UTF-8" />
+</head>
+
+<body class="user">
+	<h2 th:class="title" th:text="#{title.review.regist.complete}"></h2>
+	<div class="info_form_area">
+		<p th:text="#{msg.review.regist.complete}"></p>
+		<div class="detail_button_area">
+			<a th:href="@{/}" th:text="#{msg.back.to.top}"></a>
+		</div>
+	</div>
+</body>
+
+</html>

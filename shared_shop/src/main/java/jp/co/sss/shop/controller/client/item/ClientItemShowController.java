@@ -13,9 +13,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jp.co.sss.shop.bean.ItemBean;
+import jp.co.sss.shop.bean.ReviewBean;
 import jp.co.sss.shop.entity.Item;
+import jp.co.sss.shop.entity.Review;
 import jp.co.sss.shop.repository.CategoryRepository;
 import jp.co.sss.shop.repository.ItemRepository;
+import jp.co.sss.shop.repository.ReviewRepository;
 import jp.co.sss.shop.service.BeanTools;
 import jp.co.sss.shop.util.Constant;
 
@@ -41,6 +44,12 @@ public class ClientItemShowController {
 	 */
 	@Autowired
 	ItemRepository itemRepository;
+
+	/**
+	 * レビュー情報
+	 */
+	@Autowired
+	ReviewRepository reviewRepository;
 
 	/**
 	 * Entity、Form、Bean間のデータコピーサービス
@@ -74,6 +83,12 @@ public class ClientItemShowController {
 
 		// エンティティ内の検索結果をJavaBeansにコピー
 		List<ItemBean> itemBeanList = beanTools.copyEntityListToItemBeanList(itemList);
+
+		// レビュー情報の平均評価と件数を取得してセット
+		for (ItemBean bean : itemBeanList) {
+			bean.setAvgRating(reviewRepository.getAvgRating(bean.getId()));
+			bean.setReviewCount(reviewRepository.countByItemId(bean.getId()));
+		}
 
 		// 商品情報をViewへ渡す
 		model.addAttribute("items", itemBeanList);
@@ -156,6 +171,12 @@ public class ClientItemShowController {
 		// 商品情報を画面表示用Beanにコピーする。
 		List<ItemBean> itemBeanList = beanTools.copyEntityListToItemBeanList(itemList);
 
+		// レビュー情報の平均評価と件数を取得してセット
+		for (ItemBean bean : itemBeanList) {
+			bean.setAvgRating(reviewRepository.getAvgRating(bean.getId()));
+			bean.setReviewCount(reviewRepository.countByItemId(bean.getId()));
+		}
+
 		model.addAttribute("items", itemBeanList);
 		model.addAttribute("sortType", sortType);
 		model.addAttribute("categoryId", categoryId);
@@ -198,11 +219,14 @@ public class ClientItemShowController {
 	 * 詳細表示処理
 	 *
 	 * @param id      表示対象ID
+	 * @param sortType レビュー並び替え種別
+	 * @param all      全件表示フラグ
 	 * @param model   Viewとの値受渡し
 	 * @return "client/item/detail" 詳細画面 表示
 	 */
 	@RequestMapping(path = "/client/item/detail/{id}")
-	public String showItem(@PathVariable int id, Model model) {
+	public String showItem(@PathVariable int id, @RequestParam(required = false) Integer sortType,
+			@RequestParam(required = false) Boolean all, Model model) {
 
 		// 商品IDに該当する商品情報を取得する
 		Item item = itemRepository.findByIdAndDeleteFlag(id, Constant.NOT_DELETED);
@@ -213,8 +237,44 @@ public class ClientItemShowController {
 		// Itemエンティティの各フィールドの値をItemBeanにコピー
 		ItemBean itemBean = beanTools.copyEntityToItemBean(item);
 
+		// レビュー平均と件数をセット
+		itemBean.setAvgRating(reviewRepository.getAvgRating(id));
+		itemBean.setReviewCount(reviewRepository.countByItemId(id));
+
+		// レビュー情報取得
+		List<Review> reviews;
+		if (sortType == null) {
+			sortType = 1; // デフォルト：新着順
+		}
+
+		if (sortType == 2) {
+			// 高評価順
+			reviews = reviewRepository.findByItemIdOrderByRatingDescInsertDateDesc(id);
+		} else if (sortType == 3) {
+			// 低評価順
+			reviews = reviewRepository.findByItemIdOrderByRatingAscInsertDateDesc(id);
+		} else {
+			// 新着順
+			reviews = reviewRepository.findByItemIdOrderByInsertDateDesc(id);
+		}
+
+		// 表示件数制御
+		boolean isAll = all != null && all;
+		List<Review> displayReviews;
+		if (isAll || reviews.size() <= 5) {
+			displayReviews = reviews;
+		} else {
+			displayReviews = reviews.subList(0, 5);
+		}
+
+		List<ReviewBean> reviewBeans = beanTools.copyEntityListToReviewBeanList(displayReviews);
+
 		// 商品情報をViewへ渡す
 		model.addAttribute("item", itemBean);
+		model.addAttribute("reviews", reviewBeans);
+		model.addAttribute("reviewSortType", sortType);
+		model.addAttribute("isAll", isAll);
+		model.addAttribute("totalReviewCount", reviews.size());
 
 		return "client/item/detail";
 	}

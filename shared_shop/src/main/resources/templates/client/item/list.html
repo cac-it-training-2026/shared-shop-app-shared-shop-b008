@@ -39,7 +39,17 @@
 					<img th:src="@{/images/common/no_image.jpg}" th:if="${item.image == null}" />
 
 				</td>
-				<td><a th:href="@{/client/item/detail/{id}(id=${item.id})}" th:text="${item.name}"></a></td>
+				<td>
+					<a th:href="@{/client/item/detail/{id}(id=${item.id})}" th:text="${item.name}"></a>
+					<div th:if="${item.reviewCount > 0}">
+						<span th:if="${item.avgRating >= 4.5}">★★★★★</span>
+						<span th:if="${item.avgRating >= 3.5 and item.avgRating < 4.5}">★★★★☆</span>
+						<span th:if="${item.avgRating >= 2.5 and item.avgRating < 3.5}">★★★☆☆</span>
+						<span th:if="${item.avgRating >= 1.5 and item.avgRating < 2.5}">★★☆☆☆</span>
+						<span th:if="${item.avgRating < 1.5}">★☆☆☆☆</span>
+						(<span th:text="${item.reviewCount}"></span>)
+					</div>
+				</td>
 				<td th:text="${item.price}"></td>
 				<td th:text="${item.categoryName}"></td>
 			</tr>
