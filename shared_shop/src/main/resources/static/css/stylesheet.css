@@ -1073,7 +1073,18 @@ p.link_center {
 	margin-top: 10px !important; /* 見出しとの余白を調整 */
 }
 
-/* お届け先一覧のボタンレイアウト調整 */
+/* お届け先一覧のレイアウト調整 */
+.delivery_address_list .address_cell {
+	text-align: left;
+	min-width: 250px;
+	word-break: break-all;
+}
+
+.delivery_address_list .operate_cell {
+	width: 1%;
+	white-space: nowrap;
+}
+
 .delivery_address_list .operate_cell form {
 	margin: 2px 0;
 }

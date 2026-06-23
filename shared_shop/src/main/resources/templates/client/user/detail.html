@@ -73,7 +73,7 @@
 							<td th:text="${address.addressNo}"></td>
 							<td th:text="${address.name}"></td>
 							<td th:text="${address.postalCode}"></td>
-								<td th:text="${address.address}"></td>
+								<td class="address_cell" th:text="${address.address}"></td>
 							<td th:text="${address.phoneNumber}"></td>
 							<td class="operate_cell">
 								<form th:action="@{/client/delivery_address/update/input/{id}(id=${address.id})}" method="post">
