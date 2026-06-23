@@ -3,12 +3,10 @@ package jp.co.sss.shop.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import jakarta.persistence.LockModeType;
 import jp.co.sss.shop.entity.User;
 
 /**
@@ -52,16 +50,5 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 	 * @return 会員エンティティ
 	 */
 	User findByIdAndDeleteFlag(Integer id, int deleteFlg);
-
-	/**
-	 * クーポン付与数の同時更新を防ぐため、会員情報を排他ロックして取得します。
-	 * @param id 会員ID
-	 * @param deleteFlag 削除フラグ
-	 * @return 会員エンティティ
-	 */
-	@Lock(LockModeType.PESSIMISTIC_WRITE)
-	@Query("SELECT u FROM User u WHERE u.id = :id AND u.deleteFlag = :deleteFlag")
-	User findByIdAndDeleteFlagForUpdate(
-			@Param("id") Integer id, @Param("deleteFlag") int deleteFlag);
 
 }

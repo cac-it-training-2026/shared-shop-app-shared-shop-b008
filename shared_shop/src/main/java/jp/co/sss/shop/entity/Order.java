@@ -72,23 +72,6 @@ public class Order {
 	@Column
 	private Date deliveryDate;
 
-	/** 利用したクーポン種別 */
-	@ManyToOne
-	@JoinColumn(name = "coupon_type_id", referencedColumnName = "id")
-	private CouponType couponType;
-
-	/** 注文時点のクーポン名称 */
-	@Column
-	private String couponName;
-
-	/** 注文時点のクーポン割引率 */
-	@Column
-	private Integer couponDiscountRate;
-
-	/** 注文時点のクーポン割引額 */
-	@Column
-	private Integer couponDiscountAmount;
-
 	/**
 	 * 会員情報
 	 */
@@ -228,38 +211,6 @@ public class Order {
 	 */
 	public void setDeliveryDate(Date deliveryDate) {
 		this.deliveryDate = deliveryDate;
-	}
-
-	public CouponType getCouponType() {
-		return couponType;
-	}
-
-	public void setCouponType(CouponType couponType) {
-		this.couponType = couponType;
-	}
-
-	public String getCouponName() {
-		return couponName;
-	}
-
-	public void setCouponName(String couponName) {
-		this.couponName = couponName;
-	}
-
-	public Integer getCouponDiscountRate() {
-		return couponDiscountRate;
-	}
-
-	public void setCouponDiscountRate(Integer couponDiscountRate) {
-		this.couponDiscountRate = couponDiscountRate;
-	}
-
-	public Integer getCouponDiscountAmount() {
-		return couponDiscountAmount;
-	}
-
-	public void setCouponDiscountAmount(Integer couponDiscountAmount) {
-		this.couponDiscountAmount = couponDiscountAmount;
 	}
 
 	/**
