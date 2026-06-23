@@ -1,9 +1,9 @@
 -- Issue #7: 商品レビュー機能追加
--- ordersテーブルに注文ステータスカラムを追加
--- 0:未発送、1:発送済み。既存データはレビュー可能にするため1で初期化。
-ALTER TABLE orders ADD status NUMBER(1,0) DEFAULT 1 NOT NULL;
+-- ORDERSテーブルに注文ステータスカラムを追加
+-- 既存テーブルのID型（NUMBER(6,0)等）に合わせつつ、状態を管理
+ALTER TABLE ORDERS ADD STATUS NUMBER(1,0) DEFAULT 1 NOT NULL;
 
--- reviewsテーブルの作成 (提供されたDDL定義に従う)
+-- REVIEWSテーブルの作成 (提供されたDDL定義に厳密に従う)
 CREATE TABLE REVIEWS (
     ID NUMBER(10,0),
     USER_ID NUMBER(10,0) NOT NULL ENABLE,
@@ -19,10 +19,10 @@ CREATE TABLE REVIEWS (
     CONSTRAINT FK_REVIEWS_ORDER_ITEM FOREIGN KEY (ORDER_ITEM_ID) REFERENCES ORDER_ITEMS(ID)
 );
 
--- reviewsテーブル用シーケンスの作成
-CREATE SEQUENCE seq_reviews START WITH 1 INCREMENT BY 1;
+-- REVIEWSテーブル用シーケンスの作成
+CREATE SEQUENCE SEQ_REVIEWS START WITH 1 INCREMENT BY 1;
 
 -- ロールバック用SQL
--- DROP SEQUENCE seq_reviews;
+-- DROP SEQUENCE SEQ_REVIEWS;
 -- DROP TABLE REVIEWS;
--- ALTER TABLE orders DROP COLUMN status;
+-- ALTER TABLE ORDERS DROP COLUMN STATUS;
