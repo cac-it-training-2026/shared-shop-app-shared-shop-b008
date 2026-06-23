@@ -51,13 +51,13 @@
 			</form>
 		</div>
 
-		<h3 class="title">お届け先管理</h3>
+		<h3 class="title delivery_address_title">お届け先管理</h3>
 		<div class="delivery_address_area">
 			<div th:if="${#lists.isEmpty(deliveryAddresses)}">
 				<p>登録済みのお届け先はありません。</p>
 			</div>
 			<div th:if="${!#lists.isEmpty(deliveryAddresses)}">
-				<table class="list_table">
+				<table class="list_table delivery_address_list">
 					<thead>
 						<tr>
 							<th>番号</th>
