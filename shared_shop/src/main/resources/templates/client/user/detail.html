@@ -65,7 +65,7 @@
 							<th>郵便番号</th>
 							<th>住所</th>
 							<th>電話番号</th>
-							<th colspan="2">操作</th>
+							<th>操作</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -73,16 +73,14 @@
 							<td th:text="${address.addressNo}"></td>
 							<td th:text="${address.name}"></td>
 							<td th:text="${address.postalCode}"></td>
-							<td th:text="${address.address}"></td>
+							<td class="address_cell" th:text="${address.address}"></td>
 							<td th:text="${address.phoneNumber}"></td>
-							<td>
+							<td class="operate_cell">
 								<form th:action="@{/client/delivery_address/update/input/{id}(id=${address.id})}" method="post">
-									<input type="submit" value="編集" />
+									<input type="submit" value="編集" class="btn_small" />
 								</form>
-							</td>
-							<td>
 								<form th:action="@{/client/delivery_address/delete/check/{id}(id=${address.id})}" method="post">
-									<input type="submit" value="削除" class="delete" />
+									<input type="submit" value="削除" class="delete btn_small" />
 								</form>
 							</td>
 						</tr>
