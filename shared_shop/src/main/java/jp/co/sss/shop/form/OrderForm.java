@@ -62,6 +62,12 @@ public class OrderForm implements Serializable {
 	@NotBlank(message = "{orderForm.deliveryDate.notblank}")
 	@Pattern(regexp = "^[0-9]{4}-[0-9]{2}-[0-9]{2}$", message = "{orderForm.deliveryDate.invalid_format}")
 	private String deliveryDate;
+
+	/**
+	 * 選択されたお届け先ID
+	 */
+	private Integer deliveryAddressId;
+
 	/** 利用する会員保有クーポンID */
 	private Integer couponId;
 
@@ -184,6 +190,22 @@ public class OrderForm implements Serializable {
 	 */
 	public void setDeliveryDate(String deliveryDate) {
 		this.deliveryDate = deliveryDate;
+	}
+
+	/**
+	 * 選択されたお届け先IDの取得
+	 * @return お届け先ID
+	 */
+	public Integer getDeliveryAddressId() {
+		return deliveryAddressId;
+	}
+
+	/**
+	 * 選択されたお届け先IDのセット
+	 * @param deliveryAddressId お届け先ID
+	 */
+	public void setDeliveryAddressId(Integer deliveryAddressId) {
+		this.deliveryAddressId = deliveryAddressId;
 	}
 
 	public Integer getCouponId() {

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{common/layout_5block :: layout(~{::title},~{::body/content()})}">
+
+<head>
+	<title th:text="#{title.order.address.input}+' | '+ #{shop.title}"> </title>
+	<meta charset="UTF-8" />
+</head>
+
+<body class="user order_address_selection">
+	<h2 th:class="title" th:text="#{title.order.address.input}"></h2>
+	<p th:class="input_message">お届け先を選択してください。</p>
+	<div class="user_info_form_area">
+		<form th:action="@{/client/order/address/select}" method="post">
+			<ul class="input_list">
+				<li th:each="address : ${deliveryAddresses}">
+					<label>
+						<input type="radio" name="deliveryAddressId" th:value="${address.id}"
+							th:checked="${address.id == orderForm.deliveryAddressId}" required />
+						<span th:text="'お届け先' + ${address.addressNo} + '：' + ${address.name} + '（' + ${address.address} + '）'"></span>
+					</label>
+				</li>
+			</ul>
+			<div class="new_address_link">
+				<a th:href="@{/client/order/address/input}">新しい住所に届ける</a>
+			</div>
+			<input type="submit" value="次へ" class="send_button" />
+		</form>
+		<form th:action="@{/client/basket/list}" method="post">
+			<input type="submit" value="戻る" class="back_button" />
+		</form>
+	</div>
+</body>
+
+</html>

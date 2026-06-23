@@ -51,6 +51,52 @@
 			</form>
 		</div>
 
+		<h3 class="title">お届け先管理</h3>
+		<div class="delivery_address_area">
+			<div th:if="${#lists.isEmpty(deliveryAddresses)}">
+				<p>登録済みのお届け先はありません。</p>
+			</div>
+			<div th:if="${!#lists.isEmpty(deliveryAddresses)}">
+				<table class="list_table">
+					<thead>
+						<tr>
+							<th>番号</th>
+							<th>氏名</th>
+							<th>郵便番号</th>
+							<th>住所</th>
+							<th>電話番号</th>
+							<th colspan="2">操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="address : ${deliveryAddresses}">
+							<td th:text="${address.addressNo}"></td>
+							<td th:text="${address.name}"></td>
+							<td th:text="${address.postalCode}"></td>
+							<td th:text="${address.address}"></td>
+							<td th:text="${address.phoneNumber}"></td>
+							<td>
+								<form th:action="@{/client/delivery_address/update/input/{id}(id=${address.id})}" method="post">
+									<input type="submit" value="編集" />
+								</form>
+							</td>
+							<td>
+								<form th:action="@{/client/delivery_address/delete/check/{id}(id=${address.id})}" method="post">
+									<input type="submit" value="削除" class="delete" />
+								</form>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="regist_button_area">
+				<form th:action="@{/client/delivery_address/regist/input}" method="post">
+					<input type="submit" value="お届け先登録" th:disabled="${#lists.size(deliveryAddresses) >= 3}" />
+				</form>
+				<p th:if="${#lists.size(deliveryAddresses) >= 3}" class="error_message">お届け先は最大3件まで登録可能です。</p>
+			</div>
+		</div>
+
 		<h3 class="title login_history_title">ログイン履歴（最新3件）</h3>
 		<div class="login_history_area">
 			<div th:if="${#lists.isEmpty(loginHistories)}">
