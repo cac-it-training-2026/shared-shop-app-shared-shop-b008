@@ -59,8 +59,7 @@ public class OrderForm implements Serializable {
 	/**
 	 * 配送希望日
 	 */
-	@NotBlank(message = "{orderForm.deliveryDate.notblank}")
-	@Pattern(regexp = "^[0-9]{4}-[0-9]{2}-[0-9]{2}$", message = "{orderForm.deliveryDate.invalid_format}")
+	@Pattern(regexp = "^$|^[0-9]{4}-[0-9]{2}-[0-9]{2}$", message = "{orderForm.deliveryDate.invalid_format}")
 	private String deliveryDate;
 	/** 利用する会員保有クーポンID */
 	private Integer couponId;

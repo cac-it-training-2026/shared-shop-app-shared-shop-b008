@@ -1,6 +1,7 @@
 package jp.co.sss.shop.controller.client.order;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -9,8 +10,12 @@ import static org.mockito.Mockito.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import jp.co.sss.shop.bean.BasketBean;
 import jp.co.sss.shop.bean.UserBean;
 import jp.co.sss.shop.entity.CouponType;
@@ -230,8 +235,6 @@ class ClientOrderRegistControllerTest {
 
     @Test
     void addressInputCheck_DeliveryDate_Empty_Valid_From_BusinessCheck() {
-        // Note: NotBlank validation is handled by @Valid in Spring, not by manual check in this method.
-        // In this unit test, we're calling addressInputCheck manually.
         OrderForm lastForm = new OrderForm();
         session.setAttribute("orderForm", lastForm);
 
@@ -244,6 +247,22 @@ class ClientOrderRegistControllerTest {
 
         assertEquals("redirect:/client/order/payment/input", view);
         assertNull(result.getFieldError("deliveryDate"));
+    }
+
+    @Test
+    void orderFormValidation_AllowsEmptyDeliveryDate() {
+        OrderForm form = new OrderForm();
+        form.setPostalCode("1234567");
+        form.setAddress("Test Address");
+        form.setName("Test Name");
+        form.setPhoneNumber("09012345678");
+        form.setDeliveryDate("");
+
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        Set<ConstraintViolation<OrderForm>> violations = validator.validate(form);
+
+        assertFalse(violations.stream()
+                .anyMatch(violation -> "deliveryDate".equals(violation.getPropertyPath().toString())));
     }
 
     @Test
