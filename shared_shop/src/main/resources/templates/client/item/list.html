@@ -39,7 +39,14 @@
 					<img th:src="@{/images/common/no_image.jpg}" th:if="${item.image == null}" />
 
 				</td>
-				<td><a th:href="@{/client/item/detail/{id}(id=${item.id})}" th:text="${item.name}"></a></td>
+				<td>
+					<a th:href="@{/client/item/detail/{id}(id=${item.id})}" th:text="${item.name}"></a>
+					<div class="review_aggregate" th:if="${item.reviewCount > 0}">
+						<span class="rating_star" th:each="i : ${#numbers.sequence(1, 5)}"
+							th:text="${i <= item.avgRating} ? '★' : '☆'"></span>
+						<span th:text="|（${item.reviewCount}）|"></span>
+					</div>
+				</td>
 				<td th:text="${item.price}"></td>
 				<td th:text="${item.categoryName}"></td>
 			</tr>

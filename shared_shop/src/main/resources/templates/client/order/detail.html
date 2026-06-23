@@ -67,7 +67,14 @@
 				<th>[[#{data.subtotal}]]</th>
 			</tr>
 			<tr th:each="orderItem: ${orderItemBeans}">
-				<td th:text="${orderItem.name}"></td>
+				<td>
+					<span th:text="${orderItem.name}"></span>
+					<form th:action="@{/client/review/regist/input}" method="post" style="display: inline;" th:if="${orderItem.id != null}">
+						<input type="hidden" name="itemId" th:value="${orderItem.id}" />
+						<input type="hidden" name="orderItemId" th:value="${orderItem.orderItemId}" />
+						<input type="submit" value="レビューを書く" class="regist_button" />
+					</form>
+				</td>
 				<td th:text="${orderItem.price}"></td>
 				<td th:text="${orderItem.orderNum}"></td>
 				<td th:text="${orderItem.subtotal}"></td>

@@ -32,6 +32,11 @@ public class OrderItemBean {
 	private Integer subtotal;
 
 	/**
+	 * 注文商品ID(order_itemsテーブルのID)
+	 */
+	private Integer orderItemId;
+
+	/**
 	 * 注文商品IDの取得
 	 * @return 注文商品ID
 	 */
@@ -125,5 +130,21 @@ public class OrderItemBean {
 	 */
 	public void setOrderNum(Integer orderNum) {
 		this.orderNum = orderNum;
+	}
+
+	/**
+	 * 注文商品ID(order_itemsテーブルのID)の取得
+	 * @return 注文商品ID
+	 */
+	public Integer getOrderItemId() {
+		return orderItemId;
+	}
+
+	/**
+	 * 注文商品ID(order_itemsテーブルのID)のセット
+	 * @param orderItemId 注文商品ID
+	 */
+	public void setOrderItemId(Integer orderItemId) {
+		this.orderItemId = orderItemId;
 	}
 }

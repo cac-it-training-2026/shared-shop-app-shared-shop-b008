@@ -94,6 +94,12 @@ public class ClientItemShowController {
 		// エンティティ内の検索結果をJavaBeansにコピー
 		List<ItemBean> itemBeanList = beanTools.copyEntityListToItemBeanList(itemList);
 
+		// 各商品のレビュー集計情報をセット
+		for (ItemBean bean : itemBeanList) {
+			bean.setAvgRating(reviewRepository.getAvgRatingByItemId(bean.getId()));
+			bean.setReviewCount(reviewRepository.getReviewCountByItemId(bean.getId()));
+		}
+
 		// 商品情報をViewへ渡す
 		model.addAttribute("items", itemBeanList);
 		model.addAttribute("sortType", sortType);
@@ -175,6 +181,12 @@ public class ClientItemShowController {
 		// 商品情報を画面表示用Beanにコピーする。
 		List<ItemBean> itemBeanList = beanTools.copyEntityListToItemBeanList(itemList);
 
+		// 各商品のレビュー集計情報をセット
+		for (ItemBean bean : itemBeanList) {
+			bean.setAvgRating(reviewRepository.getAvgRatingByItemId(bean.getId()));
+			bean.setReviewCount(reviewRepository.getReviewCountByItemId(bean.getId()));
+		}
+
 		model.addAttribute("items", itemBeanList);
 		model.addAttribute("sortType", sortType);
 		model.addAttribute("categoryId", categoryId);
@@ -226,6 +238,12 @@ public class ClientItemShowController {
 	FavoriteRepository favoriteRepository;
 
 	/**
+	 * レビュー情報
+	 */
+	@Autowired
+	jp.co.sss.shop.repository.ReviewRepository reviewRepository;
+
+	/**
 	 * 詳細表示処理
 	 *
 	 * @param id      表示対象ID
@@ -244,6 +262,18 @@ public class ClientItemShowController {
 
 		// 商品情報と関連商品を先にModelへ格納し、閲覧履歴処理と責務を分離する
 		ItemBean itemBean = beanTools.copyEntityToItemBean(item);
+
+		// レビュー集計情報の取得
+		Double avgRating = reviewRepository.getAvgRatingByItemId(id);
+		Long reviewCount = reviewRepository.getReviewCountByItemId(id);
+		itemBean.setAvgRating(avgRating);
+		itemBean.setReviewCount(reviewCount);
+
+		// 最新5件のレビューを取得
+		List<jp.co.sss.shop.entity.Review> reviews = reviewRepository.findByItemIdOrderByInsertDateDesc(id,
+				PageRequest.of(0, 5));
+		model.addAttribute("reviews", reviews);
+
 		List<Item> relatedItemList = itemRepository.findRelatedItems(
 				item.getCategory().getId(),
 				item.getId(),

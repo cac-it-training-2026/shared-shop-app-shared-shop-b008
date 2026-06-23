@@ -19,7 +19,18 @@
 			</div>
 			<dl class="item_detail_list">
 				<dt>[[#{data.item.name}]]</dt>
-				<dd th:text="*{name}"></dd>
+				<dd>
+					<span th:text="*{name}"></span>
+					<div class="review_aggregate" th:if="*{reviewCount > 0}">
+						<span class="rating_star" th:each="i : ${#numbers.sequence(1, 5)}"
+							th:text="${i <= item.avgRating} ? '★' : '☆'"></span>
+						<span th:text="|（${item.avgRating}）|"></span>
+						<span th:text="|${item.reviewCount}件のレビュー|"></span>
+					</div>
+					<div class="review_aggregate" th:if="*{reviewCount == 0}">
+						<span>まだレビューはありません</span>
+					</div>
+				</dd>
 				<dt>[[#{data.item.price}]]</dt>
 				<dd th:text="*{price}"></dd>
 				<dt>[[#{data.item.stock}]]</dt>
@@ -90,6 +101,36 @@
 			</div>
 		</div>
 	</th:block>
+
+	<!-- レビュー一覧 -->
+	<section class="item_reviews">
+		<h2 class="title">カスタマーレビュー</h2>
+		<div th:if="${reviews != null and !#lists.isEmpty(reviews)}">
+			<article class="review_item" th:each="review : ${reviews}">
+				<div class="review_header">
+					<span class="review_user" th:text="${review.user.name}"></span>
+					<span class="rating_star" th:each="i : ${#numbers.sequence(1, 5)}"
+						th:text="${i <= review.rating} ? '★' : '☆'"></span>
+					<span class="review_date" th:text="${#dates.format(review.insertDate, 'yyyy/MM/dd')}"></span>
+				</div>
+				<div class="review_comment">
+					<p th:text="${review.reviewComment}"></p>
+				</div>
+				<div class="review_actions" th:if="${session.user != null and (session.user.id == review.user.id or session.user.authority <= 1)}">
+					<form th:action="@{/client/review/delete/{id}(id=${review.id})}" method="post" onsubmit="return confirm('本当に削除しますか？');">
+						<input type="hidden" name="itemId" th:value="${item.id}" />
+						<input type="submit" value="削除" class="delete_button" />
+					</form>
+				</div>
+			</article>
+			<div class="all_reviews_link">
+				<a th:href="@{/client/review/list/{itemId}(itemId=${item.id})}" class="regist_button">すべてのレビューを見る</a>
+			</div>
+		</div>
+		<div th:if="${reviews == null or #lists.isEmpty(reviews)}">
+			<p>レビューはまだ投稿されていません。</p>
+		</div>
+	</section>
 
 </body>
 

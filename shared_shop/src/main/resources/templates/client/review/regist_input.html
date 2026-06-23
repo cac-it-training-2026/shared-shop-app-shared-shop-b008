@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{common/layout_5block :: layout(~{::title},~{::body/content()})}">
+<head>
+    <title>商品レビュー投稿 | [[#{shop.title}]]</title>
+    <meta charset="UTF-8" />
+</head>
+<body class="user">
+    <h2 class="title">商品レビュー投稿</h2>
+    <div class="user_info_area">
+        <p>購入いただいた商品の評価とレビューをお願いします。</p>
+        <div class="review_item_info">
+            <p>商品名：<span th:text="${item.name}"></span></p>
+        </div>
+        <form th:action="@{/client/review/regist/complete}" method="post" th:object="${reviewForm}">
+            <input type="hidden" th:field="*{itemId}" />
+            <input type="hidden" th:field="*{orderItemId}" />
+            <table class="detail_table">
+                <tr>
+                    <th>評価（1〜5）<span class="required">※必須</span></th>
+                    <td>
+                        <select th:field="*{rating}">
+                            <option value="5">5（大変満足）</option>
+                            <option value="4">4（満足）</option>
+                            <option value="3" selected>3（普通）</option>
+                            <option value="2">2（不満）</option>
+                            <option value="1">1（大変不満）</option>
+                        </select>
+                        <div th:if="${#fields.hasErrors('rating')}" th:errors="*{rating}" class="error"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <th>レビュー本文</th>
+                    <td>
+                        <textarea th:field="*{reviewComment}" rows="5" cols="50" placeholder="2000文字以内で入力してください"></textarea>
+                        <div th:if="${#fields.hasErrors('reviewComment')}" th:errors="*{reviewComment}" class="error"></div>
+                    </td>
+                </tr>
+            </table>
+            <div class="button_area">
+                <input type="submit" value="投稿する" class="regist_button" />
+                <a th:href="@{/client/order/detail/{id}(id=${reviewForm.orderItemId})}" class="back_button">戻る</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{common/layout_5block :: layout(~{::title},~{::body/content()})}">
+<head>
+    <title>商品レビュー投稿完了 | [[#{shop.title}]]</title>
+    <meta charset="UTF-8" />
+</head>
+<body class="user">
+    <h2 class="title">商品レビュー投稿完了</h2>
+    <div class="user_info_area">
+        <p>レビューを投稿しました。ありがとうございました。</p>
+        <div class="button_area">
+            <a th:href="@{/client/order/list}" class="back_button">注文履歴一覧へ</a>
+            <a th:href="@{/}" class="back_button">トップ画面へ</a>
+        </div>
+    </div>
+</body>
+</html>
