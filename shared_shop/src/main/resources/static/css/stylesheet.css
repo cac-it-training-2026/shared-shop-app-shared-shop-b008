@@ -1073,24 +1073,7 @@ p.link_center {
 	margin-top: 10px !important; /* 見出しとの余白を調整 */
 }
 
-/* お届け先一覧のレイアウト調整 */
-.delivery_address_list th,
-.delivery_address_list td {
-	padding: 8px 4px !important;
-}
-
-.delivery_address_list .address_cell {
-	text-align: left;
-	min-width: 200px;
-	word-break: break-all;
-	line-height: 1.4;
-}
-
-.delivery_address_list .operate_cell {
-	width: 80px;
-	white-space: nowrap;
-}
-
+/* お届け先一覧のボタンレイアウト調整 */
 .delivery_address_list .operate_cell form {
 	margin: 2px 0;
 }
