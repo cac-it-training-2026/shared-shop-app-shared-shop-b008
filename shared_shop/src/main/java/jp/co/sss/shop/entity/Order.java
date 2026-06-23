@@ -72,6 +72,18 @@ public class Order {
 	@Column
 	private Date deliveryDate;
 
+	/**
+	 * 注文取消フラグ
+	 */
+	@Column
+	private Integer cancelFlag = 0;
+
+	/**
+	 * 注文取消日
+	 */
+	@Column
+	private Date cancelDate;
+
 	/** 利用したクーポン種別 */
 	@ManyToOne
 	@JoinColumn(name = "coupon_type_id", referencedColumnName = "id")
@@ -228,6 +240,22 @@ public class Order {
 	 */
 	public void setDeliveryDate(Date deliveryDate) {
 		this.deliveryDate = deliveryDate;
+	}
+
+	public Integer getCancelFlag() {
+		return cancelFlag;
+	}
+
+	public void setCancelFlag(Integer cancelFlag) {
+		this.cancelFlag = cancelFlag;
+	}
+
+	public Date getCancelDate() {
+		return cancelDate;
+	}
+
+	public void setCancelDate(Date cancelDate) {
+		this.cancelDate = cancelDate;
 	}
 
 	public CouponType getCouponType() {
