@@ -1073,20 +1073,55 @@ p.link_center {
 	margin-top: 10px !important; /* 見出しとの余白を調整 */
 }
 
-/* お届け先一覧のレイアウト調整 */
-.delivery_address_list .address_cell {
+/* 一覧画面の行内操作リンク（編集・削除）用 */
+.list_table .address_cell {
 	text-align: left;
 	min-width: 250px;
 	word-break: break-all;
 }
 
-.delivery_address_list .operate_cell {
-	width: 1%;
+.list_table .cell_with_ops {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 20px;
+	padding: 8px 10px !important;
+}
+
+.list_table .ops_links {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	font-size: 0.9rem;
 	white-space: nowrap;
 }
 
-.delivery_address_list .operate_cell form {
-	margin: 2px 0;
+.list_table .inline_form {
+	display: inline;
+	margin: 0;
+}
+
+.list_table .ops_links a {
+	color: #3d98bf;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.list_table .ops_links a:hover {
+	color: #12526d;
+}
+
+.list_table .ops_links a.delete_link {
+	color: #d22222;
+}
+
+.list_table .ops_links a.delete_link:hover {
+	color: #9e1818;
+}
+
+.list_table .separator {
+	color: #ccc;
+	margin: 0 2px;
 }
 
 .btn_small {

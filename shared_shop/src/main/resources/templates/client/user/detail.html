@@ -64,8 +64,7 @@
 							<th>氏名</th>
 							<th>郵便番号</th>
 							<th>住所</th>
-							<th>電話番号</th>
-							<th>操作</th>
+							<th style="text-align: left; padding-left: 10px;">電話番号</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -73,15 +72,20 @@
 							<td th:text="${address.addressNo}"></td>
 							<td th:text="${address.name}"></td>
 							<td th:text="${address.postalCode}"></td>
-								<td class="address_cell" th:text="${address.address}"></td>
-							<td th:text="${address.phoneNumber}"></td>
-							<td class="operate_cell">
-								<form th:action="@{/client/delivery_address/update/input/{id}(id=${address.id})}" method="post">
-									<input type="submit" value="編集" class="btn_small" />
-								</form>
-								<form th:action="@{/client/delivery_address/delete/check/{id}(id=${address.id})}" method="post">
-									<input type="submit" value="削除" class="delete btn_small" />
-								</form>
+							<td class="address_cell" th:text="${address.address}"></td>
+							<td class="phone_ops_cell">
+								<div class="cell_with_ops">
+									<span class="phone_text" th:text="${address.phoneNumber}"></span>
+									<div class="ops_links">
+										<form th:action="@{/client/delivery_address/update/input/{id}(id=${address.id})}" method="post" class="inline_form">
+											<a onclick="this.parentNode.submit()">編集</a>
+										</form>
+										<span class="separator">|</span>
+										<form th:action="@{/client/delivery_address/delete/check/{id}(id=${address.id})}" method="post" class="inline_form">
+											<a onclick="this.parentNode.submit()" class="delete_link">削除</a>
+										</form>
+									</div>
+								</div>
 							</td>
 						</tr>
 					</tbody>
