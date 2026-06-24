@@ -3,7 +3,9 @@ package jp.co.sss.shop.controller.client.user;
 import jakarta.servlet.http.HttpSession;
 
 import jp.co.sss.shop.bean.UserBean;
+import jp.co.sss.shop.entity.DeliveryAddress;
 import jp.co.sss.shop.entity.User;
+import jp.co.sss.shop.repository.DeliveryAddressRepository;
 import jp.co.sss.shop.repository.LoginHistoryRepository;
 import jp.co.sss.shop.util.Constant;
 import org.springframework.beans.BeanUtils;
@@ -33,6 +35,12 @@ public class ClientUserShowController {
 	 */
 	@Autowired
 	LoginHistoryRepository loginHistoryRepository;
+
+	/**
+	 * お届け先情報リポジトリ
+	 */
+	@Autowired
+	DeliveryAddressRepository deliveryAddressRepository;
 
 	/**
 	 * セッション
@@ -68,6 +76,9 @@ public class ClientUserShowController {
 
 		// 最新3件のログイン履歴を取得し、Modelに追加する
 		model.addAttribute("loginHistories", loginHistoryRepository.findTop3ByUserIdOrderByLoginDateTimeDesc(loginUser.getId()));
+
+		// 登録済みのお届け先リストを取得し、Modelに追加する
+		model.addAttribute("deliveryAddresses", deliveryAddressRepository.findByUserIdOrderByAddressNo(loginUser.getId()));
 
 		// 詳細画面表示時に会員変更・退会用フォームを初期化する。
 		session.removeAttribute("userForm");

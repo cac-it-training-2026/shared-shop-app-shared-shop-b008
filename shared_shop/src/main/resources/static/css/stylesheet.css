@@ -1055,19 +1055,79 @@ p.link_center {
 
 
 
-/* ---- ログイン履歴(会員詳細画面) ---- */
-.login_history_title {
+/* ---- ログイン履歴・お届け先管理(会員詳細画面) ---- */
+.login_history_title,
+.delivery_address_title {
 	margin-top: 32px !important; /* ボタン群との余白(24px～32px) */
 	margin-left: -50px;           /* 親要素(.info_form_area)の余白を打ち消してメインタイトルと揃える */
 }
 
-.login_history_area {
+.login_history_area,
+.delivery_address_area {
 	margin-left: 50px; /* 会員情報の詳細エリア(detail_area)と左端位置を揃える */
 	width: 70%;       /* 会員情報の詳細エリアと幅を揃える */
 }
 
-.login_history_list {
+.login_history_list,
+.delivery_address_list {
 	margin-top: 10px !important; /* 見出しとの余白を調整 */
+}
+
+/* 一覧画面の行内操作リンク（編集・削除）用 */
+.list_table .address_cell {
+	text-align: left;
+	min-width: 250px;
+	word-break: break-all;
+}
+
+.list_table .cell_with_ops {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 20px;
+	padding: 8px 10px !important;
+}
+
+.list_table .ops_links {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	font-size: 0.9rem;
+	white-space: nowrap;
+}
+
+.list_table .inline_form {
+	display: inline;
+	margin: 0;
+}
+
+.list_table .ops_links a {
+	color: #3d98bf;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.list_table .ops_links a:hover {
+	color: #12526d;
+}
+
+.list_table .ops_links a.delete_link {
+	color: #d22222;
+}
+
+.list_table .ops_links a.delete_link:hover {
+	color: #9e1818;
+}
+
+.list_table .separator {
+	color: #ccc;
+	margin: 0 2px;
+}
+
+.btn_small {
+	padding: 1px 8px !important;
+	font-size: 0.85rem !important;
+	min-width: 60px;
 }
 
 .all_show_link {
@@ -2609,10 +2669,52 @@ body.admin .input_value {
 body.user .related_items_title,
 body.admin .related_items_title,
 body.user .login_history_title,
-body.admin .login_history_title {
+body.admin .login_history_title,
+body.user .delivery_address_title,
+body.admin .delivery_address_title {
 	border-bottom: 2px solid var(--witch-moss);
 	color: var(--witch-green-deep);
 	font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+}
+
+body.user .address_select_list,
+body.admin .address_select_list {
+	display: grid;
+	gap: 12px;
+	margin: 0 0 18px;
+	padding: 0;
+}
+
+body.user .address_select_list li,
+body.admin .address_select_list li {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+body.user .address_select_list label,
+body.admin .address_select_list label {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	padding: 12px 14px;
+	border: 1px solid rgba(146, 130, 82, 0.42);
+	border-radius: 8px;
+	background: rgba(255, 253, 244, 0.72);
+	box-shadow: inset 0 0 12px rgba(93, 79, 38, 0.05);
+	cursor: pointer;
+}
+
+body.user .address_select_list label:hover,
+body.admin .address_select_list label:hover {
+	border-color: var(--witch-moss);
+	background: rgba(255, 250, 225, 0.94);
+}
+
+body.user .address_select_list input[type="radio"],
+body.admin .address_select_list input[type="radio"] {
+	flex: 0 0 auto;
+	margin-top: 3px;
 }
 
 body.user .coupon_rate,

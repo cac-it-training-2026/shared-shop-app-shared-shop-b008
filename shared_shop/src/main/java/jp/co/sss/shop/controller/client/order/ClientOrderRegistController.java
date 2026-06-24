@@ -26,17 +26,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import java.util.Optional;
+
 import jp.co.sss.shop.bean.BasketBean;
 import jp.co.sss.shop.bean.OrderItemBean;
 import jp.co.sss.shop.bean.UserBean;
 import jp.co.sss.shop.bean.UserCouponBean;
 import jp.co.sss.shop.entity.CouponType;
+import jp.co.sss.shop.entity.DeliveryAddress;
 import jp.co.sss.shop.entity.Item;
 import jp.co.sss.shop.entity.Order;
 import jp.co.sss.shop.entity.OrderItem;
 import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.entity.UserCoupon;
 import jp.co.sss.shop.form.OrderForm;
+import jp.co.sss.shop.repository.DeliveryAddressRepository;
 import jp.co.sss.shop.repository.ItemRepository;
 import jp.co.sss.shop.repository.OrderItemRepository;
 import jp.co.sss.shop.repository.OrderRepository;
@@ -114,6 +118,12 @@ public class ClientOrderRegistController {
 	UserCouponRepository userCouponRepository;
 
 	/**
+	 * お届け先情報リポジトリ
+	 */
+	@Autowired
+	DeliveryAddressRepository deliveryAddressRepository;
+
+	/**
 	 * Entity、Form、Bean間のデータコピーサービス
 	 */
 	@Autowired
@@ -154,37 +164,99 @@ public class ClientOrderRegistController {
 			return "redirect:/login";
 		}
 
-		// セッションに保存されているログインユーザーBeanには、基本的に会員IDなど最低限の情報のみが入っている。
-		// そのため、届け先入力画面の初期表示に必要な郵便番号・住所・氏名・電話番号などの最新情報を、
-		// userテーブルから削除されていない会員情報として改めて取得する。
-		// findByIdAndDeleteFlagを使うことで、論理削除済みの会員情報を誤って利用しないようにしている。
+		// 登録済みのお届け先を確認
+		List<DeliveryAddress> addresses = deliveryAddressRepository.findByUserIdOrderByAddressNo(loginUser.getId());
+
+		// お届け先が登録されている場合は、お届け先選択画面へ遷移する
+		if (!addresses.isEmpty()) {
+			OrderForm orderForm = new OrderForm();
+			orderForm.setId(loginUser.getId());
+			orderForm.setPayMethod(Constant.DEFAULT_PAYMENT_METHOD);
+
+			// 初期選択は「お届け先1」
+			DeliveryAddress address1 = null;
+			for (DeliveryAddress addr : addresses) {
+				if (addr.getAddressNo() == 1) {
+					address1 = addr;
+					break;
+				}
+			}
+			if (address1 != null) {
+				orderForm.setDeliveryAddressId(address1.getId());
+				BeanUtils.copyProperties(address1, orderForm);
+			} else {
+				// お届け先1がない場合は、リストの最初の要素を選択
+				DeliveryAddress firstAddress = addresses.get(0);
+				orderForm.setDeliveryAddressId(firstAddress.getId());
+				BeanUtils.copyProperties(firstAddress, orderForm);
+			}
+
+			session.setAttribute(ORDER_FORM, orderForm);
+			return "redirect:/client/order/address/select";
+		}
+
+		// お届け先が登録されていない場合は、従来通り新規入力画面の初期化を行う
 		User user = userRepository.findByIdAndDeleteFlag(loginUser.getId(), Constant.NOT_DELETED);
 		if (user == null) {
 			return "redirect:/syserror";
 		}
 
-		// 注文入力用のFormを新しく作成し、会員情報Entityから届け先入力に必要な項目をコピーする。
-		// これにより、画面を開いた時点で会員登録済みの住所情報が初期値として表示される。
 		OrderForm orderForm = new OrderForm();
 		BeanUtils.copyProperties(user, orderForm);
-
-		// OrderFormのidには「注文ID」ではなく、注文者である「会員ID」を保持させる。
-		// 後続の注文登録処理では、このidを使ってOrder EntityのUser情報を設定する。
 		orderForm.setId(user.getId());
-
-		// 支払方法は、初期状態ではシステム共通のデフォルト支払方法を設定しておく。
-		// ユーザーが支払方法選択画面で変更した場合は、後続の処理でこの値が上書きされる。
 		orderForm.setPayMethod(Constant.DEFAULT_PAYMENT_METHOD);
 
-		// 入力途中の注文情報を複数画面にまたがって利用するため、OrderFormをセッションスコープへ保存する。
-		// 注文手続きは「届け先入力 → 支払方法選択 → 注文確認 → 注文完了」と画面遷移するため、
-		// リクエストスコープではなくセッションに保持している。
 		session.setAttribute(ORDER_FORM, orderForm);
-
-		// 前回の入力チェックエラー情報がセッションに残っていると、初期表示時にもエラーが表示されてしまう。
-		// 新しく注文手続きを開始するタイミングでは不要なため、ここで削除しておく。
 		session.removeAttribute("result");
 		return "redirect:/client/order/address/input";
+	}
+
+
+	/**
+	 * 届け先選択画面を表示します。
+	 *
+	 * @param model Viewとの値受渡し
+	 * @return "client/order/address_selection" 届け先選択画面
+	 */
+	@RequestMapping(path = "/client/order/address/select", method = RequestMethod.GET)
+	public String addressSelect(Model model) {
+		UserBean loginUser = (UserBean) session.getAttribute("user");
+		OrderForm orderForm = (OrderForm) session.getAttribute(ORDER_FORM);
+		if (loginUser == null || orderForm == null) {
+			return "redirect:/syserror";
+		}
+
+		List<DeliveryAddress> addresses = deliveryAddressRepository.findByUserIdOrderByAddressNo(loginUser.getId());
+		model.addAttribute("deliveryAddresses", addresses);
+		model.addAttribute(ORDER_FORM, orderForm);
+		return "client/order/address_selection";
+	}
+
+	/**
+	 * 届け先選択値を保存し、支払方法選択画面へ遷移します。
+	 *
+	 * @param deliveryAddressId 選択されたお届け先ID
+	 * @return 支払方法選択画面表示処理へリダイレクト
+	 */
+	@RequestMapping(path = "/client/order/address/select", method = RequestMethod.POST)
+	public String addressSelectCheck(@RequestParam Integer deliveryAddressId) {
+		UserBean loginUser = (UserBean) session.getAttribute("user");
+		OrderForm orderForm = (OrderForm) session.getAttribute(ORDER_FORM);
+		if (loginUser == null || orderForm == null) {
+			return "redirect:/syserror";
+		}
+
+		Optional<DeliveryAddress> opt = deliveryAddressRepository.findByIdAndUserId(deliveryAddressId, loginUser.getId());
+		if (opt.isEmpty()) {
+			return "redirect:/syserror";
+		}
+
+		DeliveryAddress address = opt.get();
+		BeanUtils.copyProperties(address, orderForm);
+		orderForm.setDeliveryAddressId(address.getId());
+
+		session.setAttribute(ORDER_FORM, orderForm);
+		return "redirect:/client/order/payment/input";
 	}
 
 	/**
@@ -282,6 +354,10 @@ public class ClientOrderRegistController {
 		
 		// 入力チェック結果に関係なく、ユーザーが入力した最新の届け先情報を一度セッションへ保存する。
 		// これにより、エラーで入力画面に戻った場合でも、入力済みの値を画面に再表示できる。
+
+		// 新規入力の場合は deliveryAddressId をクリアする
+		form.setDeliveryAddressId(null);
+
 		session.setAttribute(ORDER_FORM, form);
 		return "redirect:/client/order/payment/input";
 	}
