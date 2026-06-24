@@ -5,7 +5,11 @@
 </head>
 <body>
 <div th:fragment="layout-header" class="container">
-	<h1 th:class="site_title" th:text="#{shop.title}"></h1>
+	<h1 class="site_title">
+		<img class="site_title_hat" th:src="@{/static/images/logo_witch_hat.png}" alt="" aria-hidden="true" />
+		<span th:text="#{shop.title}"></span>
+	</h1>
+	<img class="header_herbs" th:src="@{/static/images/hanging_herbs.png}" alt="" aria-hidden="true" />
 	<div th:if="${session.user != null and session.user.authority == 2}" class="user_info">
 		<a th:href="@{/client/user/detail}" th:text="${session.user.name}"></a>さん | <a th:href="@{/logout}" th:text="#{logout}"></a>
 	</div>

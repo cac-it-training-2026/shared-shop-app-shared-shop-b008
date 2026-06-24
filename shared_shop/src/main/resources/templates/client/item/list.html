@@ -26,7 +26,7 @@
 
 
 	<th:block th:if="!${#lists.isEmpty(items)}">
-		<table class="list_table item_detail witch-product-table">
+		<table class="list_table item_detail witch-product-table spirit-paginated-table" data-spirit-page-size="5">
 			<tr>
 				<th th:text="#{data.item.image}"></th>
 				<th th:text="#{data.item.name}"></th>

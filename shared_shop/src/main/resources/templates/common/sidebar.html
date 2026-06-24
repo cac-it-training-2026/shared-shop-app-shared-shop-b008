@@ -27,9 +27,9 @@
 			</form>
 		</div>
 		<div class="coupon_sidebar" th:if="${session.user != null and session.user.authority == 2}">
-			<a th:href="@{/client/coupon/list}">マイクーポン</a>
-			<a th:href="@{/client/coupon/gacha}">クーポンガチャ</a>
-			<a th:href="@{/client/favorite/list}">お気に入り商品一覧</a>
+			<a class="coupon_nav coupon_nav_mine" th:href="@{/client/coupon/list}">マイクーポン</a>
+			<a class="coupon_nav coupon_nav_gacha" th:href="@{/client/coupon/gacha}">クーポンガチャ</a>
+			<a class="coupon_nav coupon_nav_favorite" th:href="@{/client/favorite/list}">お気に入り商品一覧</a>
 		</div>
 	</div>
 

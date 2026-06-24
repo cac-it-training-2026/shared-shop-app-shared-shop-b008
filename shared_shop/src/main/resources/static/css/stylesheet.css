@@ -4331,6 +4331,571 @@ body.admin .main .review_area > .title {
 	}
 }
 
+/* ---- Spirit shop asset pass ---- */
+body.user,
+body.admin {
+	min-height: 100vh;
+	background-image:
+		linear-gradient(rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.42)),
+		url("../static/images/background.png");
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: cover;
+	background-attachment: fixed;
+}
+
+body.user::before,
+body.admin::before {
+	opacity: 0.2;
+	background:
+		linear-gradient(90deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0.12)),
+		radial-gradient(circle at 18% 12%, rgba(255, 248, 206, 0.3), transparent 24%),
+		radial-gradient(circle at 82% 14%, rgba(188, 214, 177, 0.22), transparent 28%);
+}
+
+body.user::after,
+body.admin::after {
+	content: "";
+	position: fixed;
+	left: clamp(10px, 3vw, 34px);
+	bottom: 12px;
+	z-index: 0;
+	width: clamp(78px, 10vw, 132px);
+	aspect-ratio: 471 / 469;
+	pointer-events: none;
+	background: url("../static/images/plants_books_bottle.png") center / contain no-repeat;
+	filter: drop-shadow(0 7px 8px rgba(48, 38, 18, 0.14));
+	opacity: 0.68;
+}
+
+body.user header .container,
+body.admin header .container {
+	align-items: center;
+	min-height: 124px;
+	padding-top: 12px;
+}
+
+body.user header .container::before,
+body.admin header .container::before {
+	display: block;
+	top: 7px;
+	left: -8px;
+	width: 78px;
+	height: 78px;
+	background: url("../static/images/leaf_corner_deco.png") center / contain no-repeat;
+	color: transparent;
+	transform: rotate(-10deg);
+	opacity: 0.82;
+}
+
+body.user header .container::after,
+body.admin header .container::after {
+	display: none;
+	top: 0;
+	right: clamp(8px, 3vw, 36px);
+	width: clamp(110px, 15vw, 176px);
+	height: clamp(92px, 12vw, 152px);
+	background: url("../static/images/hanging_herbs.png") top right / contain no-repeat;
+	color: transparent;
+	transform: rotate(2deg);
+	opacity: 0.92;
+	z-index: 0;
+}
+
+body.user .site_title,
+body.admin .site_title {
+	display: grid;
+	grid-template-columns: 88px minmax(0, 1fr);
+	align-items: center;
+	column-gap: 6px;
+	max-width: min(760px, calc(100vw - 150px));
+	margin: 8px 0 0 0;
+	padding-left: 0;
+	color: #244820;
+	font-family: "Yu Mincho", "Hiragino Mincho ProN", "Yu Gothic", serif;
+	font-size: clamp(2.1rem, 4.1vw, 3.55rem);
+	font-weight: 900;
+	line-height: 1.04;
+	letter-spacing: 0;
+	text-shadow:
+		0 2px 0 rgba(255, 250, 220, 0.92),
+		0 4px 9px rgba(73, 57, 24, 0.2);
+	filter: drop-shadow(0 2px 0 rgba(255, 255, 240, 0.75));
+}
+
+body.user .site_title::before,
+body.admin .site_title::before {
+	display: none;
+}
+
+body.user .site_title_hat,
+body.admin .site_title_hat {
+	width: 88px;
+	height: 88px;
+	object-fit: contain;
+	transform: rotate(-12deg);
+	filter: drop-shadow(0 5px 6px rgba(47, 36, 16, 0.2));
+	z-index: 2;
+}
+
+body.user .site_title::after,
+body.admin .site_title::after {
+	content: "Forest Spirit Market";
+	display: block;
+	margin-top: 7px;
+	color: #5a6b2f;
+	font-family: Georgia, "Times New Roman", serif;
+	font-size: clamp(0.92rem, 1.5vw, 1.15rem);
+	font-style: italic;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-shadow: 0 1px 0 rgba(255, 252, 232, 0.9);
+	grid-column: 2;
+}
+
+body.user .header_herbs,
+body.admin .header_herbs {
+	position: absolute;
+	top: 0;
+	right: clamp(8px, 3vw, 36px);
+	z-index: 0;
+	width: clamp(110px, 15vw, 176px);
+	height: auto;
+	pointer-events: none;
+	transform: rotate(2deg);
+	filter: drop-shadow(0 6px 6px rgba(50, 42, 20, 0.12));
+	opacity: 0.92;
+}
+
+body.user .user_info,
+body.admin .user_info {
+	margin-right: clamp(104px, 15vw, 188px);
+	padding: 13px 16px;
+	border: 1px solid rgba(126, 112, 67, 0.28);
+	border-radius: 999px;
+	background: rgba(255, 252, 238, 0.74);
+	backdrop-filter: blur(2px);
+}
+
+body.user .navi_menu,
+body.admin .navi_menu {
+	gap: clamp(8px, 1.4vw, 18px);
+	padding: 2px 0 24px;
+}
+
+body.user .navi_menu a,
+body.admin .navi_menu a {
+	min-height: 64px;
+	padding: 0 18px;
+	border: 0;
+	border-radius: 0;
+	background:
+		url("../static/images/navi_button_transparent_2x.png") center / 100% 100% no-repeat;
+	box-shadow: none;
+	color: #2e4d22;
+	font-size: clamp(1.04rem, 1.8vw, 1.35rem);
+	line-height: 64px;
+	white-space: nowrap;
+	filter: drop-shadow(0 5px 7px rgba(58, 43, 17, 0.13));
+}
+
+body.user .navi_menu a::before,
+body.admin .navi_menu a::before,
+body.user .navi_menu a::after,
+body.admin .navi_menu a::after {
+	display: none;
+}
+
+body.user .navi_menu a:hover,
+body.admin .navi_menu a:hover,
+body.user .navi_menu a.witch-active,
+body.admin .navi_menu a.witch-active {
+	background:
+		url("../static/images/navi_button_clicked_transparent_2x.png") center / 100% 100% no-repeat;
+	color: #fff8df;
+	text-shadow: 0 2px 2px rgba(22, 34, 12, 0.7);
+	transform: translateY(-2px);
+}
+
+body:has(.witch-item-list-page) .navi_menu a:hover,
+body:has(.witch-item-list-page) .navi_menu li:nth-child(2) a,
+body:has(.witch-item-list-page) .navi_menu a.witch-active {
+	background:
+		url("../static/images/navi_button_clicked_transparent_2x.png") center / 100% 100% no-repeat;
+	color: #fff8df;
+	text-shadow: 0 2px 2px rgba(22, 34, 12, 0.7);
+}
+
+body.user > .container,
+body.admin > .container {
+	gap: clamp(20px, 2.2vw, 34px);
+}
+
+body.user .main,
+body.admin .main,
+body.user .container.content,
+body.admin .container.content {
+	border: 32px solid transparent;
+	border-image: url("../static/images/body_frame_transparent_2x.png") 96 fill stretch;
+	border-radius: 0;
+	background:
+		linear-gradient(rgba(255, 253, 243, 0.9), rgba(250, 244, 224, 0.9)) padding-box;
+	box-shadow: 0 14px 28px rgba(63, 47, 18, 0.13);
+}
+
+body.user .main::before,
+body.admin .main::before,
+body.user .container.content::before,
+body.admin .container.content::before {
+	top: -34px;
+	left: -34px;
+	width: 92px;
+	height: 92px;
+	background: url("../static/images/corner_deco_3_transparent_2x.png") center / contain no-repeat;
+	color: transparent;
+	transform: rotate(0deg);
+	opacity: 0.88;
+}
+
+body.user .main::after,
+body.admin .main::after,
+body.user .container.content::after,
+body.admin .container.content::after {
+	right: -30px;
+	bottom: -30px;
+	width: 96px;
+	height: 96px;
+	background: url("../static/images/corner_deco_2_transparent_2x.png") center / contain no-repeat;
+	color: transparent;
+	transform: rotate(180deg);
+	opacity: 0.86;
+}
+
+body.user .main .title,
+body.admin .main .title,
+body.user .content .title,
+body.admin .content .title,
+body.user .page_title,
+body.admin .page_title,
+body.user .main .related_items_title,
+body.admin .main .related_items_title,
+body.user .main .review_area > .title,
+body.admin .main .review_area > .title {
+	width: min(460px, 88%);
+	min-height: 58px;
+	box-sizing: border-box;
+	margin: 0 auto 26px;
+	padding: 13px 52px 17px;
+	border: 0;
+	border-radius: 0;
+	background:
+		url("../static/images/green_title_ribbon.png") center / 100% 100% no-repeat,
+		linear-gradient(180deg, #54713a, #2e4e22);
+	box-shadow: none;
+	color: #fffbe6;
+	font-size: clamp(1.36rem, 2vw, 1.76rem);
+	line-height: 1.15;
+	text-shadow: 0 2px 2px rgba(24, 38, 14, 0.72);
+}
+
+body.user aside.search,
+body.admin aside.admin_menu {
+	width: 27%;
+	min-width: 268px;
+}
+
+body.user .search_area,
+body.admin .admin_menu > div,
+body.admin .admin_menu_list {
+	box-sizing: border-box;
+	min-height: 430px;
+	padding: 42px 28px 80px;
+	background: url("../static/images/sidebar_frame_transparent_2x.png") center top / 100% 100% no-repeat;
+	filter: drop-shadow(0 10px 13px rgba(52, 39, 15, 0.14));
+}
+
+body.user .search_area::after {
+	display: none;
+}
+
+body.user .search_area .title,
+body.admin .admin_menu .title,
+body.admin .admin_menu_list .title_area,
+body.admin .admin_menu_list .title_area_no_shadow {
+	min-height: 48px;
+	margin: 2px 0 12px;
+	padding: 10px 34px 12px;
+	border: 0;
+	border-radius: 0;
+	background:
+		url("../static/images/category_select_bar_transparent_3x.png") center /100% 100% no-repeat,
+		linear-gradient(180deg, rgba(255, 251, 232, 0.96), rgba(232, 219, 181, 0.92));
+	color: #30441d;
+	font-size: clamp(1rem, 1.4vw, 1.16rem);
+	line-height: 1.25;
+	text-shadow: 0 1px 0 rgba(255, 252, 226, 0.95);
+}
+
+body.user .search .form,
+body.admin .admin_menu .menu,
+body.admin .admin_menu_list .link_area {
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+	box-shadow: none;
+}
+
+body.user .search .form form {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	gap: 8px;
+	align-items: center;
+}
+
+body.user .search select {
+	min-height: 39px;
+	padding-right: 28px;
+	border: 0;
+	background:
+		linear-gradient(rgba(255, 252, 238, 0.76), rgba(255, 252, 238, 0.76)),
+		url("../static/images/category_select_bar_transparent_3x.png") center / 100% 100% no-repeat;
+	box-shadow: none;
+	appearance: none;
+}
+
+body.user .coupon_sidebar,
+body.admin .admin_menu .menu,
+body.admin .admin_menu_list .link_area {
+	gap: 12px;
+	margin-top: 18px;
+}
+
+body.user .coupon_sidebar a,
+body.admin .admin_menu .display_list,
+body.admin .admin_menu_list .link_area a {
+	position: relative;
+	min-height: 54px;
+	padding: 8px 16px 9px 56px;
+	border: 0;
+	border-radius: 0;
+	background: url("../static/images/sidebar_button.png") center / 100% 100% no-repeat;
+	box-shadow: none;
+	color: #2d421f;
+	font-size: clamp(0.96rem, 1.16vw, 1.08rem);
+	line-height: 1.18;
+	filter: drop-shadow(0 3px 4px rgba(58, 43, 17, 0.12));
+}
+
+body.user .coupon_sidebar a:hover,
+body.admin .admin_menu .display_list:hover,
+body.admin .admin_menu_list .link_area a:hover {
+	background: url("../static/images/sidebar_button.png") center / 100% 100% no-repeat;
+	color: #1d3518;
+	transform: translateY(-1px);
+}
+
+body.user .coupon_sidebar a::before {
+	content: "";
+	position: absolute;
+	left: -4px;
+	top: 50%;
+	width: 62px;
+	height: 62px;
+	border: 0;
+	border-radius: 0;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: contain;
+	transform: translateY(-50%) rotate(-6deg);
+	filter: drop-shadow(0 4px 4px rgba(53, 39, 16, 0.18));
+}
+
+body.user .coupon_sidebar a.coupon_nav_mine::before {
+	background-image: url("../static/images/coupon_ticket_icon.png");
+	width: 70px;
+}
+
+body.user .coupon_sidebar a.coupon_nav_gacha::before {
+	background-image: url("../static/images/gacha_crystal_icon.png");
+	transform: translateY(-50%) rotate(4deg);
+}
+
+body.user .coupon_sidebar a.coupon_nav_favorite::before {
+	background-image: url("../static/images/favorite_leaf_heart_icon.png");
+	transform: translateY(-50%) rotate(-3deg);
+}
+
+body.user .list_table,
+body.admin .list_table,
+body.user .detail_table,
+body.admin .detail_table {
+	border: 26px solid transparent;
+	border-image: url("../static/images/table_frame_transparent_2x.png") 82 fill stretch;
+	border-collapse: separate;
+	border-spacing: 0;
+	background:
+		linear-gradient(rgba(255, 253, 242, 0.94), rgba(255, 250, 232, 0.94)) padding-box;
+	box-shadow: 0 8px 16px rgba(59, 43, 16, 0.1);
+}
+
+body.user .list_table th,
+body.admin .list_table th,
+body.user .detail_table th,
+body.admin .detail_table th {
+	background: linear-gradient(180deg, rgba(69, 104, 44, 0.95), rgba(45, 72, 34, 0.96));
+}
+
+body:has(.login_spell_page) {
+	background-image:
+		linear-gradient(rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.42)),
+		url("../static/images/background.png");
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: cover;
+	background-attachment: fixed;
+}
+
+body:has(.login_spell_page) .login_hat {
+	width: 88px;
+	height: 88px;
+	border-radius: 0;
+	background: url("../static/images/logo_witch_hat.png") center / contain no-repeat;
+	box-shadow: none;
+	transform: rotate(-10deg);
+}
+
+body:has(.login_spell_page) .login_hat::before,
+body:has(.login_spell_page) .login_hat::after {
+	display: none;
+}
+
+body:has(.login_spell_page) .login_shop_name {
+	color: #244820;
+	font-size: clamp(1.7rem, 5vw, 2.35rem);
+	text-shadow:
+		0 2px 0 rgba(255, 250, 220, 0.92),
+		0 4px 9px rgba(73, 57, 24, 0.16);
+}
+
+@media screen and (max-width: 900px) {
+	body.user header .container::after,
+	body.admin header .container::after {
+		width: 118px;
+		height: 118px;
+		opacity: 0.62;
+	}
+
+	body.user .site_title,
+	body.admin .site_title {
+		max-width: calc(100vw - 132px);
+		font-size: clamp(1.72rem, 7vw, 2.55rem);
+	}
+
+	body.user .user_info,
+	body.admin .user_info {
+		margin-right: 0;
+	}
+
+	body.user .main,
+	body.admin .main,
+	body.user .container.content,
+	body.admin .container.content {
+		border-width: 24px;
+		padding: 20px 18px 34px;
+	}
+
+	body.user .search_area,
+	body.admin .admin_menu > div,
+	body.admin .admin_menu_list {
+		min-height: 0;
+		padding: 36px 26px 54px;
+	}
+}
+
+@media screen and (max-width: 560px) {
+	body.user::after,
+	body.admin::after {
+		width: 82px;
+		opacity: 0.48;
+	}
+
+	body.user header .container::after,
+	body.admin header .container::after,
+	body.user .header_herbs,
+	body.admin .header_herbs {
+		display: none;
+	}
+
+	body.user .site_title,
+	body.admin .site_title {
+		max-width: calc(100vw - 96px);
+		margin-left: 0;
+		grid-template-columns: 66px minmax(0, 1fr);
+		font-size: clamp(1.44rem, 7.8vw, 2rem);
+	}
+
+	body.user .site_title_hat,
+	body.admin .site_title_hat {
+		width: 66px;
+		height: 66px;
+	}
+
+	body.user .site_title::after,
+	body.admin .site_title::after {
+		font-size: 0.78rem;
+	}
+
+	body.user .navi_menu,
+	body.admin .navi_menu {
+		grid-template-columns: 1fr 1fr;
+	}
+
+	body.user .navi_menu a,
+	body.admin .navi_menu a {
+		min-height: 54px;
+		padding: 0 10px;
+		font-size: 0.98rem;
+		line-height: 54px;
+	}
+
+	body.user .main,
+	body.admin .main,
+	body.user .container.content,
+	body.admin .container.content {
+		border-width: 18px;
+		padding: 18px 10px 30px;
+	}
+
+	body.user .main .title,
+	body.admin .main .title,
+	body.user .content .title,
+	body.admin .content .title,
+	body.user .page_title,
+	body.admin .page_title,
+	body.user .main .related_items_title,
+	body.admin .main .related_items_title,
+	body.user .main .review_area > .title,
+	body.admin .main .review_area > .title {
+		min-height: 50px;
+		padding: 11px 32px 14px;
+		font-size: 1.18rem;
+	}
+
+	body.user .list_table,
+	body.admin .list_table,
+	body.user .detail_table,
+	body.admin .detail_table {
+		border-width: 16px;
+	}
+
+	body.user .coupon_sidebar a,
+	body.admin .admin_menu .display_list,
+	body.admin .admin_menu_list .link_area a {
+		padding-left: 50px;
+	}
+}
+
 /* Order address flow refinements */
 .address_select_row {
 	display: flex;
@@ -4437,4 +5002,388 @@ body.user .list_table.order tr.order_canceled_row:hover td {
 	border: 1px solid rgba(178, 83, 63, 0.42);
 	background: #f7ddd6;
 	color: #93402f;
+}
+
+/* ---- Spirit shop final alignment pass ---- */
+body.user header .container,
+body.admin header .container,
+body:has(.witch-item-list-page) header .container {
+	min-height: 96px;
+	padding-top: 8px;
+}
+
+body.user .site_title,
+body.admin .site_title,
+body:has(.witch-item-list-page) .site_title {
+	grid-template-columns: 70px minmax(0, 1fr);
+	max-width: min(620px, calc(100vw - 150px));
+	margin-top: 4px;
+	font-size: clamp(1.66rem, 3.25vw, 2.55rem);
+	line-height: 1.02;
+}
+
+body.user .site_title_hat,
+body.admin .site_title_hat,
+body:has(.witch-item-list-page) .site_title_hat {
+	width: 70px;
+	height: 70px;
+}
+
+body.user .site_title::before,
+body.admin .site_title::before,
+body:has(.witch-item-list-page) .site_title::before {
+	display: none;
+	content: none;
+}
+
+body.user .site_title::after,
+body.admin .site_title::after,
+body:has(.witch-item-list-page) .site_title::after {
+	content: "Forest Spirit Market";
+	grid-column: 2;
+	margin-top: 4px;
+	font-size: clamp(0.78rem, 1.18vw, 0.96rem);
+}
+
+body.user .header_herbs,
+body.admin .header_herbs,
+body:has(.witch-item-list-page) .header_herbs {
+	width: clamp(96px, 12vw, 146px);
+}
+
+body.user .navi_area,
+body.admin .navi_area {
+	position: relative;
+	padding: 18px 0 22px;
+}
+
+body.user .navi_area::before,
+body.user .navi_area::after,
+body.admin .navi_area::before,
+body.admin .navi_area::after {
+	content: "";
+	position: absolute;
+	left: 50%;
+	width: min(1180px, calc(100% - 48px));
+	height: 22px;
+	pointer-events: none;
+	background: url("../static/images/fairy_forest_divider_line.png") center / 100% 100% no-repeat;
+	transform: translateX(-50%);
+	opacity: 0.9;
+}
+
+body.user .navi_area::before,
+body.admin .navi_area::before {
+	top: 0;
+}
+
+body.user .navi_area::after,
+body.admin .navi_area::after {
+	bottom: 0;
+}
+
+body.user .navi_menu,
+body.admin .navi_menu,
+body:has(.witch-item-list-page) .navi_menu {
+	padding: 4px 0;
+}
+
+body.user > .container,
+body.admin > .container,
+body:has(.witch-item-list-page) > .container {
+	display: grid;
+	grid-template-columns: 348px minmax(0, 1fr);
+	align-items: start;
+	gap: 28px;
+	width: min(1280px, calc(100% - 40px));
+}
+
+body.user aside.search,
+body.admin aside.admin_menu,
+body:has(.witch-item-list-page) aside.search {
+	width: 348px;
+	min-width: 348px;
+}
+
+body.user .main,
+body.admin .main,
+body:has(.witch-item-list-page) .main {
+	width: auto;
+	min-width: 0;
+}
+
+body.user .main .title,
+body.admin .main .title,
+body.user .content .title,
+body.admin .content .title,
+body.user .page_title,
+body.admin .page_title,
+body.user .main .related_items_title,
+body.admin .main .related_items_title,
+body.user .main .review_area > .title,
+body.admin .main .review_area > .title,
+body:has(.witch-item-list-page) .witch-page-title {
+	width: min(380px, 82%);
+	min-height: 56px;
+	margin: 0 auto 24px;
+	padding: 12px 44px 15px;
+	border: 0;
+	border-radius: 0;
+	background: url("../static/images/title_transparent_2x.png") center / 100% 100% no-repeat;
+	box-shadow: none;
+	color: #fffbe6;
+	font-size: clamp(1.28rem, 1.78vw, 1.62rem);
+	line-height: 1.15;
+	text-shadow:
+		0 2px 2px rgba(19, 35, 14, 0.78),
+		0 0 8px rgba(255, 245, 190, 0.22);
+}
+
+body.user .search_area,
+body.admin .admin_menu > div,
+body.admin .admin_menu_list,
+body:has(.witch-item-list-page) .search_area {
+	box-sizing: border-box;
+	width: 348px;
+	min-height: 430px;
+	padding: 38px 42px 70px;
+	background: url("../static/images/sidebar_frame_transparent_2x.png") center top / 100% 100% no-repeat;
+}
+
+body.user .search_area .title,
+body.admin .admin_menu .title,
+body.admin .admin_menu_list .title_area,
+body.admin .admin_menu_list .title_area_no_shadow,
+body:has(.witch-item-list-page) .search_area .title {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 50px;
+	margin: 0 auto 13px;
+	padding: 9px 34px 13px;
+	border: 0;
+	border-radius: 0;
+	background: url("../static/images/green_title_ribbon.png") center / 100% 100% no-repeat;
+	box-shadow: none;
+	color: #fffbe6;
+	font-size: 1.12rem;
+	font-weight: 900;
+	line-height: 1.1;
+	text-align: center;
+	text-shadow: 0 2px 2px rgba(20, 35, 12, 0.76);
+}
+
+body.user .search .form,
+body:has(.witch-item-list-page) .search .form {
+	padding: 0;
+	border: 0;
+	background: transparent;
+	box-shadow: none;
+}
+
+body.user .search .form form,
+body:has(.witch-item-list-page) .search .form form {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 62px;
+	gap: 8px;
+	align-items: center;
+	width: 92%;
+	margin: 0 auto;
+	box-sizing: border-box;
+}
+
+body.user .search .form select,
+body:has(.witch-item-list-page) .search .form select {
+	width: 100%;
+	max-width: 100%;
+	min-width: 0;
+	min-height: 43px;
+	padding: 8px 28px 8px 12px;
+	border: 0;
+	box-sizing: border-box;
+	background: url("../static/images/category_select_bar_transparent_3x.png") center / 100% 100% no-repeat;
+	box-shadow: none;
+	appearance: none;
+}
+
+body.user .search .form [type=submit],
+body:has(.witch-item-list-page) .search .form [type=submit] {
+	width: 62px;
+	min-width: 62px;
+	padding-inline: 0;
+}
+
+body.user .coupon_sidebar,
+body:has(.witch-item-list-page) .coupon_sidebar {
+	gap: 14px;
+	margin-top: 26px;
+}
+
+body.user .coupon_sidebar a,
+body:has(.witch-item-list-page) .coupon_sidebar a {
+	min-height: 58px;
+	padding: 10px 18px 11px 64px;
+	border: 0;
+	background: url("../static/images/sidebar_button.png") center / 100% 100% no-repeat;
+	color: #163d24;
+	font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+	font-size: 1.12rem;
+	font-weight: 900;
+	letter-spacing: 0;
+	text-shadow:
+		0 1px 0 rgba(255, 247, 207, 0.82),
+		0 0 7px rgba(239, 219, 132, 0.22);
+}
+
+body.user .coupon_sidebar a::before,
+body:has(.witch-item-list-page) .coupon_sidebar a::before,
+body.user .coupon_sidebar a:nth-child(1)::before,
+body.user .coupon_sidebar a:nth-child(2)::before,
+body.user .coupon_sidebar a:nth-child(3)::before,
+body:has(.witch-item-list-page) .coupon_sidebar a:nth-child(1)::before,
+body:has(.witch-item-list-page) .coupon_sidebar a:nth-child(2)::before,
+body:has(.witch-item-list-page) .coupon_sidebar a:nth-child(3)::before {
+	content: "" !important;
+	left: -12px;
+	top: 50%;
+	width: 78px;
+	height: 78px;
+	border: 0;
+	border-radius: 0;
+	background-color: transparent;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: contain;
+	box-shadow: none;
+	filter: drop-shadow(0 4px 5px rgba(53, 39, 16, 0.16));
+}
+
+body.user .coupon_sidebar a.coupon_nav_mine::before,
+body:has(.witch-item-list-page) .coupon_sidebar a.coupon_nav_mine::before {
+	background-image: url("../static/images/coupon_ticket_icon.png") !important;
+	width: 86px;
+}
+
+body.user .coupon_sidebar a.coupon_nav_gacha::before,
+body:has(.witch-item-list-page) .coupon_sidebar a.coupon_nav_gacha::before {
+	background-image: url("../static/images/gacha_crystal_icon.png") !important;
+}
+
+body.user .coupon_sidebar a.coupon_nav_favorite::before,
+body:has(.witch-item-list-page) .coupon_sidebar a.coupon_nav_favorite::before {
+	background-image: url("../static/images/favorite_leaf_heart_icon.png") !important;
+}
+
+body.user .spirit-paginated-table,
+body.admin .spirit-paginated-table {
+	margin-bottom: 14px;
+	table-layout: fixed;
+}
+
+body.user .spirit-paginated-table[style],
+body.admin .spirit-paginated-table[style] {
+	min-height: 0;
+}
+
+.spirit_pager {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 9px;
+	margin: 16px auto 8px;
+	padding: 8px 12px;
+	border-top: 1px solid rgba(112, 125, 62, 0.22);
+}
+
+.spirit_pager_button {
+	min-width: 36px;
+	height: 36px;
+	border: 1px solid rgba(78, 105, 45, 0.56);
+	border-radius: 999px;
+	background:
+		linear-gradient(180deg, rgba(255, 253, 236, 0.94), rgba(226, 237, 195, 0.9));
+	color: #254b24;
+	font-family: Georgia, "Yu Mincho", serif;
+	font-size: 1rem;
+	font-weight: 900;
+	cursor: pointer;
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.74),
+		0 3px 7px rgba(46, 63, 28, 0.13);
+}
+
+.spirit_pager_button:hover:not(:disabled),
+.spirit_pager_button.is-current {
+	background: linear-gradient(180deg, #557331, #274a22);
+	color: #fff8df;
+	text-shadow: 0 1px 1px rgba(20, 30, 12, 0.65);
+	transform: translateY(-1px);
+}
+
+.spirit_pager_button:disabled {
+	cursor: default;
+	opacity: 0.42;
+}
+
+.spirit_pager_arrow {
+	font-size: 1.45rem;
+	line-height: 1;
+}
+
+@media screen and (max-width: 900px) {
+	body.user > .container,
+	body.admin > .container,
+	body:has(.witch-item-list-page) > .container {
+		display: flex;
+		flex-direction: column;
+		width: calc(100% - 24px);
+	}
+
+	body.user aside.search,
+	body.admin aside.admin_menu,
+	body:has(.witch-item-list-page) aside.search,
+	body.user .search_area,
+	body.admin .admin_menu > div,
+	body.admin .admin_menu_list,
+	body:has(.witch-item-list-page) .search_area {
+		width: 100%;
+		min-width: 0;
+	}
+}
+
+@media screen and (max-width: 560px) {
+	body.user header .container,
+	body.admin header .container,
+	body:has(.witch-item-list-page) header .container {
+		min-height: 88px;
+	}
+
+	body.user .site_title,
+	body.admin .site_title,
+	body:has(.witch-item-list-page) .site_title {
+		grid-template-columns: 54px minmax(0, 1fr);
+		max-width: 100%;
+		font-size: clamp(1.02rem, 5.35vw, 1.34rem);
+	}
+
+	body.user .site_title_hat,
+	body.admin .site_title_hat,
+	body:has(.witch-item-list-page) .site_title_hat {
+		width: 54px;
+		height: 54px;
+	}
+
+	body.user .navi_area,
+	body.admin .navi_area {
+		padding: 14px 0 18px;
+	}
+
+	body.user .navi_area::before,
+	body.user .navi_area::after,
+	body.admin .navi_area::before,
+	body.admin .navi_area::after {
+		width: calc(100% - 22px);
+		height: 16px;
+	}
 }

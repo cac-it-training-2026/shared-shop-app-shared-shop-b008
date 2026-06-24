@@ -156,6 +156,77 @@
 				});
 			}
 		}
+		function initSpiritPagination() {
+			var tables = document.querySelectorAll(".spirit-paginated-table");
+			for (var t = 0; t < tables.length; t++) {
+				(function (table) {
+					var rows = Array.prototype.slice.call(table.querySelectorAll("tr"));
+					if (rows.length <= 1) {
+						return;
+					}
+					var bodyRows = rows.slice(1);
+					var pageSize = parseInt(table.getAttribute("data-spirit-page-size"), 10) || 6;
+					var pageCount = Math.ceil(bodyRows.length / pageSize);
+					if (pageCount <= 1) {
+						return;
+					}
+					var pager = document.createElement("nav");
+					pager.className = "spirit_pager";
+					pager.setAttribute("aria-label", "Pagination");
+					table.insertAdjacentElement("afterend", pager);
+
+					var currentPage = 1;
+					var render = function () {
+						for (var i = 0; i < bodyRows.length; i++) {
+							var visible = i >= (currentPage - 1) * pageSize && i < currentPage * pageSize;
+							bodyRows[i].hidden = !visible;
+						}
+						pager.innerHTML = "";
+						var prev = document.createElement("button");
+						prev.type = "button";
+						prev.className = "spirit_pager_button spirit_pager_arrow";
+						prev.textContent = "<";
+						prev.disabled = currentPage === 1;
+						prev.addEventListener("click", function () {
+							if (currentPage > 1) {
+								currentPage--;
+								render();
+							}
+						});
+						pager.appendChild(prev);
+						for (var p = 1; p <= pageCount; p++) {
+							var button = document.createElement("button");
+							button.type = "button";
+							button.className = "spirit_pager_button";
+							button.textContent = p;
+							button.setAttribute("aria-label", "Page " + p);
+							if (p === currentPage) {
+								button.classList.add("is-current");
+								button.setAttribute("aria-current", "page");
+							}
+							button.addEventListener("click", function () {
+								currentPage = parseInt(this.textContent, 10);
+								render();
+							});
+							pager.appendChild(button);
+						}
+						var next = document.createElement("button");
+						next.type = "button";
+						next.className = "spirit_pager_button spirit_pager_arrow";
+						next.textContent = ">";
+						next.disabled = currentPage === pageCount;
+						next.addEventListener("click", function () {
+							if (currentPage < pageCount) {
+								currentPage++;
+								render();
+							}
+						});
+						pager.appendChild(next);
+					};
+					render();
+				}(tables[t]));
+			}
+		}
 		document.addEventListener("DOMContentLoaded", function () {
 			var body = document.body;
 			if (body.classList.contains("witch-ui-ready")) {
@@ -202,6 +273,7 @@
 					this.classList.remove("witch-row-hover");
 				});
 			}
+			initSpiritPagination();
 			initGacha(reduceMotion);
 		});
 	}());
