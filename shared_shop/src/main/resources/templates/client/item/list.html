@@ -40,7 +40,19 @@
 					<img class="witch-product-image" th:src="@{/images/common/no_image.jpg}" th:if="${item.image == null}" />
 
 				</td>
-				<td><a class="witch-product-name-link" th:href="@{/client/item/detail/{id}(id=${item.id})}" th:text="${item.name}"></a></td>
+				<td>
+					<a class="witch-product-name-link" th:href="@{/client/item/detail/{id}(id=${item.id})}" th:text="${item.name}"></a>
+					<div class="item_review compact">
+						<th:block th:if="${item.reviewCount > 0}">
+							<span class="star_rating">★</span>
+							<span class="rating_value" th:text="${#numbers.formatDecimal(item.avgRating, 1, 1)}"></span>
+							<span class="review_count" th:text="'(' + ${item.reviewCount} + ')'"></span>
+						</th:block>
+						<th:block th:unless="${item.reviewCount > 0}">
+							<span class="no_review">評価なし</span>
+						</th:block>
+					</div>
+				</td>
 				<td th:text="${item.price}"></td>
 				<td th:text="${item.categoryName}"></td>
 			</tr>

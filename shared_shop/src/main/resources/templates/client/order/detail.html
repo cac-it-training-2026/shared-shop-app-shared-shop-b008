@@ -83,7 +83,11 @@
 				<th>[[#{data.subtotal}]]</th>
 			</tr>
 			<tr th:each="orderItem: ${orderItemBeans}">
-				<td th:text="${orderItem.name}"></td>
+				<td>
+					<span th:text="${orderItem.name}"></span>
+					<br />
+					<a th:href="@{/client/review/regist/input/{id}(id=${orderItem.id})}" class="review_link">レビューを書く</a>
+				</td>
 				<td th:text="${orderItem.price}"></td>
 				<td th:text="${orderItem.orderNum}"></td>
 				<td th:text="${orderItem.subtotal}"></td>

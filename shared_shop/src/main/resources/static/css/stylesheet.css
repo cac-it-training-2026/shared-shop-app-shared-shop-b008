@@ -3854,3 +3854,307 @@ body:has(.login_spell_page) .error_list ul {
 		display: none;
 	}
 }
+
+/* ---- Product reviews ---- */
+body.user .item_review,
+body.admin .item_review {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	margin-top: 7px;
+	color: rgba(47, 42, 32, 0.76);
+	font-size: 0.9rem;
+	font-weight: 700;
+}
+
+body.user .item_review.compact,
+body.admin .item_review.compact {
+	margin-top: 8px;
+	font-size: 0.82rem;
+}
+
+body.user .star_rating,
+body.admin .star_rating,
+body.user .review_rating,
+body.admin .review_rating {
+	color: #b57a19;
+	font-weight: 900;
+	text-shadow: 0 1px 0 rgba(255, 248, 219, 0.8);
+}
+
+body.user .rating_value,
+body.admin .rating_value {
+	color: var(--witch-green-deep);
+	font-weight: 900;
+}
+
+body.user .review_count,
+body.admin .review_count,
+body.user .no_review,
+body.admin .no_review {
+	color: rgba(47, 42, 32, 0.58);
+}
+
+body.user .review_area,
+body.admin .review_area {
+	margin: 34px auto 4px;
+	padding: 22px;
+	border: 1.5px solid rgba(146, 130, 82, 0.56);
+	border-radius: 8px;
+	background:
+		linear-gradient(180deg, rgba(255, 253, 241, 0.92), rgba(250, 241, 211, 0.86)),
+		rgba(255, 250, 235, 0.88);
+	box-shadow:
+		inset 0 0 18px rgba(93, 79, 38, 0.07),
+		0 4px 10px rgba(65, 48, 20, 0.1);
+}
+
+body.user .review_area > .title,
+body.admin .review_area > .title {
+	margin: 0 0 14px;
+	padding-bottom: 8px;
+	border-bottom: 2px solid var(--witch-moss);
+	color: var(--witch-green-deep);
+	font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+}
+
+body.user .review_sort_area,
+body.admin .review_sort_area {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	margin: 0 0 18px;
+	color: rgba(47, 42, 32, 0.72);
+	font-weight: 800;
+}
+
+body.user .review_sort_area a,
+body.admin .review_sort_area a,
+body.user .review_sort_area span,
+body.admin .review_sort_area span {
+	display: inline-flex;
+	align-items: center;
+	min-height: 30px;
+	padding: 4px 12px;
+	border: 1px solid rgba(91, 111, 54, 0.36);
+	border-radius: 999px;
+	background: rgba(255, 252, 235, 0.78);
+	color: var(--witch-green-deep);
+	text-decoration: none;
+}
+
+body.user .review_sort_area span,
+body.admin .review_sort_area span {
+	background: linear-gradient(180deg, #557331, #365421);
+	color: #fff8df;
+	box-shadow: 0 8px 14px rgba(47, 74, 36, 0.18);
+}
+
+body.user .review_item,
+body.admin .review_item {
+	position: relative;
+	margin: 14px 0 0;
+	padding: 16px 18px;
+	border: 1px solid rgba(146, 130, 82, 0.34);
+	border-radius: 8px;
+	background: rgba(255, 253, 244, 0.74);
+}
+
+body.user .review_item hr,
+body.admin .review_item hr {
+	display: none;
+}
+
+body.user .review_header,
+body.admin .review_header {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 10px;
+}
+
+body.user .review_user,
+body.admin .review_user {
+	color: var(--witch-green-deep);
+	font-weight: 900;
+}
+
+body.user .review_date,
+body.admin .review_date {
+	margin-left: auto;
+	color: rgba(47, 42, 32, 0.56);
+	font-size: 0.86rem;
+}
+
+body.user .review_comment p,
+body.admin .review_comment p {
+	margin: 0;
+	color: var(--witch-text);
+	line-height: 1.8;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+body.user .review_action,
+body.admin .review_action {
+	margin-top: 12px;
+	text-align: right;
+}
+
+body.user .review_link,
+body.admin .review_link {
+	display: inline-flex;
+	align-items: center;
+	margin-top: 8px;
+	padding: 5px 12px;
+	border: 1px solid rgba(91, 111, 54, 0.42);
+	border-radius: 999px;
+	background: rgba(255, 252, 235, 0.8);
+	color: var(--witch-green-deep);
+	font-size: 0.86rem;
+	font-weight: 800;
+	text-decoration: none;
+}
+
+body.user .review_link:hover,
+body.admin .review_link:hover {
+	background: rgba(255, 247, 216, 0.96);
+	border-color: var(--witch-moss);
+}
+
+body.user.review_regist_page .info_form_area,
+body.admin.review_regist_page .info_form_area {
+	width: min(720px, 100%);
+}
+
+body.user .review_form,
+body.admin .review_form {
+	display: grid;
+	gap: 16px;
+	margin-top: 18px;
+}
+
+body.user .review_input_table,
+body.admin .review_input_table {
+	width: 100%;
+	border-collapse: separate;
+	border-spacing: 0 12px;
+}
+
+body.user .review_input_table th,
+body.admin .review_input_table th {
+	width: 120px;
+	padding: 12px 14px;
+	color: var(--witch-green-deep);
+	text-align: left;
+	vertical-align: top;
+}
+
+body.user .review_input_table td,
+body.admin .review_input_table td {
+	padding: 10px 0;
+}
+
+body.user .review_input_table input[type="radio"],
+body.admin .review_input_table input[type="radio"] {
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
+}
+
+body.user .review_input_table input[type="radio"] + label,
+body.admin .review_input_table input[type="radio"] + label {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 42px;
+	height: 42px;
+	margin-right: 6px;
+	border: 1px solid rgba(146, 130, 82, 0.42);
+	border-radius: 50%;
+	background: rgba(255, 253, 244, 0.86);
+	color: rgba(86, 72, 36, 0.45);
+	font-size: 1.5rem;
+	line-height: 1;
+	cursor: pointer;
+	transition: transform 150ms ease, color 150ms ease, background 150ms ease;
+}
+
+body.user .review_input_table input[type="radio"]:focus + label,
+body.admin .review_input_table input[type="radio"]:focus + label {
+	box-shadow: 0 0 0 4px rgba(210, 183, 89, 0.22);
+}
+
+body.user .review_input_table input[type="radio"] + label.is-selected,
+body.admin .review_input_table input[type="radio"] + label.is-selected,
+body.user .review_input_table input[type="radio"]:checked + label,
+body.admin .review_input_table input[type="radio"]:checked + label {
+	background: #fff4bf;
+	color: #b57a19;
+	transform: translateY(-1px);
+}
+
+body.user .review_input_table textarea,
+body.admin .review_input_table textarea {
+	width: 100%;
+	box-sizing: border-box;
+	min-height: 180px;
+	padding: 14px 16px;
+	border: 1px solid rgba(91, 111, 54, 0.38);
+	border-radius: 8px;
+	background: rgba(255, 252, 235, 0.88);
+	color: var(--witch-text);
+	font: inherit;
+	line-height: 1.7;
+	resize: vertical;
+}
+
+body.user .review_input_table textarea:focus,
+body.admin .review_input_table textarea:focus {
+	border-color: rgba(47, 91, 44, 0.72);
+	box-shadow: 0 0 0 4px rgba(210, 183, 89, 0.22);
+	outline: none;
+}
+
+body.user .review_rating_status,
+body.admin .review_rating_status {
+	min-height: 1.4em;
+	margin: -8px 0 0 134px;
+	color: var(--witch-green-deep);
+	font-weight: 900;
+}
+
+@media screen and (max-width: 560px) {
+	body.user .review_area,
+	body.admin .review_area {
+		padding: 16px 12px;
+	}
+
+	body.user .review_date,
+	body.admin .review_date {
+		width: 100%;
+		margin-left: 0;
+	}
+
+	body.user .review_input_table,
+	body.admin .review_input_table,
+	body.user .review_input_table tbody,
+	body.admin .review_input_table tbody,
+	body.user .review_input_table tr,
+	body.admin .review_input_table tr,
+	body.user .review_input_table th,
+	body.admin .review_input_table th,
+	body.user .review_input_table td,
+	body.admin .review_input_table td {
+		display: block;
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	body.user .review_rating_status,
+	body.admin .review_rating_status {
+		margin-left: 0;
+	}
+}
