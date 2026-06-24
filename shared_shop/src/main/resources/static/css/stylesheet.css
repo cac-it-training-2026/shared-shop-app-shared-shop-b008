@@ -1134,3 +1134,2681 @@ p.link_center {
 	text-align: right;
 	margin-top: 10px;
 }
+
+/* ---- 商品一覧: ナチュラル魔女の森風 ---- */
+:root {
+	--witch-bg: #f7f0d8;
+	--witch-paper: #fffaf0;
+	--witch-paper-soft: #f3eed2;
+	--witch-green: #2f5b2c;
+	--witch-green-deep: #1f3f22;
+	--witch-green-soft: #dfe8c8;
+	--witch-moss: #6c7f35;
+	--witch-wood: #8a6a3f;
+	--witch-wood-deep: #5d3f20;
+	--witch-border: #b7a875;
+	--witch-text: #2f2a20;
+}
+
+body:has(.witch-item-list-page) {
+	background:
+		radial-gradient(circle at 15% 8%, rgba(111, 143, 78, 0.16), transparent 26%),
+		radial-gradient(circle at 88% 18%, rgba(77, 112, 54, 0.13), transparent 28%),
+		linear-gradient(180deg, #fbf7e8 0%, #f0e7c9 100%);
+	color: var(--witch-text);
+	font-family: "Yu Mincho", "Hiragino Mincho ProN", "Yu Gothic", serif;
+}
+
+body:has(.witch-item-list-page)::before {
+	content: "";
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
+	opacity: 0.18;
+	background-image:
+		linear-gradient(45deg, rgba(90, 70, 30, 0.04) 25%, transparent 25%),
+		linear-gradient(-45deg, rgba(90, 70, 30, 0.03) 25%, transparent 25%);
+	background-size: 6px 6px;
+	z-index: 0;
+}
+
+body:has(.witch-item-list-page) header,
+body:has(.witch-item-list-page) .navi_area,
+body:has(.witch-item-list-page) footer {
+	background: transparent;
+}
+
+body:has(.witch-item-list-page) header,
+body:has(.witch-item-list-page) .navi_area,
+body:has(.witch-item-list-page) > .container,
+body:has(.witch-item-list-page) footer {
+	position: relative;
+	z-index: 1;
+}
+
+body:has(.witch-item-list-page) header .container,
+body:has(.witch-item-list-page) > .container,
+body:has(.witch-item-list-page) .navi_menu {
+	width: min(1280px, calc(100% - 40px));
+}
+
+body:has(.witch-item-list-page) header .container {
+	position: relative;
+	align-items: flex-start;
+	min-height: 118px;
+	padding-top: 18px;
+}
+
+/* 素材差し替え候補: logo_witch_hat.png / hanging_herbs.png */
+body:has(.witch-item-list-page) header .container::before,
+body:has(.witch-item-list-page) header .container::after {
+	content: "❧";
+	position: absolute;
+	top: 20px;
+	color: rgba(72, 104, 45, 0.72);
+	font-size: 64px;
+	line-height: 1;
+}
+
+body:has(.witch-item-list-page) header .container::before {
+	left: -16px;
+	transform: rotate(72deg);
+}
+
+body:has(.witch-item-list-page) header .container::after {
+	right: 0;
+	transform: rotate(-34deg);
+}
+
+body:has(.witch-item-list-page) .site_title {
+	position: relative;
+	margin: 10px 0 0 74px;
+	color: var(--witch-green-deep);
+	font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+	font-size: 0;
+	font-weight: 700;
+	letter-spacing: 0;
+	line-height: 1.05;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+body:has(.witch-item-list-page) .site_title::before {
+	content: "なんでも\A魔女商会";
+	display: block;
+	white-space: pre;
+	font-size: 38px;
+}
+
+body:has(.witch-item-list-page) .site_title::after {
+	content: "Anything Witch Shop";
+	display: block;
+	margin-top: 6px;
+	color: #5f5638;
+	font-size: 16px;
+	font-style: italic;
+	font-weight: 600;
+}
+
+body:has(.witch-item-list-page) .user_info {
+	position: relative;
+	z-index: 1;
+	color: var(--witch-text);
+	font-size: 1.05rem;
+}
+
+body:has(.witch-item-list-page) a {
+	color: var(--witch-green-deep);
+}
+
+body:has(.witch-item-list-page) .navi_menu {
+	display: flex;
+	gap: 14px;
+	padding: 0 0 20px;
+}
+
+body:has(.witch-item-list-page) .navi_menu li {
+	width: auto;
+	flex: 1;
+}
+
+body:has(.witch-item-list-page) .navi_menu a {
+	box-sizing: border-box;
+	border: 2px solid var(--witch-border);
+	border-radius: 8px;
+	background: rgba(255, 250, 235, 0.92);
+	box-shadow:
+		inset 0 0 0 3px rgba(255, 255, 255, 0.42),
+		0 3px 8px rgba(70, 50, 20, 0.12);
+	color: var(--witch-green-deep);
+	font-weight: 700;
+	text-shadow: none;
+}
+
+body:has(.witch-item-list-page) .navi_menu li:first-of-type a,
+body:has(.witch-item-list-page) .navi_menu li:last-of-type a {
+	border-radius: 8px;
+}
+
+body:has(.witch-item-list-page) .navi_menu a:hover,
+body:has(.witch-item-list-page) .navi_menu li:nth-child(2) a {
+	border-color: #9a8f56;
+	background: linear-gradient(180deg, var(--witch-green), var(--witch-green-deep));
+	color: #fff8df;
+}
+
+body:has(.witch-item-list-page) > .container {
+	align-items: flex-start;
+	gap: 26px;
+	margin-top: 0;
+}
+
+body:has(.witch-item-list-page) aside.search {
+	width: 28%;
+	min-width: 270px;
+}
+
+body:has(.witch-item-list-page) .main {
+	position: relative;
+	box-sizing: border-box;
+	width: 72%;
+	padding: 26px 28px 44px;
+	border: 1.5px solid rgba(146, 130, 82, 0.7);
+	border-radius: 8px;
+	background: rgba(255, 250, 235, 0.94);
+	box-shadow:
+		inset 0 0 24px rgba(93, 79, 38, 0.08),
+		0 8px 18px rgba(65, 48, 20, 0.13);
+}
+
+/* 素材差し替え候補: leaf_corner_deco.png */
+body:has(.witch-item-list-page) .main::before,
+body:has(.witch-item-list-page) .main::after {
+	content: "❧";
+	position: absolute;
+	color: rgba(101, 126, 55, 0.42);
+	font-size: 46px;
+	line-height: 1;
+	pointer-events: none;
+}
+
+body:has(.witch-item-list-page) .main::before {
+	top: 10px;
+	left: 12px;
+}
+
+body:has(.witch-item-list-page) .main::after {
+	right: 12px;
+	bottom: 10px;
+	transform: rotate(180deg);
+}
+
+.witch-item-list-page {
+	position: relative;
+	z-index: 1;
+}
+
+body:has(.witch-item-list-page) .main .title::before {
+	display: none;
+}
+
+.witch-item-list-page .witch-page-title {
+	display: block;
+	width: min(330px, 72%);
+	margin: 0 auto 28px;
+	padding: 14px 28px;
+	border: 1px solid #9a8f56;
+	border-radius: 8px;
+	background: linear-gradient(180deg, var(--witch-green), var(--witch-green-deep));
+	box-shadow:
+		inset 0 0 0 2px rgba(225, 208, 120, 0.28),
+		0 4px 8px rgba(40, 30, 10, 0.18);
+	color: #fff8df;
+	font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+	font-size: 1.9rem;
+	font-weight: 700;
+	letter-spacing: 0;
+	text-align: center;
+	text-shadow: 0 1px 1px rgba(20, 30, 12, 0.7);
+}
+
+body:has(.witch-item-list-page) .search_area {
+	position: relative;
+	padding-bottom: 190px;
+}
+
+body:has(.witch-item-list-page) .search_area .title {
+	border: 2px solid var(--witch-wood-deep);
+	border-bottom: 0;
+	border-radius: 8px 8px 0 0;
+	background:
+		linear-gradient(90deg, rgba(80, 50, 20, 0.08) 1px, transparent 1px),
+		linear-gradient(180deg, #b58a52, #9b7442);
+	background-size: 18px 100%, 100% 100%;
+	color: #273116;
+	font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+	font-size: 1.28rem;
+	font-weight: 700;
+	text-shadow: 0 1px 0 rgba(245, 226, 170, 0.6);
+}
+
+body:has(.witch-item-list-page) .search .form {
+	padding: 18px 14px 20px;
+	border: 2px solid var(--witch-wood-deep);
+	border-top: 0;
+	border-radius: 0 0 8px 8px;
+	background:
+		linear-gradient(90deg, rgba(80, 50, 20, 0.08) 1px, transparent 1px),
+		linear-gradient(180deg, #b58a52, #9b7442);
+	background-size: 18px 100%, 100% 100%;
+	box-shadow: 0 5px 10px rgba(55, 38, 15, 0.22);
+}
+
+body:has(.witch-item-list-page) .search .form form {
+	display: flex;
+	gap: 10px;
+}
+
+body:has(.witch-item-list-page) .search select {
+	flex: 1;
+	width: auto;
+	min-width: 0;
+	padding: 8px 10px;
+	border: 1px solid rgba(64, 49, 30, 0.65);
+	border-radius: 6px;
+	background: #fffaf0;
+	color: var(--witch-text);
+	font-size: 1rem;
+}
+
+body:has(.witch-item-list-page) [type=submit] {
+	border: 1px solid var(--witch-green-deep);
+	border-radius: 6px;
+	background: linear-gradient(180deg, #496f31, #294821);
+	box-shadow: 0 2px 4px rgba(53, 38, 12, 0.22);
+	color: #fff8df;
+	font-weight: 700;
+	text-shadow: none;
+}
+
+body:has(.witch-item-list-page) .coupon_sidebar {
+	gap: 9px;
+	margin-top: 24px;
+}
+
+body:has(.witch-item-list-page) .coupon_sidebar a {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	min-height: 54px;
+	padding: 10px 14px;
+	border: 1.5px solid rgba(111, 127, 53, 0.74);
+	border-radius: 8px;
+	background: rgba(232, 238, 205, 0.78);
+	box-shadow:
+		inset 0 0 0 2px rgba(255, 255, 245, 0.5),
+		0 2px 5px rgba(77, 66, 28, 0.1);
+	color: var(--witch-green-deep);
+	font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+	font-size: 1.05rem;
+	font-weight: 700;
+	text-align: left;
+}
+
+body:has(.witch-item-list-page) .coupon_sidebar a:hover {
+	background: rgba(217, 229, 178, 0.9);
+	transform: translateY(-1px);
+}
+
+body:has(.witch-item-list-page) .coupon_sidebar a::before {
+	display: inline-grid;
+	width: 38px;
+	height: 38px;
+	place-items: center;
+	flex: 0 0 38px;
+	border: 1px solid rgba(111, 127, 53, 0.55);
+	border-radius: 50%;
+	background: rgba(255, 250, 235, 0.72);
+	color: var(--witch-moss);
+	font-size: 1.15rem;
+}
+
+body:has(.witch-item-list-page) .coupon_sidebar a:nth-child(1)::before {
+	content: "券";
+}
+
+body:has(.witch-item-list-page) .coupon_sidebar a:nth-child(2)::before {
+	content: "晶";
+}
+
+body:has(.witch-item-list-page) .coupon_sidebar a:nth-child(3)::before {
+	content: "♡";
+}
+
+/* 素材差し替え候補: plants_books_bottle.png */
+body:has(.witch-item-list-page) .search_area::after {
+	content: "⚘  ✧  ❧";
+	position: absolute;
+	left: 6px;
+	right: 6px;
+	bottom: 10px;
+	min-height: 130px;
+	padding-top: 74px;
+	border-bottom: 3px solid rgba(93, 63, 32, 0.55);
+	color: rgba(72, 104, 45, 0.78);
+	font-size: 2.4rem;
+	text-align: center;
+	text-shadow: 0 2px 0 rgba(255, 250, 235, 0.75);
+}
+
+.witch-item-list-page .sorted_by {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 18px;
+	margin: 0 0 22px;
+	color: var(--witch-green-deep);
+	font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+	font-size: 1.08rem;
+	font-weight: 700;
+}
+
+.witch-item-list-page .sorted_by span,
+.witch-item-list-page .sorted_by a {
+	padding-bottom: 3px;
+}
+
+.witch-item-list-page .sorted_by span {
+	border-bottom: 2px solid var(--witch-moss);
+	color: var(--witch-green-deep);
+}
+
+.witch-item-list-page .sorted_by a {
+	text-decoration: none;
+	border-bottom: 1px dotted rgba(47, 91, 44, 0.55);
+}
+
+.witch-item-list-page .sorted_by a:hover,
+.witch-item-list-page .witch-product-name-link:hover {
+	color: var(--witch-moss);
+}
+
+.witch-item-list-page .sorted_by p {
+	flex-basis: 100%;
+	margin: 12px 0 0;
+}
+
+.witch-item-list-page .witch-product-table {
+	overflow: hidden;
+	margin: 0 auto 16px;
+	border: 1px solid rgba(183, 168, 117, 0.64);
+	border-radius: 8px;
+	background: rgba(255, 250, 235, 0.96);
+	border-collapse: separate;
+	border-spacing: 0;
+	box-shadow: 0 3px 10px rgba(65, 48, 20, 0.08);
+}
+
+.witch-item-list-page .witch-product-table tr:first-child th {
+	padding: 13px 12px;
+	border-bottom: 1px solid rgba(183, 168, 117, 0.45);
+	background: linear-gradient(180deg, #557331, #365421);
+	color: #fff8df;
+	font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+	font-size: 1.05rem;
+	font-weight: 700;
+	text-shadow: 0 1px 1px rgba(20, 30, 12, 0.55);
+}
+
+.witch-item-list-page .witch-product-table tr:first-child th:first-child {
+	border-radius: 8px 0 0 0;
+}
+
+.witch-item-list-page .witch-product-table tr:first-child th:last-child {
+	border-radius: 0 8px 0 0;
+}
+
+.witch-item-list-page .witch-product-table th::after {
+	background: rgba(255, 250, 235, 0.45);
+}
+
+.witch-item-list-page .witch-product-table td {
+	padding: 14px 16px;
+	border-bottom: 1px solid rgba(183, 168, 117, 0.28);
+	color: var(--witch-text);
+	font-size: 1.05rem;
+}
+
+.witch-item-list-page .witch-product-table tr:nth-child(even) td {
+	background: rgba(255, 252, 240, 0.94);
+}
+
+.witch-item-list-page .witch-product-table tr:nth-child(odd) td {
+	background: rgba(229, 236, 203, 0.62);
+}
+
+.witch-item-list-page .witch-product-table tr:last-child td {
+	border-bottom: 0;
+}
+
+.witch-item-list-page .witch-product-table td.image {
+	width: 24%;
+}
+
+.witch-item-list-page .witch-product-image {
+	width: 90px;
+	height: 90px;
+	max-width: 120px;
+	object-fit: contain;
+	vertical-align: middle;
+	filter: drop-shadow(0 3px 2px rgba(60, 45, 20, 0.14));
+}
+
+.witch-item-list-page .witch-product-name-link {
+	color: var(--witch-green-deep);
+	font-weight: 700;
+	text-decoration: none;
+	border-bottom: 1px dotted rgba(47, 91, 44, 0.55);
+}
+
+@media screen and (max-width: 900px) {
+	body:has(.witch-item-list-page) header .container,
+	body:has(.witch-item-list-page) > .container,
+	body:has(.witch-item-list-page) .navi_menu {
+		width: calc(100% - 24px);
+	}
+
+	body:has(.witch-item-list-page) header .container,
+	body:has(.witch-item-list-page) > .container {
+		flex-direction: column;
+	}
+
+	body:has(.witch-item-list-page) .site_title {
+		margin-left: 46px;
+	}
+
+	body:has(.witch-item-list-page) .navi_menu {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 8px;
+	}
+
+	body:has(.witch-item-list-page) aside.search,
+	body:has(.witch-item-list-page) .main {
+		width: 100%;
+		min-width: 0;
+	}
+
+	body:has(.witch-item-list-page) .search_area {
+		padding-bottom: 0;
+	}
+
+	body:has(.witch-item-list-page) .search_area::after {
+		display: none;
+	}
+
+	body:has(.witch-item-list-page) .coupon_sidebar {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+@media screen and (max-width: 560px) {
+	body:has(.witch-item-list-page) header .container::before,
+	body:has(.witch-item-list-page) header .container::after {
+		top: 28px;
+		font-size: 48px;
+	}
+
+	body:has(.witch-item-list-page) header .container::before {
+		left: 0;
+	}
+
+	body:has(.witch-item-list-page) header .container::after {
+		right: 20px;
+	}
+
+	body:has(.witch-item-list-page) .site_title::before {
+		font-size: 30px;
+	}
+
+	body:has(.witch-item-list-page) .main {
+		padding: 22px 12px 36px;
+	}
+
+	.witch-item-list-page .witch-page-title {
+		width: 100%;
+		box-sizing: border-box;
+		font-size: 1.55rem;
+	}
+
+	body:has(.witch-item-list-page) .search .form form,
+	.witch-item-list-page .sorted_by,
+	body:has(.witch-item-list-page) .coupon_sidebar {
+		grid-template-columns: 1fr;
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.witch-item-list-page .witch-product-table {
+		font-size: 0.9rem;
+		table-layout: fixed;
+	}
+
+	.witch-item-list-page .witch-product-table td,
+	.witch-item-list-page .witch-product-table tr:first-child th {
+		padding: 10px 4px;
+		overflow-wrap: anywhere;
+	}
+
+	.witch-item-list-page .witch-product-image {
+		width: 52px;
+		height: 52px;
+	}
+
+	.witch-item-list-page .witch-product-table td.image {
+		width: 30%;
+	}
+}
+
+/* ---- 商品一覧: 絵本風の追加ディテールと軽いインタラクション ---- */
+body:has(.witch-item-list-page).witch-ui-ready {
+	overflow-x: hidden;
+}
+
+body:has(.witch-item-list-page)::after {
+	content: "";
+	position: fixed;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	background:
+		radial-gradient(circle at 8% 88%, rgba(86, 126, 58, 0.18), transparent 18%),
+		radial-gradient(circle at 92% 84%, rgba(123, 143, 68, 0.13), transparent 20%),
+		linear-gradient(90deg, rgba(47, 91, 44, 0.11), transparent 12%, transparent 88%, rgba(47, 91, 44, 0.09));
+	mask-image: linear-gradient(180deg, transparent 0, #000 120px, #000 100%);
+}
+
+body:has(.witch-item-list-page) header .container {
+	isolation: isolate;
+}
+
+body:has(.witch-item-list-page) .site_title {
+	filter: drop-shadow(0 2px 0 rgba(255, 250, 235, 0.85));
+}
+
+body:has(.witch-item-list-page) .site_title::before {
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 8px;
+	text-decoration-color: rgba(137, 128, 74, 0.38);
+}
+
+body:has(.witch-item-list-page) .site_title + .site_title {
+	display: none;
+}
+
+body:has(.witch-item-list-page) .navi_menu a {
+	position: relative;
+	overflow: hidden;
+}
+
+body:has(.witch-item-list-page) .navi_menu a::before,
+body:has(.witch-item-list-page) .navi_menu a::after {
+	content: "";
+	position: absolute;
+	width: 12px;
+	height: 12px;
+	border-color: rgba(154, 143, 86, 0.78);
+	border-style: solid;
+	pointer-events: none;
+}
+
+body:has(.witch-item-list-page) .navi_menu a::before {
+	top: 7px;
+	left: 8px;
+	border-width: 2px 0 0 2px;
+	border-radius: 6px 0 0 0;
+}
+
+body:has(.witch-item-list-page) .navi_menu a::after {
+	right: 8px;
+	bottom: 7px;
+	border-width: 0 2px 2px 0;
+	border-radius: 0 0 6px 0;
+}
+
+body:has(.witch-item-list-page) .navi_menu a:hover {
+	transform: translateY(-2px);
+	box-shadow:
+		inset 0 0 0 3px rgba(255, 248, 223, 0.18),
+		0 6px 12px rgba(56, 42, 18, 0.18);
+}
+
+body:has(.witch-item-list-page) .main {
+	background:
+		radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 16%), rgba(255, 248, 190, 0.20), transparent 22%),
+		linear-gradient(180deg, rgba(255, 253, 242, 0.96), rgba(249, 241, 216, 0.96));
+}
+
+body:has(.witch-item-list-page) .main::before,
+body:has(.witch-item-list-page) .main::after {
+	text-shadow:
+		0 1px 0 rgba(255, 250, 235, 0.8),
+		0 0 12px rgba(117, 146, 79, 0.22);
+}
+
+.witch-item-list-page .witch-page-title {
+	position: relative;
+	isolation: isolate;
+}
+
+.witch-item-list-page .witch-page-title::before,
+.witch-item-list-page .witch-page-title::after {
+	content: "❧";
+	position: absolute;
+	top: 50%;
+	color: rgba(220, 202, 121, 0.72);
+	font-size: 1.45rem;
+	line-height: 1;
+	transform: translateY(-50%);
+}
+
+.witch-item-list-page .witch-page-title::before {
+	left: 16px;
+}
+
+.witch-item-list-page .witch-page-title::after {
+	right: 16px;
+	transform: translateY(-50%) rotate(180deg);
+}
+
+body:has(.witch-item-list-page) .search_area .title,
+body:has(.witch-item-list-page) .search .form {
+	position: relative;
+	overflow: hidden;
+}
+
+body:has(.witch-item-list-page) .search_area .title::before,
+body:has(.witch-item-list-page) .search .form::before,
+body:has(.witch-item-list-page) .search .form::after {
+	content: "";
+	position: absolute;
+	pointer-events: none;
+	border-radius: 50%;
+	background: rgba(92, 59, 24, 0.16);
+	box-shadow: inset 0 0 0 1px rgba(255, 233, 171, 0.18);
+}
+
+body:has(.witch-item-list-page) .search_area .title::before {
+	width: 42px;
+	height: 18px;
+	top: 8px;
+	left: 20px;
+	transform: rotate(-11deg);
+}
+
+body:has(.witch-item-list-page) .search .form::before {
+	width: 56px;
+	height: 22px;
+	right: 28px;
+	bottom: 18px;
+	transform: rotate(8deg);
+}
+
+body:has(.witch-item-list-page) .search .form::after {
+	width: 26px;
+	height: 12px;
+	left: 34px;
+	bottom: 24px;
+	transform: rotate(-18deg);
+}
+
+body:has(.witch-item-list-page) .search select:focus,
+body:has(.witch-item-list-page) [type=submit]:focus,
+.witch-item-list-page .witch-product-name-link:focus {
+	outline: 2px solid rgba(111, 127, 53, 0.75);
+	outline-offset: 3px;
+}
+
+body:has(.witch-item-list-page) .witch-search-touched .title {
+	box-shadow:
+		inset 0 0 0 2px rgba(255, 232, 144, 0.24),
+		0 0 16px rgba(240, 215, 120, 0.18);
+}
+
+.witch-item-list-page .witch-product-table {
+	position: relative;
+}
+
+.witch-item-list-page .witch-product-table td {
+	transition: background-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.witch-item-list-page .witch-product-table tr.witch-row-hover td,
+.witch-item-list-page .witch-product-table tr:hover td {
+	background: rgba(240, 232, 187, 0.78);
+	box-shadow: inset 0 1px 0 rgba(255, 250, 230, 0.75), inset 0 -1px 0 rgba(158, 143, 86, 0.16);
+}
+
+.witch-item-list-page .witch-product-table tr.witch-row-hover .witch-product-image,
+.witch-item-list-page .witch-product-table tr:hover .witch-product-image {
+	transform: translateY(-2px) scale(1.03);
+}
+
+.witch-item-list-page .witch-product-image {
+	transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.witch-item-list-page .witch-product-name-link {
+	background-image: linear-gradient(90deg, rgba(111, 127, 53, 0.28), rgba(111, 127, 53, 0.28));
+	background-position: 0 100%;
+	background-repeat: no-repeat;
+	background-size: 0 6px;
+	transition: background-size 0.18s ease, color 0.18s ease;
+}
+
+.witch-item-list-page .witch-product-name-link:hover {
+	background-size: 100% 6px;
+}
+
+.witch-ambient {
+	position: fixed;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	overflow: hidden;
+}
+
+.witch-ambient span {
+	position: absolute;
+	left: 9%;
+	top: 21%;
+	color: rgba(95, 126, 62, 0.26);
+	font-size: 14px;
+	animation: witch-float 9s ease-in-out infinite;
+	animation-delay: calc(var(--i) * -1.35s);
+}
+
+.witch-ambient span:nth-child(2) {
+	left: 23%;
+	top: 54%;
+	font-size: 20px;
+}
+
+.witch-ambient span:nth-child(3) {
+	left: 38%;
+	top: 28%;
+	font-size: 24px;
+}
+
+.witch-ambient span:nth-child(4) {
+	left: 56%;
+	top: 66%;
+	font-size: 16px;
+}
+
+.witch-ambient span:nth-child(5) {
+	left: 72%;
+	top: 20%;
+	font-size: 22px;
+}
+
+.witch-ambient span:nth-child(6) {
+	left: 86%;
+	top: 48%;
+	font-size: 18px;
+}
+
+.witch-ambient span:nth-child(7) {
+	left: 67%;
+	top: 82%;
+	font-size: 15px;
+}
+
+.witch-ambient span:nth-child(even) {
+	color: rgba(159, 140, 73, 0.22);
+	animation-duration: 11s;
+}
+
+@keyframes witch-float {
+	0%,
+	100% {
+		opacity: 0.24;
+		transform: translate3d(0, 0, 0) rotate(0deg);
+	}
+	50% {
+		opacity: 0.6;
+		transform: translate3d(8px, -16px, 0) rotate(14deg);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	body:has(.witch-item-list-page) .navi_menu a:hover,
+	.witch-item-list-page .witch-product-table td,
+	.witch-item-list-page .witch-product-image,
+	.witch-item-list-page .witch-product-name-link,
+	.witch-ambient span {
+		animation: none;
+		transition: none;
+		transform: none;
+	}
+}
+
+@media screen and (max-width: 560px) {
+	.witch-ambient span {
+		font-size: 13px;
+		opacity: 0.3;
+	}
+
+	.witch-item-list-page .witch-page-title::before,
+	.witch-item-list-page .witch-page-title::after {
+		font-size: 1.1rem;
+	}
+}
+
+/* ---- 全画面共通: なんでも魔女商会テーマ ---- */
+body.user,
+body.admin {
+	overflow-x: hidden;
+	background:
+		radial-gradient(circle at 15% 8%, rgba(111, 143, 78, 0.16), transparent 26%),
+		radial-gradient(circle at 88% 18%, rgba(77, 112, 54, 0.13), transparent 28%),
+		linear-gradient(180deg, #fbf7e8 0%, #f0e7c9 100%);
+	color: var(--witch-text);
+	font-family: "Yu Mincho", "Hiragino Mincho ProN", "Yu Gothic", serif;
+}
+
+body.user::before,
+body.admin::before {
+	content: "";
+	position: fixed;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	opacity: 0.18;
+	background-image:
+		linear-gradient(45deg, rgba(90, 70, 30, 0.04) 25%, transparent 25%),
+		linear-gradient(-45deg, rgba(90, 70, 30, 0.03) 25%, transparent 25%);
+	background-size: 6px 6px;
+}
+
+body.user::after,
+body.admin::after {
+	content: "";
+	position: fixed;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	background:
+		radial-gradient(circle at 8% 88%, rgba(86, 126, 58, 0.18), transparent 18%),
+		radial-gradient(circle at 92% 84%, rgba(123, 143, 68, 0.13), transparent 20%),
+		linear-gradient(90deg, rgba(47, 91, 44, 0.11), transparent 12%, transparent 88%, rgba(47, 91, 44, 0.09));
+}
+
+body.user > header,
+body.admin > header,
+body.user > nav,
+body.admin > nav,
+body.user > .container,
+body.admin > .container,
+body.user > .content,
+body.admin > .content,
+body.user > footer,
+body.admin > footer {
+	position: relative;
+	z-index: 1;
+}
+
+body.user header,
+body.admin header,
+body.user .navi_area,
+body.admin .navi_area,
+body.user footer,
+body.admin footer {
+	background: transparent;
+}
+
+body.user header .container,
+body.admin header .container,
+body.user > .container,
+body.admin > .container,
+body.user .navi_menu,
+body.admin .navi_menu,
+body.user .container.content,
+body.admin .container.content {
+	width: min(1280px, calc(100% - 40px));
+}
+
+body.user header .container,
+body.admin header .container {
+	position: relative;
+	align-items: flex-start;
+	min-height: 118px;
+	padding-top: 18px;
+	isolation: isolate;
+}
+
+body.user header .container::before,
+body.admin header .container::before,
+body.user header .container::after,
+body.admin header .container::after {
+	content: "❧";
+	position: absolute;
+	top: 20px;
+	color: rgba(72, 104, 45, 0.72);
+	font-size: 64px;
+	line-height: 1;
+	pointer-events: none;
+}
+
+body.user header .container::before,
+body.admin header .container::before {
+	left: -16px;
+	transform: rotate(72deg);
+}
+
+body.user header .container::after,
+body.admin header .container::after {
+	right: 0;
+	transform: rotate(-34deg);
+}
+
+body.user .site_title,
+body.admin .site_title {
+	position: relative;
+	margin: 10px 0 0 74px;
+	color: var(--witch-green-deep);
+	font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+	font-size: 0;
+	font-weight: 700;
+	line-height: 1.05;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.85);
+	filter: drop-shadow(0 2px 0 rgba(255, 250, 235, 0.85));
+}
+
+body.user .site_title::before,
+body.admin .site_title::before {
+	content: "なんでも\A魔女商会";
+	display: block;
+	white-space: pre;
+	font-size: 38px;
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 8px;
+	text-decoration-color: rgba(137, 128, 74, 0.38);
+}
+
+body.user .site_title::after,
+body.admin .site_title::after {
+	content: "Anything Witch Shop";
+	display: block;
+	margin-top: 6px;
+	color: #5f5638;
+	font-size: 16px;
+	font-style: italic;
+	font-weight: 600;
+}
+
+body.user .user_info,
+body.admin .user_info {
+	position: relative;
+	z-index: 1;
+	color: var(--witch-text);
+	font-size: 1.05rem;
+}
+
+body.user a,
+body.admin a {
+	color: var(--witch-green-deep);
+}
+
+body.user .navi_menu,
+body.admin .navi_menu {
+	display: flex;
+	gap: 14px;
+	padding: 0 0 20px;
+}
+
+body.user .navi_menu li,
+body.admin .navi_menu li {
+	width: auto;
+	flex: 1;
+}
+
+body.user .navi_menu a,
+body.admin .navi_menu a {
+	position: relative;
+	box-sizing: border-box;
+	overflow: hidden;
+	border: 2px solid var(--witch-border);
+	border-radius: 8px;
+	background: rgba(255, 250, 235, 0.92);
+	box-shadow:
+		inset 0 0 0 3px rgba(255, 255, 255, 0.42),
+		0 3px 8px rgba(70, 50, 20, 0.12);
+	color: var(--witch-green-deep);
+	font-weight: 700;
+	text-shadow: none;
+}
+
+body.user .navi_menu li:first-of-type a,
+body.admin .navi_menu li:first-of-type a,
+body.user .navi_menu li:last-of-type a,
+body.admin .navi_menu li:last-of-type a {
+	border-radius: 8px;
+}
+
+body.user .navi_menu a::before,
+body.admin .navi_menu a::before,
+body.user .navi_menu a::after,
+body.admin .navi_menu a::after {
+	content: "";
+	position: absolute;
+	width: 12px;
+	height: 12px;
+	border-color: rgba(154, 143, 86, 0.78);
+	border-style: solid;
+	pointer-events: none;
+}
+
+body.user .navi_menu a::before,
+body.admin .navi_menu a::before {
+	top: 7px;
+	left: 8px;
+	border-width: 2px 0 0 2px;
+	border-radius: 6px 0 0 0;
+}
+
+body.user .navi_menu a::after,
+body.admin .navi_menu a::after {
+	right: 8px;
+	bottom: 7px;
+	border-width: 0 2px 2px 0;
+	border-radius: 0 0 6px 0;
+}
+
+body.user .navi_menu a:hover,
+body.admin .navi_menu a:hover,
+body.user .navi_menu a.witch-active,
+body.admin .navi_menu a.witch-active {
+	border-color: #9a8f56;
+	background: linear-gradient(180deg, var(--witch-green), var(--witch-green-deep));
+	color: #fff8df;
+	transform: translateY(-2px);
+}
+
+body.user > .container,
+body.admin > .container {
+	align-items: flex-start;
+	gap: 26px;
+	margin-top: 0;
+}
+
+body.user .main,
+body.admin .main,
+body.user .container.content,
+body.admin .container.content {
+	position: relative;
+	box-sizing: border-box;
+	padding: 26px 28px 44px;
+	border: 1.5px solid rgba(146, 130, 82, 0.7);
+	border-radius: 8px;
+	background:
+		radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 16%), rgba(255, 248, 190, 0.20), transparent 22%),
+		linear-gradient(180deg, rgba(255, 253, 242, 0.96), rgba(249, 241, 216, 0.96));
+	box-shadow:
+		inset 0 0 24px rgba(93, 79, 38, 0.08),
+		0 8px 18px rgba(65, 48, 20, 0.13);
+}
+
+body.user .container.content,
+body.admin .container.content {
+	display: flex;
+	min-height: 320px;
+	justify-content: center;
+}
+
+body.user .main::before,
+body.admin .main::before,
+body.user .container.content::before,
+body.admin .container.content::before,
+body.user .main::after,
+body.admin .main::after,
+body.user .container.content::after,
+body.admin .container.content::after {
+	content: "❧";
+	position: absolute;
+	color: rgba(101, 126, 55, 0.42);
+	font-size: 46px;
+	line-height: 1;
+	pointer-events: none;
+	text-shadow:
+		0 1px 0 rgba(255, 250, 235, 0.8),
+		0 0 12px rgba(117, 146, 79, 0.22);
+}
+
+body.user .main::before,
+body.admin .main::before,
+body.user .container.content::before,
+body.admin .container.content::before {
+	top: 10px;
+	left: 12px;
+}
+
+body.user .main::after,
+body.admin .main::after,
+body.user .container.content::after,
+body.admin .container.content::after {
+	right: 12px;
+	bottom: 10px;
+	transform: rotate(180deg);
+}
+
+body.user .main .title,
+body.admin .main .title,
+body.user .content .title,
+body.admin .content .title,
+body.user .page_title,
+body.admin .page_title {
+	display: block;
+	width: min(340px, 78%);
+	margin: 0 auto 28px;
+	padding: 14px 28px;
+	border: 1px solid #9a8f56;
+	border-radius: 8px;
+	background: linear-gradient(180deg, var(--witch-green), var(--witch-green-deep));
+	box-shadow:
+		inset 0 0 0 2px rgba(225, 208, 120, 0.28),
+		0 4px 8px rgba(40, 30, 10, 0.18);
+	color: #fff8df;
+	font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+	font-size: 1.75rem;
+	font-weight: 700;
+	text-align: center;
+	text-shadow: 0 1px 1px rgba(20, 30, 12, 0.7);
+}
+
+body.user .main .title::before,
+body.admin .main .title::before {
+	display: none;
+}
+
+body.user aside.search,
+body.admin aside.admin_menu {
+	width: 28%;
+	min-width: 270px;
+}
+
+body.user .search_area,
+body.admin .admin_menu > div,
+body.admin .admin_menu_list {
+	position: relative;
+}
+
+body.user .search_area .title,
+body.admin .admin_menu .title,
+body.admin .admin_menu_list .title_area,
+body.admin .admin_menu_list .title_area_no_shadow {
+	border: 2px solid var(--witch-wood-deep);
+	border-bottom: 0;
+	border-radius: 8px 8px 0 0;
+	background:
+		linear-gradient(90deg, rgba(80, 50, 20, 0.08) 1px, transparent 1px),
+		linear-gradient(180deg, #b58a52, #9b7442);
+	background-size: 18px 100%, 100% 100%;
+	color: #273116;
+	font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+	font-size: 1.2rem;
+	font-weight: 700;
+	text-align: center;
+	text-shadow: 0 1px 0 rgba(245, 226, 170, 0.6);
+}
+
+body.user .search .form,
+body.admin .admin_menu .menu,
+body.admin .admin_menu_list .link_area {
+	padding: 18px 14px 20px;
+	border: 2px solid var(--witch-wood-deep);
+	border-top: 0;
+	border-radius: 0 0 8px 8px;
+	background:
+		linear-gradient(90deg, rgba(80, 50, 20, 0.08) 1px, transparent 1px),
+		linear-gradient(180deg, #b58a52, #9b7442);
+	background-size: 18px 100%, 100% 100%;
+	box-shadow: 0 5px 10px rgba(55, 38, 15, 0.22);
+}
+
+body.user .search .form form {
+	display: flex;
+	gap: 10px;
+}
+
+body.user .search select,
+body.user select,
+body.admin select,
+body.user input[type=text],
+body.admin input[type=text],
+body.user input[type=password],
+body.admin input[type=password],
+body.user input[type=date],
+body.admin input[type=date],
+body.user textarea,
+body.admin textarea {
+	box-sizing: border-box;
+	padding: 8px 10px;
+	border: 1px solid rgba(64, 49, 30, 0.65);
+	border-radius: 6px;
+	background: #fffaf0;
+	color: var(--witch-text);
+	font-size: 1rem;
+	box-shadow: inset 0 1px 3px rgba(68, 48, 22, 0.1);
+}
+
+body.user .search select {
+	flex: 1;
+	width: auto;
+	min-width: 0;
+}
+
+body.user [type=submit],
+body.admin [type=submit],
+body.user [type=button],
+body.admin [type=button],
+body.user .coupon_link_button,
+body.admin .coupon_link_button {
+	border: 1px solid var(--witch-green-deep);
+	border-radius: 6px;
+	background: linear-gradient(180deg, #496f31, #294821);
+	box-shadow: 0 2px 4px rgba(53, 38, 12, 0.22);
+	color: #fff8df;
+	font-weight: 700;
+	text-shadow: none;
+}
+
+body.user [type=submit]:hover,
+body.admin [type=submit]:hover,
+body.user [type=button]:hover,
+body.admin [type=button]:hover,
+body.user .coupon_link_button:hover,
+body.admin .coupon_link_button:hover {
+	background: linear-gradient(180deg, #557b3c, #2f5427);
+	transform: translateY(-1px);
+}
+
+body.user [type=submit].delete,
+body.admin [type=submit].delete,
+body.user .delete_button,
+body.admin .delete_button {
+	border-color: #6c3a2d;
+	background: linear-gradient(180deg, #9d5b45, #6f3428);
+	color: #fff8df;
+}
+
+body.user .coupon_sidebar {
+	gap: 9px;
+	margin-top: 24px;
+}
+
+body.user .coupon_sidebar a,
+body.admin .admin_menu .display_list,
+body.admin .admin_menu_list .link_area a {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	min-height: 48px;
+	padding: 10px 14px;
+	border: 1.5px solid rgba(111, 127, 53, 0.74);
+	border-radius: 8px;
+	background: rgba(232, 238, 205, 0.78);
+	box-shadow:
+		inset 0 0 0 2px rgba(255, 255, 245, 0.5),
+		0 2px 5px rgba(77, 66, 28, 0.1);
+	color: var(--witch-green-deep);
+	font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+	font-size: 1.05rem;
+	font-weight: 700;
+	text-align: center;
+	text-decoration: none;
+}
+
+body.user .coupon_sidebar a:hover,
+body.admin .admin_menu .display_list:hover,
+body.admin .admin_menu_list .link_area a:hover {
+	background: rgba(217, 229, 178, 0.9);
+	transform: translateY(-1px);
+}
+
+body.user .coupon_sidebar a::before {
+	display: inline-grid;
+	width: 38px;
+	height: 38px;
+	place-items: center;
+	flex: 0 0 38px;
+	border: 1px solid rgba(111, 127, 53, 0.55);
+	border-radius: 50%;
+	background: rgba(255, 250, 235, 0.72);
+	color: var(--witch-moss);
+	font-size: 1.15rem;
+}
+
+body.user .coupon_sidebar a:nth-child(1)::before {
+	content: "券";
+}
+
+body.user .coupon_sidebar a:nth-child(2)::before {
+	content: "晶";
+}
+
+body.user .coupon_sidebar a:nth-child(3)::before {
+	content: "♡";
+}
+
+body.user .sorted_by,
+body.admin .sorted_by,
+body.user .paging,
+body.admin .paging {
+	color: var(--witch-green-deep);
+	font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+	font-size: 1.05rem;
+	font-weight: 700;
+}
+
+body.user .sorted_by a,
+body.admin .sorted_by a,
+body.user .paging a,
+body.admin .paging a {
+	text-decoration: none;
+	border-bottom: 1px dotted rgba(47, 91, 44, 0.55);
+}
+
+body.user .list_table,
+body.admin .list_table,
+body.user .detail_table,
+body.admin .detail_table {
+	overflow: hidden;
+	margin: 24px auto 20px;
+	border: 1px solid rgba(183, 168, 117, 0.64);
+	border-radius: 8px;
+	background: rgba(255, 250, 235, 0.96);
+	border-collapse: separate;
+	border-spacing: 0;
+	box-shadow: 0 3px 10px rgba(65, 48, 20, 0.08);
+	color: var(--witch-text);
+}
+
+body.user .list_table th,
+body.admin .list_table th,
+body.user .detail_table th,
+body.admin .detail_table th {
+	padding: 13px 12px;
+	border-bottom: 1px solid rgba(183, 168, 117, 0.45);
+	background: linear-gradient(180deg, #557331, #365421);
+	color: #fff8df;
+	font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+	font-size: 1.02rem;
+	font-weight: 700;
+	text-shadow: 0 1px 1px rgba(20, 30, 12, 0.55);
+}
+
+body.user .list_table td,
+body.admin .list_table td,
+body.user .detail_table td,
+body.admin .detail_table td {
+	padding: 14px 16px;
+	border-bottom: 1px solid rgba(183, 168, 117, 0.28);
+	color: var(--witch-text);
+	font-size: 1.02rem;
+	background: rgba(255, 252, 240, 0.94);
+}
+
+body.user .list_table tr:nth-child(odd) td,
+body.admin .list_table tr:nth-child(odd) td {
+	background: rgba(229, 236, 203, 0.62);
+}
+
+body.user .list_table tr.witch-row-hover td,
+body.admin .list_table tr.witch-row-hover td,
+body.user .list_table tr:hover td,
+body.admin .list_table tr:hover td {
+	background: rgba(240, 232, 187, 0.78);
+	box-shadow: inset 0 1px 0 rgba(255, 250, 230, 0.75), inset 0 -1px 0 rgba(158, 143, 86, 0.16);
+}
+
+body.user .list_table img,
+body.admin .list_table img,
+body.user .item img,
+body.admin .item img {
+	object-fit: contain;
+	filter: drop-shadow(0 3px 2px rgba(60, 45, 20, 0.14));
+}
+
+body.user .item,
+body.admin .item,
+body.user .coupon_card,
+body.admin .coupon_card,
+body.user .related_item,
+body.admin .related_item,
+body.user .login_content,
+body.admin .login_content,
+body.user .login_form_area,
+body.admin .login_form_area,
+body.user .login_form table,
+body.admin .login_form table,
+body.user .user_info_form_area,
+body.admin .user_info_form_area,
+body.user .info_form_area,
+body.admin .info_form_area,
+body.user .coupon_payment_area,
+body.admin .coupon_payment_area,
+body.user .coupon_count,
+body.admin .coupon_count,
+body.user .gacha_panel,
+body.admin .gacha_panel {
+	border: 1.5px solid rgba(146, 130, 82, 0.62);
+	border-radius: 8px;
+	background: rgba(255, 250, 235, 0.88);
+	box-shadow:
+		inset 0 0 18px rgba(93, 79, 38, 0.07),
+		0 4px 10px rgba(65, 48, 20, 0.11);
+}
+
+body.user .login_content,
+body.admin .login_content,
+body.user .login_form_area,
+body.admin .login_form_area,
+body.user .login_form table {
+	margin: 0 auto;
+	padding: 18px 22px;
+}
+
+body.user .login_form table,
+body.admin .login_form table {
+	width: min(460px, 100%);
+	background:
+		radial-gradient(circle at 20% 10%, rgba(255, 248, 204, 0.35), transparent 32%),
+		rgba(255, 250, 235, 0.88);
+}
+
+body.user .login_form th,
+body.admin .login_form th,
+body.user .login_form td,
+body.admin .login_form td {
+	background: transparent;
+}
+
+body.user .user_info_form_area,
+body.admin .user_info_form_area,
+body.user .info_form_area,
+body.admin .info_form_area {
+	width: min(760px, 100%);
+	margin: 30px auto 0;
+	padding: 20px 24px;
+}
+
+body.user .item .item_name,
+body.admin .item .item_name,
+body.user .related_item_name,
+body.admin .related_item_name,
+body.user .witch-product-name-link,
+body.admin .witch-product-name-link {
+	color: var(--witch-green-deep);
+	font-weight: 700;
+	text-decoration: none;
+	border-bottom: 1px dotted rgba(47, 91, 44, 0.55);
+}
+
+body.user .item .description,
+body.admin .item .description,
+body.user .related_item_price,
+body.admin .related_item_price,
+body.user .input_value,
+body.admin .input_value {
+	color: var(--witch-text);
+}
+
+body.user .related_items_title,
+body.admin .related_items_title,
+body.user .login_history_title,
+body.admin .login_history_title {
+	border-bottom: 2px solid var(--witch-moss);
+	color: var(--witch-green-deep);
+	font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+}
+
+body.user .coupon_rate,
+body.admin .coupon_rate {
+	background: linear-gradient(180deg, #557331, #365421);
+	color: #fff8df;
+}
+
+body.user .coupon_message,
+body.admin .coupon_message,
+body.user .complete_message,
+body.admin .complete_message,
+body.user .check_message,
+body.admin .check_message,
+body.user .input_message,
+body.admin .input_message,
+body.user .description,
+body.admin .description {
+	color: var(--witch-green-deep);
+}
+
+body.user footer,
+body.admin footer {
+	color: rgba(47, 42, 32, 0.72);
+}
+
+body.user small,
+body.admin small {
+	text-shadow: 0 1px 0 rgba(255, 250, 235, 0.75);
+}
+
+body.user .witch-ambient,
+body.admin .witch-ambient {
+	position: fixed;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	overflow: hidden;
+}
+
+body.user .witch-ambient span,
+body.admin .witch-ambient span {
+	position: absolute;
+	left: 9%;
+	top: 21%;
+	color: rgba(95, 126, 62, 0.26);
+	font-size: 14px;
+	animation: witch-float 9s ease-in-out infinite;
+	animation-delay: calc(var(--i) * -1.35s);
+}
+
+body.user .witch-ambient span:nth-child(2),
+body.admin .witch-ambient span:nth-child(2) {
+	left: 23%;
+	top: 54%;
+	font-size: 20px;
+}
+
+body.user .witch-ambient span:nth-child(3),
+body.admin .witch-ambient span:nth-child(3) {
+	left: 38%;
+	top: 28%;
+	font-size: 24px;
+}
+
+body.user .witch-ambient span:nth-child(4),
+body.admin .witch-ambient span:nth-child(4) {
+	left: 56%;
+	top: 66%;
+	font-size: 16px;
+}
+
+body.user .witch-ambient span:nth-child(5),
+body.admin .witch-ambient span:nth-child(5) {
+	left: 72%;
+	top: 20%;
+	font-size: 22px;
+}
+
+body.user .witch-ambient span:nth-child(6),
+body.admin .witch-ambient span:nth-child(6) {
+	left: 86%;
+	top: 48%;
+	font-size: 18px;
+}
+
+body.user .witch-ambient span:nth-child(7),
+body.admin .witch-ambient span:nth-child(7) {
+	left: 67%;
+	top: 82%;
+	font-size: 15px;
+}
+
+@media screen and (max-width: 900px) {
+	body.user header .container,
+	body.admin header .container,
+	body.user > .container,
+	body.admin > .container,
+	body.user .navi_menu,
+	body.admin .navi_menu,
+	body.user .container.content,
+	body.admin .container.content {
+		width: calc(100% - 24px);
+	}
+
+	body.user header .container,
+	body.admin header .container,
+	body.user > .container,
+	body.admin > .container {
+		flex-direction: column;
+	}
+
+	body.user .navi_menu,
+	body.admin .navi_menu {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 8px;
+	}
+
+	body.user aside.search,
+	body.admin aside.admin_menu,
+	body.user .main,
+	body.admin .main {
+		width: 100%;
+		min-width: 0;
+	}
+
+	body.user .coupon_sidebar,
+	body.admin .coupon_sidebar {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+@media screen and (max-width: 560px) {
+	body.user header .container::before,
+	body.admin header .container::before,
+	body.user header .container::after,
+	body.admin header .container::after {
+		top: 28px;
+		font-size: 48px;
+	}
+
+	body.user header .container::before,
+	body.admin header .container::before {
+		left: 0;
+	}
+
+	body.user header .container::after,
+	body.admin header .container::after {
+		right: 20px;
+	}
+
+	body.user .site_title,
+	body.admin .site_title {
+		margin-left: 46px;
+	}
+
+	body.user .site_title::before,
+	body.admin .site_title::before {
+		font-size: 30px;
+	}
+
+	body.user .main,
+	body.admin .main,
+	body.user .container.content,
+	body.admin .container.content {
+		padding: 22px 12px 36px;
+	}
+
+	body.user .main .title,
+	body.admin .main .title,
+	body.user .content .title,
+	body.admin .content .title,
+	body.user .page_title,
+	body.admin .page_title {
+		width: 100%;
+		box-sizing: border-box;
+		font-size: 1.45rem;
+	}
+
+	body.user .search .form form,
+	body.admin .search .form form,
+	body.user .coupon_sidebar,
+	body.admin .coupon_sidebar {
+		grid-template-columns: 1fr;
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	body.user .list_table,
+	body.admin .list_table {
+		table-layout: fixed;
+		font-size: 0.9rem;
+	}
+
+	body.user .list_table td,
+	body.admin .list_table td,
+	body.user .list_table th,
+	body.admin .list_table th {
+		padding: 10px 4px;
+		overflow-wrap: anywhere;
+	}
+}
+
+/* ---- Fairy magic refinement: coupon gacha and login ---- */
+body.user .witch-ambient span,
+body.admin .witch-ambient span,
+body:has(.login_spell_page) .witch-ambient span {
+	filter: drop-shadow(0 0 7px rgba(246, 216, 118, 0.38));
+}
+
+body.user .witch-ambient span:nth-child(8),
+body.admin .witch-ambient span:nth-child(8),
+body:has(.login_spell_page) .witch-ambient span:nth-child(8) {
+	left: 14%;
+	top: 78%;
+	font-size: 17px;
+}
+
+body.user .witch-ambient span:nth-child(9),
+body.admin .witch-ambient span:nth-child(9),
+body:has(.login_spell_page) .witch-ambient span:nth-child(9) {
+	left: 48%;
+	top: 12%;
+	font-size: 13px;
+}
+
+body.user .witch-ambient span:nth-child(10),
+body.admin .witch-ambient span:nth-child(10),
+body:has(.login_spell_page) .witch-ambient span:nth-child(10) {
+	left: 91%;
+	top: 73%;
+	font-size: 19px;
+}
+
+body.user:has(.coupon_gacha_page) .main {
+	overflow: visible;
+}
+
+body.user:has(.coupon_gacha_page) .coupon_page {
+	position: relative;
+}
+
+body.user:has(.coupon_gacha_page) .coupon_lead {
+	max-width: 720px;
+	margin: 16px auto 26px;
+	padding: 10px 18px;
+	border: 1px solid rgba(177, 151, 82, 0.42);
+	border-radius: 999px;
+	background: rgba(255, 251, 228, 0.62);
+	text-align: center;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+body.user:has(.coupon_gacha_page) .gacha_panel {
+	display: grid;
+	grid-template-columns: minmax(310px, 430px) minmax(280px, 1fr);
+	gap: clamp(24px, 5vw, 58px);
+	align-items: center;
+	margin: 34px auto;
+	padding: clamp(20px, 4vw, 42px);
+	border: 1px solid rgba(157, 128, 58, 0.44);
+	border-radius: 26px 8px 26px 8px;
+	background:
+		radial-gradient(circle at 20% 0%, rgba(255, 246, 192, 0.9), transparent 34%),
+		radial-gradient(circle at 84% 100%, rgba(181, 205, 136, 0.55), transparent 38%),
+		linear-gradient(135deg, rgba(255, 253, 238, 0.94), rgba(242, 235, 197, 0.84));
+	box-shadow:
+		0 24px 42px rgba(54, 61, 34, 0.14),
+		inset 0 0 0 7px rgba(255, 255, 255, 0.24);
+}
+
+body.user:has(.coupon_gacha_page) .gacha_panel::before,
+body.user:has(.coupon_gacha_page) .gacha_panel::after {
+	content: "";
+	position: absolute;
+	pointer-events: none;
+}
+
+body.user:has(.coupon_gacha_page) .gacha_stage {
+	position: relative;
+	display: grid;
+	justify-items: center;
+	gap: 16px;
+}
+
+body.user:has(.coupon_gacha_page) .gacha_stage::before {
+	content: "";
+	position: absolute;
+	inset: 8% -8% auto auto;
+	width: 42%;
+	height: 42%;
+	border-radius: 999px;
+	background: radial-gradient(circle, rgba(255, 235, 139, 0.28), transparent 70%);
+	filter: blur(3px);
+}
+
+body.user:has(.coupon_gacha_page) .gacha_wheel {
+	position: relative;
+	width: min(380px, 72vw);
+	height: min(380px, 72vw);
+	border: 0;
+	border-radius: 50%;
+	background:
+		radial-gradient(circle at 50% 50%, rgba(255, 252, 226, 0.98) 0 22%, transparent 22.5%),
+		conic-gradient(from -45deg,
+			#f0c96e 0 25%,
+			#7ea853 25% 50%,
+			#244d30 50% 75%,
+			#d7e7b7 75% 100%);
+	box-shadow:
+		0 0 0 10px #f8edbd,
+		0 0 0 13px rgba(82, 112, 45, 0.78),
+		0 22px 44px rgba(42, 62, 31, 0.24),
+		inset 0 0 38px rgba(56, 42, 23, 0.25);
+	isolation: isolate;
+	transform: translateZ(0);
+}
+
+body.user:has(.coupon_gacha_page) .gacha_wheel::before {
+	content: "";
+	position: absolute;
+	inset: 5.8%;
+	border: 2px dashed rgba(255, 248, 207, 0.75);
+	border-radius: inherit;
+	box-shadow: inset 0 0 28px rgba(255, 248, 207, 0.35);
+}
+
+body.user:has(.coupon_gacha_page) .gacha_wheel::after {
+	content: "";
+	position: absolute;
+	inset: -18px;
+	border-radius: inherit;
+	background:
+		radial-gradient(circle at 50% 0%, rgba(255, 237, 128, 0.42), transparent 12%),
+		radial-gradient(circle at 100% 50%, rgba(255, 237, 128, 0.34), transparent 12%),
+		radial-gradient(circle at 50% 100%, rgba(255, 237, 128, 0.34), transparent 12%),
+		radial-gradient(circle at 0% 50%, rgba(255, 237, 128, 0.34), transparent 12%);
+	z-index: -1;
+	opacity: 0.8;
+	animation: witch-ring-breathe 3.6s ease-in-out infinite;
+}
+
+body.user:has(.coupon_gacha_page) .gacha_pointer {
+	position: absolute;
+	top: -22px;
+	left: 50%;
+	width: 0;
+	height: 0;
+	border-right: 18px solid transparent;
+	border-left: 18px solid transparent;
+	border-top: 0;
+	border-bottom: 34px solid #254b2e;
+	filter: drop-shadow(0 5px 4px rgba(38, 42, 25, 0.25));
+	transform: translateX(-50%);
+	z-index: 5;
+}
+
+body.user:has(.coupon_gacha_page) .gacha_lights {
+	position: absolute;
+	inset: -8px;
+	border-radius: inherit;
+	z-index: 4;
+	pointer-events: none;
+}
+
+body.user:has(.coupon_gacha_page) .gacha_lights span {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 10px;
+	height: 10px;
+	margin: -5px;
+	border-radius: 50%;
+	background: #fff0a4;
+	box-shadow: 0 0 10px rgba(255, 233, 122, 0.88);
+	transform: rotate(calc(var(--light-index) * 30deg)) translateY(calc(-1 * min(201px, 38vw)));
+}
+
+body.user:has(.coupon_gacha_page) .gacha_lights span:nth-child(1) { --light-index: 0; }
+body.user:has(.coupon_gacha_page) .gacha_lights span:nth-child(2) { --light-index: 1; }
+body.user:has(.coupon_gacha_page) .gacha_lights span:nth-child(3) { --light-index: 2; }
+body.user:has(.coupon_gacha_page) .gacha_lights span:nth-child(4) { --light-index: 3; }
+body.user:has(.coupon_gacha_page) .gacha_lights span:nth-child(5) { --light-index: 4; }
+body.user:has(.coupon_gacha_page) .gacha_lights span:nth-child(6) { --light-index: 5; }
+body.user:has(.coupon_gacha_page) .gacha_lights span:nth-child(7) { --light-index: 6; }
+body.user:has(.coupon_gacha_page) .gacha_lights span:nth-child(8) { --light-index: 7; }
+body.user:has(.coupon_gacha_page) .gacha_lights span:nth-child(9) { --light-index: 8; }
+body.user:has(.coupon_gacha_page) .gacha_lights span:nth-child(10) { --light-index: 9; }
+body.user:has(.coupon_gacha_page) .gacha_lights span:nth-child(11) { --light-index: 10; }
+body.user:has(.coupon_gacha_page) .gacha_lights span:nth-child(12) { --light-index: 11; }
+
+body.user:has(.coupon_gacha_page) .gacha_segment {
+	position: absolute;
+	display: grid;
+	gap: 3px;
+	place-items: center;
+	width: 112px;
+	min-height: 74px;
+	padding: 9px 10px;
+	border: 1px solid rgba(255, 251, 222, 0.72);
+	border-radius: 18px 6px 18px 6px;
+	background: rgba(255, 249, 218, 0.22);
+	color: #fff8de;
+	text-align: center;
+	text-shadow: 0 2px 3px rgba(21, 30, 17, 0.48);
+	box-shadow: inset 0 0 16px rgba(255, 251, 222, 0.16);
+	transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+	z-index: 3;
+}
+
+body.user:has(.coupon_gacha_page) .gacha_segment strong {
+	display: block;
+	font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+	font-size: 1.55rem;
+	line-height: 1;
+}
+
+body.user:has(.coupon_gacha_page) .gacha_segment small {
+	font-size: 0.74rem;
+	font-weight: 700;
+	line-height: 1.25;
+}
+
+body.user:has(.coupon_gacha_page) .segment-15 {
+	top: 12%;
+	left: 50%;
+	color: #3d3314;
+	text-shadow: 0 1px 0 rgba(255, 248, 208, 0.74);
+	transform: translateX(-50%);
+}
+
+body.user:has(.coupon_gacha_page) .segment-10 {
+	top: 50%;
+	right: 9%;
+	transform: translateY(-50%);
+}
+
+body.user:has(.coupon_gacha_page) .segment-5 {
+	bottom: 12%;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+body.user:has(.coupon_gacha_page) .segment-miss {
+	top: 50%;
+	left: 9%;
+	color: #33451f;
+	text-shadow: 0 1px 0 rgba(255, 255, 230, 0.62);
+	transform: translateY(-50%);
+}
+
+body.user:has(.coupon_gacha_page) .gacha_segment.is-lit,
+body.user:has(.coupon_gacha_page) .gacha_segment.is-final {
+	background: rgba(255, 247, 177, 0.82);
+	color: #263419;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.72);
+	box-shadow:
+		0 0 0 3px rgba(255, 239, 132, 0.75),
+		0 0 28px rgba(255, 223, 95, 0.82),
+		inset 0 0 18px rgba(255, 255, 255, 0.58);
+}
+
+body.user:has(.coupon_gacha_page) .gacha_segment.is-final {
+	transform: translateY(-50%) scale(1.08);
+}
+
+body.user:has(.coupon_gacha_page) .segment-15.is-final,
+body.user:has(.coupon_gacha_page) .segment-5.is-final {
+	transform: translateX(-50%) scale(1.08);
+}
+
+body.user:has(.coupon_gacha_page) .gacha_wheel.is-spinning .gacha_lights span {
+	animation: witch-light-chase 640ms linear infinite;
+	animation-delay: calc(var(--light-index) * 44ms);
+}
+
+body.user:has(.coupon_gacha_page) .gacha_wheel.has-result .gacha_lights span {
+	animation: witch-light-chase 1.2s linear infinite;
+}
+
+body.user:has(.coupon_gacha_page) .gacha_core {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	display: grid;
+	place-items: center;
+	width: 116px;
+	height: 116px;
+	border: 2px solid rgba(107, 84, 34, 0.58);
+	border-radius: 50%;
+	background:
+		radial-gradient(circle at 38% 24%, #fff8cf 0 18%, transparent 19%),
+		linear-gradient(145deg, #f5d987, #fff6ce 52%, #b8c57a);
+	color: #274828;
+	font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+	font-size: 1.05rem;
+	font-weight: 800;
+	line-height: 1.16;
+	text-align: center;
+	text-transform: uppercase;
+	box-shadow:
+		0 8px 18px rgba(30, 42, 22, 0.28),
+		inset 0 -8px 18px rgba(121, 105, 44, 0.18);
+	transform: translate(-50%, -50%);
+	z-index: 6;
+}
+
+body.user:has(.coupon_gacha_page) .gacha_hint {
+	max-width: 340px;
+	margin: 0;
+	color: rgba(47, 42, 32, 0.72);
+	font-size: 0.86rem;
+	text-align: center;
+}
+
+body.user:has(.coupon_gacha_page) .gacha_status {
+	position: relative;
+	padding: clamp(18px, 4vw, 30px);
+	border: 1px solid rgba(91, 118, 51, 0.34);
+	border-radius: 8px;
+	background:
+		linear-gradient(180deg, rgba(255, 252, 232, 0.94), rgba(238, 241, 202, 0.86));
+	box-shadow: inset 0 0 0 5px rgba(255, 255, 255, 0.22);
+}
+
+body.user:has(.coupon_gacha_page) .gacha_status::before {
+	content: "\2767";
+	position: absolute;
+	top: -25px;
+	right: 22px;
+	color: rgba(75, 102, 43, 0.7);
+	font-size: 44px;
+}
+
+body.user:has(.coupon_gacha_page) .gacha_status h3 {
+	margin: 0 0 16px;
+	color: var(--witch-green-deep);
+	font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+	font-size: clamp(1.45rem, 2.5vw, 2rem);
+}
+
+body.user:has(.coupon_gacha_page) .gacha_status p {
+	display: flex;
+	justify-content: space-between;
+	gap: 16px;
+	margin: 12px 0;
+	padding-bottom: 10px;
+	border-bottom: 1px dashed rgba(117, 103, 54, 0.28);
+}
+
+body.user:has(.coupon_gacha_page) .gacha_status strong,
+body.user:has(.coupon_gacha_page) .gacha_status time {
+	color: #264a2c;
+	font-weight: 800;
+}
+
+body.user:has(.coupon_gacha_page) .gacha_button {
+	position: relative;
+	width: 100%;
+	margin-top: 18px;
+	padding: 16px 26px;
+	border: 1px solid rgba(34, 72, 42, 0.6);
+	border-radius: 999px;
+	background:
+		linear-gradient(180deg, #fff2aa, #d9b24b 48%, #314f25 49%, #24431f);
+	color: #fff9dc;
+	font-size: 1.12rem;
+	font-weight: 800;
+	letter-spacing: 0;
+	text-shadow: 0 2px 3px rgba(18, 30, 17, 0.46);
+	box-shadow:
+		0 14px 22px rgba(45, 65, 29, 0.22),
+		inset 0 1px 0 rgba(255, 255, 255, 0.64);
+	cursor: pointer;
+	overflow: hidden;
+}
+
+body.user:has(.coupon_gacha_page) .gacha_button::after {
+	content: "";
+	position: absolute;
+	inset: 0 auto 0 -45%;
+	width: 38%;
+	background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.44), transparent);
+	transform: skewX(-18deg);
+	transition: left 480ms ease;
+}
+
+body.user:has(.coupon_gacha_page) .gacha_button:hover::after,
+body.user:has(.coupon_gacha_page) .gacha_button.is-drawing::after {
+	left: 110%;
+}
+
+body.user:has(.coupon_gacha_page) .gacha_button:disabled {
+	background: linear-gradient(180deg, #ded8bd, #a7aa8b);
+	color: rgba(42, 48, 31, 0.72);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+	cursor: not-allowed;
+	text-shadow: none;
+}
+
+body.user:has(.coupon_gacha_page) .coupon_limit_note {
+	display: block;
+	margin-top: 14px;
+	border: 0;
+	color: #81401f;
+	font-weight: 700;
+}
+
+body.user:has(.coupon_gacha_page) .gacha_lineup {
+	margin-top: 34px;
+}
+
+body.user:has(.coupon_gacha_page) .gacha_lineup h3 {
+	margin: 0 0 16px;
+	color: var(--witch-green-deep);
+	font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+	font-size: 1.55rem;
+}
+
+body.user:has(.coupon_gacha_page) .gacha_result_source {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+body.user:has(.coupon_gacha_page) .gacha_result_modal {
+	position: fixed;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	padding: 24px;
+	visibility: hidden;
+	opacity: 0;
+	transition: opacity 220ms ease, visibility 220ms ease;
+	z-index: 1000;
+}
+
+body.user:has(.coupon_gacha_page) .gacha_result_modal.is-open {
+	visibility: visible;
+	opacity: 1;
+}
+
+body.user:has(.coupon_gacha_page) .gacha_result_backdrop {
+	position: absolute;
+	inset: 0;
+	background:
+		radial-gradient(circle at 50% 38%, rgba(255, 236, 144, 0.26), transparent 32%),
+		rgba(20, 31, 18, 0.54);
+	backdrop-filter: blur(5px);
+}
+
+body.user:has(.coupon_gacha_page) .gacha_result_dialog {
+	position: relative;
+	width: min(420px, 100%);
+	padding: 42px 32px 30px;
+	border: 1px solid rgba(193, 164, 82, 0.62);
+	border-radius: 26px 8px 26px 8px;
+	background:
+		radial-gradient(circle at 50% 0%, rgba(255, 243, 166, 0.85), transparent 38%),
+		linear-gradient(180deg, #fffbed, #eee9bd);
+	color: #2e2a20;
+	text-align: center;
+	box-shadow:
+		0 28px 60px rgba(13, 24, 12, 0.34),
+		inset 0 0 0 7px rgba(255, 255, 255, 0.22);
+	transform: translateY(12px) scale(0.98);
+	transition: transform 260ms ease;
+}
+
+body.user:has(.coupon_gacha_page) .gacha_result_modal.is-open .gacha_result_dialog {
+	transform: translateY(0) scale(1);
+}
+
+body.user:has(.coupon_gacha_page) .gacha_result_close {
+	position: absolute;
+	top: 12px;
+	right: 14px;
+	width: 34px;
+	height: 34px;
+	border: 1px solid rgba(74, 91, 45, 0.34);
+	border-radius: 50%;
+	background: rgba(255, 252, 231, 0.82);
+	color: #2d4b27;
+	font-size: 1.4rem;
+	line-height: 1;
+	cursor: pointer;
+}
+
+body.user:has(.coupon_gacha_page) .gacha_result_sigil {
+	width: 86px;
+	height: 86px;
+	margin: 0 auto 12px;
+	border-radius: 50%;
+	background:
+		radial-gradient(circle, #fff8c5 0 18%, transparent 19%),
+		conic-gradient(from 0deg, #d5b557, #5b7a37, #f1d886, #2d562f, #d5b557);
+	box-shadow:
+		0 0 0 6px rgba(255, 246, 190, 0.55),
+		0 0 28px rgba(230, 198, 91, 0.68);
+	animation: witch-sigil-turn 9s linear infinite;
+}
+
+body.user:has(.coupon_gacha_page) .gacha_result_dialog h3 {
+	margin: 0 0 12px;
+	color: var(--witch-green-deep);
+	font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+	font-size: 1.7rem;
+}
+
+body.user:has(.coupon_gacha_page) .gacha_result_dialog p {
+	margin: 0 0 22px;
+	font-size: 1.08rem;
+	font-weight: 700;
+	line-height: 1.65;
+}
+
+body.user:has(.coupon_gacha_page) .gacha_result_dialog.miss .gacha_result_sigil,
+body.user:has(.coupon_gacha_page) .gacha_result_dialog.info .gacha_result_sigil,
+body.user:has(.coupon_gacha_page) .gacha_result_dialog.limit .gacha_result_sigil {
+	background:
+		radial-gradient(circle, #fff8c5 0 18%, transparent 19%),
+		conic-gradient(from 0deg, #b7c782, #6f8c4e, #efe9b8, #8f9a63, #b7c782);
+	box-shadow:
+		0 0 0 6px rgba(236, 241, 193, 0.48),
+		0 0 22px rgba(120, 148, 84, 0.45);
+}
+
+body.user:has(.coupon_gacha_page) .coupon_actions {
+	justify-content: center;
+}
+
+body:has(.login_spell_page) {
+	min-height: 100vh;
+	overflow-x: hidden;
+	background:
+		radial-gradient(circle at 14% 18%, rgba(255, 238, 153, 0.34), transparent 24%),
+		radial-gradient(circle at 86% 10%, rgba(113, 146, 77, 0.28), transparent 28%),
+		linear-gradient(135deg, #f7efd4 0%, #fbf7e8 42%, #e6ebc8 100%);
+	color: #2f2a20;
+}
+
+body:has(.login_spell_page)::before,
+body:has(.login_spell_page)::after {
+	content: "\2767";
+	position: fixed;
+	z-index: 0;
+	color: rgba(79, 103, 50, 0.28);
+	font-size: clamp(82px, 14vw, 190px);
+	pointer-events: none;
+}
+
+body:has(.login_spell_page)::before {
+	top: 6vh;
+	left: 4vw;
+	transform: rotate(-18deg);
+}
+
+body:has(.login_spell_page)::after {
+	right: 4vw;
+	bottom: 5vh;
+	transform: rotate(156deg);
+}
+
+body:has(.login_spell_page) > .container {
+	position: relative;
+	z-index: 1;
+	width: 100%;
+	min-height: calc(100vh - 74px);
+	display: grid;
+	place-items: center;
+	padding: 34px 20px;
+	box-sizing: border-box;
+}
+
+body:has(.login_spell_page) article.container.content {
+	border: 0;
+	background: transparent;
+	box-shadow: none;
+}
+
+body.user:has(.login_spell_page) header .container::before,
+body.user:has(.login_spell_page) header .container::after {
+	display: none !important;
+}
+
+body:has(.login_spell_page) .login_spell_page {
+	position: relative;
+	width: min(520px, 100%);
+	margin: 0 auto;
+}
+
+body:has(.login_spell_page) .login_spell_page::before {
+	content: "";
+	position: absolute;
+	inset: -42px -62px auto auto;
+	width: 156px;
+	height: 156px;
+	border-radius: 50%;
+	background: radial-gradient(circle, rgba(255, 237, 131, 0.34), transparent 68%);
+	filter: blur(2px);
+}
+
+body:has(.login_spell_page) .login_spell_panel {
+	position: relative;
+	padding: clamp(28px, 6vw, 46px);
+	border: 1px solid rgba(159, 132, 61, 0.48);
+	border-radius: 30px 10px 30px 10px;
+	background:
+		linear-gradient(90deg, rgba(104, 86, 38, 0.08) 1px, transparent 1px) 0 0 / 34px 34px,
+		radial-gradient(circle at 22% 4%, rgba(255, 248, 197, 0.78), transparent 38%),
+		linear-gradient(180deg, rgba(255, 252, 236, 0.96), rgba(238, 234, 198, 0.92));
+	box-shadow:
+		0 24px 56px rgba(58, 69, 37, 0.18),
+		inset 0 0 0 7px rgba(255, 255, 255, 0.24);
+	overflow: hidden;
+}
+
+body:has(.login_spell_page) .login_spell_panel::before,
+body:has(.login_spell_page) .login_spell_panel::after {
+	content: "";
+	position: absolute;
+	pointer-events: none;
+}
+
+body:has(.login_spell_page) .login_spell_panel::before {
+	inset: 14px;
+	border: 1px solid rgba(169, 145, 75, 0.26);
+	border-radius: 22px 7px 22px 7px;
+}
+
+body:has(.login_spell_page) .login_spell_panel::after {
+	right: -42px;
+	bottom: -34px;
+	width: 150px;
+	height: 150px;
+	border-radius: 50%;
+	background: radial-gradient(circle, rgba(96, 126, 62, 0.24), transparent 68%);
+}
+
+body:has(.login_spell_page) .login_spell_brand {
+	position: relative;
+	display: grid;
+	justify-items: center;
+	gap: 4px;
+	margin-bottom: 18px;
+	text-align: center;
+	z-index: 1;
+}
+
+body:has(.login_spell_page) .login_hat {
+	position: relative;
+	display: block;
+	width: 54px;
+	height: 42px;
+	margin-bottom: 2px;
+}
+
+body:has(.login_spell_page) .login_hat::before {
+	content: "";
+	position: absolute;
+	left: 15px;
+	bottom: 10px;
+	width: 26px;
+	height: 36px;
+	border-radius: 80% 10% 60% 10%;
+	background: linear-gradient(135deg, #244a2d, #5a753b);
+	box-shadow: inset -4px -4px 0 rgba(17, 37, 22, 0.24);
+	transform: rotate(14deg) skewX(-8deg);
+}
+
+body:has(.login_spell_page) .login_hat::after {
+	content: "";
+	position: absolute;
+	left: 2px;
+	bottom: 2px;
+	width: 50px;
+	height: 14px;
+	border-radius: 50%;
+	background: linear-gradient(90deg, #1e3e26, #6f8d46);
+	box-shadow: 0 4px 8px rgba(34, 47, 24, 0.22);
+}
+
+body:has(.login_spell_page) .login_shop_name {
+	margin: 0;
+	color: #243f25;
+	font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+	font-size: clamp(1.45rem, 5vw, 2.05rem);
+	font-weight: 800;
+	line-height: 1.08;
+}
+
+body:has(.login_spell_page) .login_spell_brand small {
+	color: rgba(47, 42, 32, 0.64);
+	font-family: Georgia, "Times New Roman", serif;
+	font-size: 0.92rem;
+	font-style: italic;
+}
+
+body:has(.login_spell_page) .page_title {
+	position: relative;
+	width: auto;
+	margin: 6px auto 10px;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	color: #2b4d2b;
+	font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+	font-size: clamp(1.55rem, 5vw, 2.2rem);
+	text-align: center;
+	box-shadow: none;
+	z-index: 1;
+}
+
+body:has(.login_spell_page) .description {
+	position: relative;
+	margin: 0 auto 24px;
+	color: rgba(48, 43, 32, 0.76);
+	text-align: center;
+	z-index: 1;
+}
+
+body:has(.login_spell_page) .login_spell_form {
+	position: relative;
+	display: grid;
+	gap: 18px;
+	width: 100%;
+	margin: 0;
+	z-index: 1;
+}
+
+body:has(.login_spell_page) .login_fields {
+	display: grid;
+	gap: 14px;
+}
+
+body:has(.login_spell_page) .login_field {
+	display: grid;
+	gap: 7px;
+	color: #2b4a2b;
+	font-weight: 800;
+}
+
+body:has(.login_spell_page) .login_field span {
+	font-size: 0.92rem;
+}
+
+body:has(.login_spell_page) .login_field input {
+	width: 100%;
+	box-sizing: border-box;
+	padding: 14px 16px;
+	border: 1px solid rgba(91, 111, 54, 0.38);
+	border-radius: 999px;
+	background: rgba(255, 252, 235, 0.88);
+	color: #2f2a20;
+	font-size: 1rem;
+	box-shadow:
+		inset 0 2px 6px rgba(78, 61, 26, 0.08),
+		0 1px 0 rgba(255, 255, 255, 0.74);
+	outline: none;
+	transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+body:has(.login_spell_page) .login_field input:focus {
+	border-color: rgba(47, 91, 44, 0.72);
+	box-shadow:
+		0 0 0 4px rgba(210, 183, 89, 0.22),
+		inset 0 2px 6px rgba(78, 61, 26, 0.08);
+	transform: translateY(-1px);
+}
+
+body:has(.login_spell_page) .login_actions {
+	display: grid;
+	gap: 12px;
+	margin-top: 6px;
+}
+
+body:has(.login_spell_page) .login_actions input[type="submit"] {
+	width: 100%;
+	padding: 14px 22px;
+	border: 1px solid rgba(41, 70, 33, 0.58);
+	border-radius: 999px;
+	background: linear-gradient(180deg, #477037, #203f25);
+	color: #fff8dc;
+	font-size: 1.05rem;
+	font-weight: 800;
+	letter-spacing: 0;
+	text-shadow: 0 2px 3px rgba(12, 22, 12, 0.4);
+	box-shadow:
+		0 14px 24px rgba(47, 74, 36, 0.22),
+		inset 0 1px 0 rgba(255, 255, 255, 0.35);
+	cursor: pointer;
+}
+
+body:has(.login_spell_page) .login_actions input[type="submit"]:hover {
+	background: linear-gradient(180deg, #557d43, #25492b);
+	transform: translateY(-1px);
+}
+
+body:has(.login_spell_page) .login_back_link {
+	color: #39572e;
+	font-weight: 800;
+	text-align: center;
+	text-decoration: none;
+	border-bottom: 1px dotted rgba(57, 87, 46, 0.48);
+	justify-self: center;
+}
+
+body:has(.login_spell_page) .error_list {
+	margin: 0;
+	padding: 12px 14px;
+	border: 1px solid rgba(168, 75, 45, 0.35);
+	border-radius: 10px;
+	background: rgba(255, 241, 218, 0.82);
+	color: #8a351d;
+}
+
+body:has(.login_spell_page) .error_list ul {
+	margin: 0;
+	padding-left: 18px;
+}
+
+@keyframes witch-ring-breathe {
+	0%, 100% {
+		transform: scale(0.98);
+		opacity: 0.62;
+	}
+	50% {
+		transform: scale(1.04);
+		opacity: 0.96;
+	}
+}
+
+@keyframes witch-light-chase {
+	0%, 100% {
+		opacity: 0.42;
+		transform: rotate(calc(var(--light-index) * 30deg)) translateY(calc(-1 * min(201px, 38vw))) scale(0.82);
+	}
+	46% {
+		opacity: 1;
+		transform: rotate(calc(var(--light-index) * 30deg)) translateY(calc(-1 * min(201px, 38vw))) scale(1.35);
+	}
+}
+
+@keyframes witch-sigil-turn {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	body.user:has(.coupon_gacha_page) .gacha_wheel::after,
+	body.user:has(.coupon_gacha_page) .gacha_wheel.is-spinning .gacha_lights span,
+	body.user:has(.coupon_gacha_page) .gacha_wheel.has-result .gacha_lights span,
+	body.user:has(.coupon_gacha_page) .gacha_result_sigil {
+		animation: none;
+	}
+}
+
+@media screen and (max-width: 900px) {
+	body.user:has(.coupon_gacha_page) .gacha_panel {
+		grid-template-columns: 1fr;
+	}
+
+	body.user:has(.coupon_gacha_page) .gacha_status {
+		width: min(520px, 100%);
+		box-sizing: border-box;
+		justify-self: center;
+	}
+}
+
+@media screen and (max-width: 560px) {
+	body.user:has(.coupon_gacha_page) .coupon_lead {
+		border-radius: 12px;
+	}
+
+	body.user:has(.coupon_gacha_page) .gacha_panel {
+		padding: 18px 12px 24px;
+		border-radius: 18px 6px 18px 6px;
+	}
+
+	body.user:has(.coupon_gacha_page) .gacha_wheel {
+		width: min(318px, 82vw);
+		height: min(318px, 82vw);
+	}
+
+	body.user:has(.coupon_gacha_page) .gacha_segment {
+		width: 92px;
+		min-height: 60px;
+		padding: 7px;
+	}
+
+	body.user:has(.coupon_gacha_page) .gacha_segment strong {
+		font-size: 1.15rem;
+	}
+
+	body.user:has(.coupon_gacha_page) .gacha_segment small {
+		font-size: 0.64rem;
+	}
+
+	body.user:has(.coupon_gacha_page) .gacha_core {
+		width: 90px;
+		height: 90px;
+		font-size: 0.82rem;
+	}
+
+	body.user:has(.coupon_gacha_page) .gacha_status p {
+		display: block;
+	}
+
+	body.user:has(.coupon_gacha_page) .gacha_result_dialog {
+		padding: 38px 20px 26px;
+	}
+
+	body:has(.login_spell_page) > .container {
+		min-height: calc(100vh - 56px);
+		padding: 18px 12px;
+	}
+
+	body:has(.login_spell_page)::before,
+	body:has(.login_spell_page)::after {
+		display: none;
+	}
+
+	body:has(.login_spell_page) .login_spell_panel {
+		padding: 26px 18px 24px;
+	}
+
+	body:has(.login_spell_page) .login_spell_page::before,
+	body:has(.login_spell_page) .login_spell_panel::after {
+		display: none;
+	}
+}

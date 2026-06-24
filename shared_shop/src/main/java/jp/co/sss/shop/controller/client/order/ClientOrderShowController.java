@@ -1,10 +1,12 @@
 package jp.co.sss.shop.controller.client.order;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +28,8 @@ import jp.co.sss.shop.service.PriceCalc;
  */
 @Controller
 public class ClientOrderShowController {
+
+	private static final Integer ORDER_CANCELED = 1;
 
 	/**
 	 * 注文情報リポジトリ
@@ -78,7 +82,8 @@ public class ClientOrderShowController {
 			// PriceCalc共通クラスを使って合計金額を計算する
 			int total = priceCalc.orderItemPriceTotal(order.getOrderItemsList());
 			int couponDiscount = order.getCouponDiscountAmount() == null ? 0 : order.getCouponDiscountAmount();
-			bean.setTotal(Math.max(0, total - couponDiscount));
+			int pointDiscount = order.getUsePoint() == null ? 0 : order.getUsePoint();
+			bean.setTotal(Math.max(0, total - couponDiscount - pointDiscount));
 
 			orderBeans.add(bean);
 		}
@@ -105,6 +110,9 @@ public class ClientOrderShowController {
 
 		// 該当する注文情報の詳細を取得
 		Order order = orderRepository.findByIdAndUserId(id, user.getId());
+		if (order == null) {
+			return "redirect:/syserror";
+		}
 
 		// BeanTools共通クラスを使って一括コピー
 		OrderBean bean = beanTools.copyEntityToOrderBean(order);
@@ -122,5 +130,31 @@ public class ClientOrderShowController {
 		model.addAttribute("orderItemBeans", orderItemBeans);
 		model.addAttribute("total", total);
 		return "client/order/detail";
+	}
+
+	@Transactional
+	@RequestMapping(path = "/client/order/cancel/{id}", method = RequestMethod.POST)
+	public String cancelOrder(@PathVariable Integer id) {
+		UserBean user = (UserBean) session.getAttribute("user");
+		if (user == null) {
+			return "redirect:/login";
+		}
+
+		Order order = orderRepository.findByIdAndUserId(id, user.getId());
+		if (order == null) {
+			return "redirect:/syserror";
+		}
+
+		if (!ORDER_CANCELED.equals(order.getCancelFlag())) {
+			order.setCancelFlag(ORDER_CANCELED);
+			order.setCancelDate(new Date(System.currentTimeMillis()));
+			orderRepository.save(order);
+		}
+		return "redirect:/client/order/cancel/complete";
+	}
+
+	@RequestMapping(path = "/client/order/cancel/complete", method = RequestMethod.GET)
+	public String cancelComplete() {
+		return "client/order/cancel_complete";
 	}
 }

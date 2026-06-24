@@ -114,6 +114,12 @@ public class BeanTools {
 		if (entity.getDeliveryDate() != null) {
 			bean.setDeliveryDate(entity.getDeliveryDate().toString());
 		}
+		if (entity.getCancelDate() != null) {
+			bean.setCancelDate(entity.getCancelDate().toString());
+		}
+
+		bean.setUsePoint(entity.getUsePoint());
+		bean.setEarnedPoint(entity.getEarnedPoint());
 
 		return bean;
 	}

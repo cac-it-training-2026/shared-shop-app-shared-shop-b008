@@ -59,8 +59,7 @@ public class OrderForm implements Serializable {
 	/**
 	 * 配送希望日
 	 */
-	@NotBlank(message = "{orderForm.deliveryDate.notblank}")
-	@Pattern(regexp = "^[0-9]{4}-[0-9]{2}-[0-9]{2}$", message = "{orderForm.deliveryDate.invalid_format}")
+	@Pattern(regexp = "^$|^[0-9]{4}-[0-9]{2}-[0-9]{2}$", message = "{orderForm.deliveryDate.invalid_format}")
 	private String deliveryDate;
 
 	/**
@@ -79,6 +78,9 @@ public class OrderForm implements Serializable {
 
 	/** 注文確認時のクーポン割引額 */
 	private Integer couponDiscountAmount = 0;
+
+	/** 利用ポイント */
+	private Integer usePoint = 0;
 
 	/**
 	 * 注文するユーザIDの取得
@@ -238,6 +240,22 @@ public class OrderForm implements Serializable {
 
 	public void setCouponDiscountAmount(Integer couponDiscountAmount) {
 		this.couponDiscountAmount = couponDiscountAmount;
+	}
+
+	/**
+	 * 利用ポイントの取得
+	 * @return 利用ポイント
+	 */
+	public Integer getUsePoint() {
+		return usePoint;
+	}
+
+	/**
+	 * 利用ポイントのセット
+	 * @param usePoint 利用ポイント
+	 */
+	public void setUsePoint(Integer usePoint) {
+		this.usePoint = usePoint;
 	}
 
 }

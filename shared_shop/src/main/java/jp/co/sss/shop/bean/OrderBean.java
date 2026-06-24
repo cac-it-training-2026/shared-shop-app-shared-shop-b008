@@ -57,6 +57,16 @@ public class OrderBean {
 	 */
 	private String deliveryDate;
 
+	/**
+	 * 注文取消フラグ
+	 */
+	private Integer cancelFlag;
+
+	/**
+	 * 注文取消日
+	 */
+	private String cancelDate;
+
 	/** 注文時点のクーポン名称 */
 	private String couponName;
 
@@ -65,6 +75,12 @@ public class OrderBean {
 
 	/** 注文時点のクーポン割引額 */
 	private Integer couponDiscountAmount;
+
+	/** 利用ポイント */
+	private Integer usePoint;
+
+	/** 付与ポイント */
+	private Integer earnedPoint;
 
 	/**
 	 * 注文IDの取得
@@ -226,6 +242,22 @@ public class OrderBean {
 		this.deliveryDate = deliveryDate;
 	}
 
+	public Integer getCancelFlag() {
+		return cancelFlag;
+	}
+
+	public void setCancelFlag(Integer cancelFlag) {
+		this.cancelFlag = cancelFlag;
+	}
+
+	public String getCancelDate() {
+		return cancelDate;
+	}
+
+	public void setCancelDate(String cancelDate) {
+		this.cancelDate = cancelDate;
+	}
+
 	public String getCouponName() {
 		return couponName;
 	}
@@ -248,6 +280,22 @@ public class OrderBean {
 
 	public void setCouponDiscountAmount(Integer couponDiscountAmount) {
 		this.couponDiscountAmount = couponDiscountAmount;
+	}
+
+	public Integer getUsePoint() {
+		return usePoint;
+	}
+
+	public void setUsePoint(Integer usePoint) {
+		this.usePoint = usePoint;
+	}
+
+	public Integer getEarnedPoint() {
+		return earnedPoint;
+	}
+
+	public void setEarnedPoint(Integer earnedPoint) {
+		this.earnedPoint = earnedPoint;
 	}
 
 }

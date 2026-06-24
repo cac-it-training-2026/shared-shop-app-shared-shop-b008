@@ -72,6 +72,18 @@ public class Order {
 	@Column
 	private Date deliveryDate;
 
+	/**
+	 * 注文取消フラグ
+	 */
+	@Column
+	private Integer cancelFlag = 0;
+
+	/**
+	 * 注文取消日
+	 */
+	@Column
+	private Date cancelDate;
+
 	/** 利用したクーポン種別 */
 	@ManyToOne
 	@JoinColumn(name = "coupon_type_id", referencedColumnName = "id")
@@ -88,6 +100,14 @@ public class Order {
 	/** 注文時点のクーポン割引額 */
 	@Column
 	private Integer couponDiscountAmount;
+
+	/** 利用ポイント */
+	@Column
+	private Integer usePoint = 0;
+
+	/** 付与ポイント */
+	@Column
+	private Integer earnedPoint = 0;
 
 	/**
 	 * 会員情報
@@ -230,6 +250,22 @@ public class Order {
 		this.deliveryDate = deliveryDate;
 	}
 
+	public Integer getCancelFlag() {
+		return cancelFlag;
+	}
+
+	public void setCancelFlag(Integer cancelFlag) {
+		this.cancelFlag = cancelFlag;
+	}
+
+	public Date getCancelDate() {
+		return cancelDate;
+	}
+
+	public void setCancelDate(Date cancelDate) {
+		this.cancelDate = cancelDate;
+	}
+
 	public CouponType getCouponType() {
 		return couponType;
 	}
@@ -260,6 +296,22 @@ public class Order {
 
 	public void setCouponDiscountAmount(Integer couponDiscountAmount) {
 		this.couponDiscountAmount = couponDiscountAmount;
+	}
+
+	public Integer getUsePoint() {
+		return usePoint;
+	}
+
+	public void setUsePoint(Integer usePoint) {
+		this.usePoint = usePoint;
+	}
+
+	public Integer getEarnedPoint() {
+		return earnedPoint;
+	}
+
+	public void setEarnedPoint(Integer earnedPoint) {
+		this.earnedPoint = earnedPoint;
 	}
 
 	/**
