@@ -3,11 +3,12 @@
 	th:replace="~{common/layout_5block :: layout(~{::title},~{::body/content()})}">
 
 <head>
+	<script th:src="@{/js/review.js}" type="text/javascript"></script>
 	<title th:text="'レビュー投稿' + ' | ' + #{shop.title}"> </title>
 	<meta charset="UTF-8" />
 </head>
 
-<body class="user">
+<body class="user review_regist_page">
 	<h2 th:class="title">レビュー投稿</h2>
 
 	<div class="info_form_area">
@@ -20,7 +21,7 @@
 			</table>
 		</div>
 
-		<form th:action="@{/client/review/regist/complete}" th:object="${reviewForm}" method="post" class="user_info_form">
+		<form th:action="@{/client/review/regist/complete}" th:object="${reviewForm}" method="post" class="user_info_form review_form">
 			<ul th:if="${#fields.hasErrors('*')}" class="error_list">
 				<li th:each="err : ${#fields.errors('*')}" th:text="${err}"></li>
 			</ul>
@@ -28,7 +29,7 @@
 			<input type="hidden" th:field="*{orderItemId}" />
 			<input type="hidden" th:field="*{itemId}" />
 
-			<table class="input_table">
+			<table class="input_table review_input_table">
 				<tr>
 					<th>評価</th>
 					<td>

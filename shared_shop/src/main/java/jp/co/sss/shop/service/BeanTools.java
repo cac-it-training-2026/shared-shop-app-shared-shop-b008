@@ -111,6 +111,16 @@ public class BeanTools {
 		// 会員名を注文情報に設定
 		bean.setUserName(entity.getUser().getName());
 
+		if (entity.getDeliveryDate() != null) {
+			bean.setDeliveryDate(entity.getDeliveryDate().toString());
+		}
+		if (entity.getCancelDate() != null) {
+			bean.setCancelDate(entity.getCancelDate().toString());
+		}
+
+		bean.setUsePoint(entity.getUsePoint());
+		bean.setEarnedPoint(entity.getEarnedPoint());
+
 		return bean;
 	}
 

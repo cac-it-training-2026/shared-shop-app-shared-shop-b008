@@ -46,6 +46,26 @@
 				<th>[[#{data.address}+#{data.address.phonenumber}]]</th>
 				<td class="value" th:text="*{phoneNumber}"></td>
 			</tr>
+			<tr>
+				<th>[[#{data.delivery.date}]]</th>
+				<td th:text="*{deliveryDate != null && deliveryDate != ''} ? *{deliveryDate} : #{data.delivery.date.none}"></td>
+			</tr>
+			<tr>
+				<th>利用クーポン</th>
+				<td th:text="${order.couponName != null} ? |${order.couponName}（${order.couponDiscountRate}％）| : '利用なし'"></td>
+			</tr>
+			<tr>
+				<th>クーポン割引</th>
+				<td th:text="|-${#numbers.formatInteger(order.couponDiscountAmount != null ? order.couponDiscountAmount : 0, 1, 'COMMA')}円|"></td>
+			</tr>
+			<tr>
+				<th>利用ポイント</th>
+				<td th:text="|-${#numbers.formatInteger(order.usePoint, 1, 'COMMA')}円|"></td>
+			</tr>
+			<tr>
+				<th>獲得ポイント</th>
+				<td th:text="|${#numbers.formatInteger(order.earnedPoint, 1, 'COMMA')}pt|"></td>
+			</tr>
 		</table>
 
 		<table class="list_table detail">

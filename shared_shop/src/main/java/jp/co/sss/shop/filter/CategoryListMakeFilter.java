@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.util.List;
 
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import jp.co.sss.shop.bean.CategoryBean;
 import jp.co.sss.shop.entity.Category;
@@ -39,16 +37,6 @@ public class CategoryListMakeFilter extends HttpFilter {
 	 */
 	@Autowired
 	BeanTools beanTools;
-	/**
-	 * フィルタの初期化時にこのフィルタ内のAutowiredを実行する
-	 *
-	 * @param filterConfig フィルタの初期化時、コンテナーからフィルターに情報を渡すためのフィルター構成オブジェクト
-	 */
-	@Override
-	public void init(FilterConfig filterConfig) throws ServletException {
-		// このフィルタークラスの@Autowiredインジェクションを処理
-		SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, filterConfig.getServletContext());
-	}
 
 	@Override
 	public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)

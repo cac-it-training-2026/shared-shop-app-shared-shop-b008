@@ -5,10 +5,15 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
@@ -21,18 +26,26 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import java.util.Optional;
+
 import jp.co.sss.shop.bean.BasketBean;
 import jp.co.sss.shop.bean.OrderItemBean;
 import jp.co.sss.shop.bean.UserBean;
+import jp.co.sss.shop.bean.UserCouponBean;
+import jp.co.sss.shop.entity.CouponType;
+import jp.co.sss.shop.entity.DeliveryAddress;
 import jp.co.sss.shop.entity.Item;
 import jp.co.sss.shop.entity.Order;
 import jp.co.sss.shop.entity.OrderItem;
 import jp.co.sss.shop.entity.User;
+import jp.co.sss.shop.entity.UserCoupon;
 import jp.co.sss.shop.form.OrderForm;
+import jp.co.sss.shop.repository.DeliveryAddressRepository;
 import jp.co.sss.shop.repository.ItemRepository;
 import jp.co.sss.shop.repository.OrderItemRepository;
 import jp.co.sss.shop.repository.OrderRepository;
 import jp.co.sss.shop.repository.UserRepository;
+import jp.co.sss.shop.repository.UserCouponRepository;
 import jp.co.sss.shop.service.BeanTools;
 import jp.co.sss.shop.service.PriceCalc;
 import jp.co.sss.shop.util.Constant;
@@ -56,7 +69,7 @@ public class ClientOrderRegistController {
 	private static final String ORDER_FORM = "orderForm";
 
 	private static final String[] ORDER_FORM_FIELD_ORDER = {
-			"postalCode", "address", "name", "phoneNumber"
+			"postalCode", "address", "name", "phoneNumber", "deliveryDate"
 	};
 
 	/**
@@ -68,6 +81,11 @@ public class ClientOrderRegistController {
 	 * 在庫切れ商品名リストの属性名
 	 */
 	private static final String ITEM_NAME_LIST_ZERO = "itemNameListZero";
+
+	private static final int ACTIVE_COUPON_TYPE = 1;
+	private static final ZoneId JAPAN_ZONE = ZoneId.of("Asia/Tokyo");
+	private static final DateTimeFormatter COUPON_DATE_FORMAT =
+			DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
 
 	/**
 	 * 商品情報リポジトリ
@@ -94,6 +112,18 @@ public class ClientOrderRegistController {
 	UserRepository userRepository;
 
 	/**
+	 * 会員保有クーポンリポジトリ
+	 */
+	@Autowired
+	UserCouponRepository userCouponRepository;
+
+	/**
+	 * お届け先情報リポジトリ
+	 */
+	@Autowired
+	DeliveryAddressRepository deliveryAddressRepository;
+
+	/**
 	 * Entity、Form、Bean間のデータコピーサービス
 	 */
 	@Autowired
@@ -104,6 +134,12 @@ public class ClientOrderRegistController {
 	 */
 	@Autowired
 	PriceCalc priceCalc;
+
+	/**
+	 * メッセージソース
+	 */
+	@Autowired
+	org.springframework.context.MessageSource messageSource;
 
 	/**
 	 * セッション
@@ -128,37 +164,99 @@ public class ClientOrderRegistController {
 			return "redirect:/login";
 		}
 
-		// セッションに保存されているログインユーザーBeanには、基本的に会員IDなど最低限の情報のみが入っている。
-		// そのため、届け先入力画面の初期表示に必要な郵便番号・住所・氏名・電話番号などの最新情報を、
-		// userテーブルから削除されていない会員情報として改めて取得する。
-		// findByIdAndDeleteFlagを使うことで、論理削除済みの会員情報を誤って利用しないようにしている。
+		// 登録済みのお届け先を確認
+		List<DeliveryAddress> addresses = deliveryAddressRepository.findByUserIdOrderByAddressNo(loginUser.getId());
+
+		// お届け先が登録されている場合は、お届け先選択画面へ遷移する
+		if (!addresses.isEmpty()) {
+			OrderForm orderForm = new OrderForm();
+			orderForm.setId(loginUser.getId());
+			orderForm.setPayMethod(Constant.DEFAULT_PAYMENT_METHOD);
+
+			// 初期選択は「お届け先1」
+			DeliveryAddress address1 = null;
+			for (DeliveryAddress addr : addresses) {
+				if (addr.getAddressNo() == 1) {
+					address1 = addr;
+					break;
+				}
+			}
+			if (address1 != null) {
+				orderForm.setDeliveryAddressId(address1.getId());
+				BeanUtils.copyProperties(address1, orderForm);
+			} else {
+				// お届け先1がない場合は、リストの最初の要素を選択
+				DeliveryAddress firstAddress = addresses.get(0);
+				orderForm.setDeliveryAddressId(firstAddress.getId());
+				BeanUtils.copyProperties(firstAddress, orderForm);
+			}
+
+			session.setAttribute(ORDER_FORM, orderForm);
+			return "redirect:/client/order/address/select";
+		}
+
+		// お届け先が登録されていない場合は、従来通り新規入力画面の初期化を行う
 		User user = userRepository.findByIdAndDeleteFlag(loginUser.getId(), Constant.NOT_DELETED);
 		if (user == null) {
 			return "redirect:/syserror";
 		}
 
-		// 注文入力用のFormを新しく作成し、会員情報Entityから届け先入力に必要な項目をコピーする。
-		// これにより、画面を開いた時点で会員登録済みの住所情報が初期値として表示される。
 		OrderForm orderForm = new OrderForm();
 		BeanUtils.copyProperties(user, orderForm);
-
-		// OrderFormのidには「注文ID」ではなく、注文者である「会員ID」を保持させる。
-		// 後続の注文登録処理では、このidを使ってOrder EntityのUser情報を設定する。
 		orderForm.setId(user.getId());
-
-		// 支払方法は、初期状態ではシステム共通のデフォルト支払方法を設定しておく。
-		// ユーザーが支払方法選択画面で変更した場合は、後続の処理でこの値が上書きされる。
 		orderForm.setPayMethod(Constant.DEFAULT_PAYMENT_METHOD);
 
-		// 入力途中の注文情報を複数画面にまたがって利用するため、OrderFormをセッションスコープへ保存する。
-		// 注文手続きは「届け先入力 → 支払方法選択 → 注文確認 → 注文完了」と画面遷移するため、
-		// リクエストスコープではなくセッションに保持している。
 		session.setAttribute(ORDER_FORM, orderForm);
-
-		// 前回の入力チェックエラー情報がセッションに残っていると、初期表示時にもエラーが表示されてしまう。
-		// 新しく注文手続きを開始するタイミングでは不要なため、ここで削除しておく。
 		session.removeAttribute("result");
 		return "redirect:/client/order/address/input";
+	}
+
+
+	/**
+	 * 届け先選択画面を表示します。
+	 *
+	 * @param model Viewとの値受渡し
+	 * @return "client/order/address_selection" 届け先選択画面
+	 */
+	@RequestMapping(path = "/client/order/address/select", method = RequestMethod.GET)
+	public String addressSelect(Model model) {
+		UserBean loginUser = (UserBean) session.getAttribute("user");
+		OrderForm orderForm = (OrderForm) session.getAttribute(ORDER_FORM);
+		if (loginUser == null || orderForm == null) {
+			return "redirect:/syserror";
+		}
+
+		List<DeliveryAddress> addresses = deliveryAddressRepository.findByUserIdOrderByAddressNo(loginUser.getId());
+		model.addAttribute("deliveryAddresses", addresses);
+		model.addAttribute(ORDER_FORM, orderForm);
+		return "client/order/address_selection";
+	}
+
+	/**
+	 * 届け先選択値を保存し、支払方法選択画面へ遷移します。
+	 *
+	 * @param deliveryAddressId 選択されたお届け先ID
+	 * @return 支払方法選択画面表示処理へリダイレクト
+	 */
+	@RequestMapping(path = "/client/order/address/select", method = RequestMethod.POST)
+	public String addressSelectCheck(@RequestParam Integer deliveryAddressId) {
+		UserBean loginUser = (UserBean) session.getAttribute("user");
+		OrderForm orderForm = (OrderForm) session.getAttribute(ORDER_FORM);
+		if (loginUser == null || orderForm == null) {
+			return "redirect:/syserror";
+		}
+
+		Optional<DeliveryAddress> opt = deliveryAddressRepository.findByIdAndUserId(deliveryAddressId, loginUser.getId());
+		if (opt.isEmpty()) {
+			return "redirect:/syserror";
+		}
+
+		DeliveryAddress address = opt.get();
+		BeanUtils.copyProperties(address, orderForm);
+		orderForm.setDeliveryAddressId(address.getId());
+
+		session.setAttribute(ORDER_FORM, orderForm);
+		return "redirect:/client/order/payment/input";
 	}
 
 	/**
@@ -223,6 +321,26 @@ public class ClientOrderRegistController {
 			form.setPayMethod(lastOrderForm.getPayMethod());
 		}
 
+		// 配送希望日のバリデーション
+		if (form.getDeliveryDate() != null && !form.getDeliveryDate().isEmpty()) {
+			try {
+				java.time.LocalDate deliveryDate = java.time.LocalDate.parse(form.getDeliveryDate());
+				java.time.LocalDate today = java.time.LocalDate.now();
+				java.time.LocalDate minDate = today.plusDays(3);
+				java.time.LocalDate maxDate = today.plusDays(14);
+
+				if (deliveryDate.isBefore(minDate) || deliveryDate.isAfter(maxDate)) {
+					result.rejectValue("deliveryDate", "orderForm.deliveryDate.invalid");
+				}
+			} catch (java.time.format.DateTimeParseException e) {
+				// 形式エラーは @Pattern でチェックしているため、ここでは何もしない、
+				// または確実にエラーにする
+				if (!result.hasFieldErrors("deliveryDate")) {
+					result.rejectValue("deliveryDate", "orderForm.deliveryDate.invalid_format");
+				}
+			}
+		}
+
 		if (result.hasErrors()) {
 			clearInvalidAddressFields(form, result);
 			session.setAttribute(ORDER_FORM, form);
@@ -236,6 +354,10 @@ public class ClientOrderRegistController {
 		
 		// 入力チェック結果に関係なく、ユーザーが入力した最新の届け先情報を一度セッションへ保存する。
 		// これにより、エラーで入力画面に戻った場合でも、入力済みの値を画面に再表示できる。
+
+		// 新規入力の場合は deliveryAddressId をクリアする
+		form.setDeliveryAddressId(null);
+
 		session.setAttribute(ORDER_FORM, form);
 		return "redirect:/client/order/payment/input";
 	}
@@ -248,6 +370,7 @@ public class ClientOrderRegistController {
 	 * @return "client/order/payment_input" 支払方法選択画面
 	 * @throws RuntimeException 注文情報がセッションに存在しない場合
 	 */
+	@Transactional
 	@RequestMapping(path = "/client/order/payment/input", method = RequestMethod.GET)
 	public String paymentInput(Model model) {
 		OrderForm orderForm = (OrderForm) session.getAttribute(ORDER_FORM);
@@ -262,6 +385,38 @@ public class ClientOrderRegistController {
 		// 住所入力から初めて遷移した場合はデフォルト支払方法、
 		// 戻る操作などで再表示された場合は前回選択された支払方法が表示される。
 		model.addAttribute("payMethod", orderForm.getPayMethod());
+
+		UserBean loginUser = (UserBean) session.getAttribute("user");
+		if (loginUser == null) {
+			return "redirect:/login";
+		}
+
+		Timestamp now = currentTimestamp();
+		userCouponRepository.deleteExpired(now);
+		Integer total = calculateCurrentBasketTotal();
+		List<UserCoupon> coupons = userCouponRepository.findAvailableByUserId(loginUser.getId(), now);
+		model.addAttribute("total", total);
+		model.addAttribute("couponBeans", toCouponBeans(coupons, total));
+		model.addAttribute("selectedCouponId", orderForm.getCouponId());
+		model.addAttribute("couponDiscountAmount", safeDiscountAmount(orderForm));
+		model.addAttribute("discountedTotal", Math.max(0, total - safeDiscountAmount(orderForm)));
+		Object couponError = session.getAttribute("couponError");
+		if (couponError != null) {
+			model.addAttribute("couponError", couponError);
+			session.removeAttribute("couponError");
+		}
+
+		// 会員の最新情報を取得して保有ポイントをモデルに追加
+		User user = userRepository.findByIdAndDeleteFlag(loginUser.getId(), Constant.NOT_DELETED);
+		model.addAttribute("point", user.getPoint());
+		model.addAttribute("usePoint", orderForm.getUsePoint());
+		model.addAttribute("discountedTotal", Math.max(0, total - safeDiscountAmount(orderForm)));
+		Object pointError = session.getAttribute("pointError");
+		if (pointError != null) {
+			model.addAttribute("pointError", pointError);
+			session.removeAttribute("pointError");
+		}
+
 		return "client/order/payment_input";
 	}
 
@@ -275,7 +430,10 @@ public class ClientOrderRegistController {
 	 * @throws RuntimeException セッション情報が取得できない場合
 	 */
 	@RequestMapping(path = "/client/order/check", method = RequestMethod.POST)
-	public String orderCheck(@RequestParam Integer payMethod) {
+	public String orderCheck(
+			@RequestParam Integer payMethod,
+			@RequestParam(required = false) Integer couponId,
+			@RequestParam(required = false) Integer usePoint) {
 		
 		// 選択された支払方法を注文入力フォームへ設定し、セッションへ保存する。
 		// 1. セッションからORDER_FORMキーでOrderFormを取得する。
@@ -287,13 +445,61 @@ public class ClientOrderRegistController {
 	    }
 		
 		// 3. 取得できたOrderFormに、画面で選択されたpayMethodをsetPayMethodで設定する。
+		if (payMethod == null || payMethod < 1 || payMethod > 5) {
+			return "redirect:/syserror";
+		}
 		orderForm.setPayMethod(payMethod);
+
+		UserBean loginUser = (UserBean) session.getAttribute("user");
+		if (loginUser == null) {
+			return "redirect:/login";
+		}
+		Integer total = calculateCurrentBasketTotal();
+		if (!setSelectedCoupon(orderForm, couponId, loginUser.getId(), total)) {
+			session.setAttribute("couponError", "選択したクーポンは利用できません。利用条件をご確認ください。");
+			return "redirect:/client/order/payment/input";
+		}
+
+		// ポイントバリデーション
+		if (usePoint == null) {
+			usePoint = 0;
+		}
+		if (usePoint < 0) {
+			session.setAttribute("pointError", messageSource.getMessage("msg.point.invalid.input", null, java.util.Locale.JAPAN));
+			return "redirect:/client/order/payment/input";
+		}
+		if (usePoint > 0) {
+			User user = userRepository.findByIdAndDeleteFlag(loginUser.getId(), Constant.NOT_DELETED);
+			int holdPoint = user.getPoint();
+			int discountedTotal = total - safeDiscountAmount(orderForm);
+
+			if (holdPoint < 100 || usePoint < 100) {
+				session.setAttribute("pointError", messageSource.getMessage("msg.point.minimum.requirement", null, java.util.Locale.JAPAN));
+				return "redirect:/client/order/payment/input";
+			}
+			if (usePoint > holdPoint) {
+				session.setAttribute("pointError", messageSource.getMessage("msg.point.over.hold", null, java.util.Locale.JAPAN));
+				return "redirect:/client/order/payment/input";
+			}
+			if (usePoint > discountedTotal) {
+				session.setAttribute("pointError", messageSource.getMessage("msg.point.over.price", null, java.util.Locale.JAPAN));
+				return "redirect:/client/order/payment/input";
+			}
+		}
+		orderForm.setUsePoint(usePoint);
 		
 		// 4. 更新後のOrderFormを再度セッションへ保存する。
 		session.setAttribute(ORDER_FORM, orderForm);
 		
 		// 5. 注文確認画面表示用のGETメソッドへリダイレクトする。
 		return "redirect:/client/order/check";
+	}
+
+	/**
+	 * 既存のController単体テストとの互換性を保つためのクーポン・ポイント未使用呼び出しです。
+	 */
+	public String orderCheck(Integer payMethod) {
+		return orderCheck(payMethod, null, 0);
 	}
 
 	/**
@@ -333,9 +539,30 @@ public class ClientOrderRegistController {
 		// 5. OrderItemBeanリストがnullではなく空でもない場合、priceCalcで小計込みの合計金額を計算する。
 		if (orderItemBeans != null && !orderItemBeans.isEmpty()) {
 			Integer total = priceCalc.orderItemBeanPriceTotalUseSubtotal(orderItemBeans);
+			UserBean loginUser = (UserBean) session.getAttribute("user");
+			if (loginUser == null) {
+				return "redirect:/login";
+			}
+			if (!setSelectedCoupon(orderForm, orderForm.getCouponId(), loginUser.getId(), total)) {
+				session.setAttribute("couponError",
+						"注文内容の変更により、選択したクーポンが利用できなくなりました。");
+				return "redirect:/client/order/payment/input";
+			}
 			
 			// totalをModelへ追加
 			model.addAttribute("total", total);
+			model.addAttribute("couponDiscountAmount", safeDiscountAmount(orderForm));
+			int totalAfterCoupon = Math.max(0, total - safeDiscountAmount(orderForm));
+			model.addAttribute("discountedTotal", totalAfterCoupon);
+
+			// ポイント関連の計算
+			int usePoint = orderForm.getUsePoint() != null ? orderForm.getUsePoint() : 0;
+			int totalAfterPoint = Math.max(0, totalAfterCoupon - usePoint);
+			int earnedPoint = (int) Math.floor(totalAfterPoint * 0.01);
+
+			model.addAttribute("usePoint", usePoint);
+			model.addAttribute("totalAfterPoint", totalAfterPoint);
+			model.addAttribute("earnedPoint", earnedPoint);
 			}
 		
 		// 6. orderItemBeansをModelへ追加し、注文確認画面へ渡す。
@@ -371,6 +598,7 @@ public class ClientOrderRegistController {
 	 * @see #createOrder(OrderForm)
 	 * @see #canOrder(List)
 	 */
+	@Transactional
 	@RequestMapping(path = "/client/order/complete", method = RequestMethod.POST)
 	public String orderComplete() {
 		
@@ -392,9 +620,40 @@ public class ClientOrderRegistController {
 			// 4. 注文不可の場合は注文確認画面へ戻す
 			return "redirect:/client/order/check";
 		}
+
+		UserBean loginUser = (UserBean) session.getAttribute("user");
+		if (loginUser == null || !loginUser.getId().equals(orderForm.getId())) {
+			return "redirect:/login";
+		}
+
+		Integer latestTotal = calculateCurrentBasketTotal();
+		UserCoupon selectedCoupon = null;
+		if (orderForm.getCouponId() != null) {
+			selectedCoupon = userCouponRepository.findByIdAndUserIdForUpdate(
+					orderForm.getCouponId(), loginUser.getId());
+			if (!isCouponUsable(selectedCoupon, latestTotal, currentTimestamp())) {
+				clearCoupon(orderForm);
+				session.setAttribute(ORDER_FORM, orderForm);
+				session.setAttribute("couponError",
+						"選択したクーポンの有効期限または利用条件が変わったため、再度選択してください。");
+				return "redirect:/client/order/payment/input";
+			}
+			applyCoupon(orderForm, selectedCoupon, latestTotal);
+		}
 		
 		// 5. createOrder(orderForm)を呼び出し、届け先・支払方法・会員情報を持つOrder Entityを生成する。
 		Order order = createOrder(orderForm);
+		if (selectedCoupon != null) {
+			order.setCouponType(selectedCoupon.getCouponType());
+		}
+
+		// 注文情報のポイント利用・付与履歴をセット
+		int usePoint = orderForm.getUsePoint() != null ? orderForm.getUsePoint() : 0;
+		int totalAfterCoupon = latestTotal - safeDiscountAmount(orderForm);
+		int totalAfterPoint = Math.max(0, totalAfterCoupon - usePoint);
+		int earnedPoint = (int) Math.floor(totalAfterPoint * 0.01);
+		order.setUsePoint(usePoint);
+		order.setEarnedPoint(earnedPoint);
 		
 		// 6. orderRepository.save(order)で注文情報を登録し、保存後のOrderを取得する。
 		order = orderRepository.save(order);
@@ -420,6 +679,15 @@ public class ClientOrderRegistController {
 			item.setStock(item.getStock() - basketBean.getOrderNum());
 			itemRepository.save(item);
 		}
+
+		if (selectedCoupon != null) {
+			userCouponRepository.delete(selectedCoupon);
+		}
+
+		// ポイント更新
+		User user = userRepository.findByIdAndDeleteFlag(loginUser.getId(), Constant.NOT_DELETED);
+		user.setPoint(user.getPoint() - usePoint + earnedPoint);
+		userRepository.save(user);
 		
 		// 10. 注文登録後は、セッションからORDER_FORMとBASKET_BEANSを削除する。
 		session.removeAttribute(ORDER_FORM);
@@ -462,6 +730,12 @@ public class ClientOrderRegistController {
 		order.setName(orderForm.getName());
 		order.setPhoneNumber(orderForm.getPhoneNumber());
 		order.setPayMethod(orderForm.getPayMethod());
+		if (orderForm.getDeliveryDate() != null && !orderForm.getDeliveryDate().isEmpty()) {
+			order.setDeliveryDate(java.sql.Date.valueOf(orderForm.getDeliveryDate()));
+		}
+		order.setCouponName(orderForm.getCouponName());
+		order.setCouponDiscountRate(orderForm.getCouponDiscountRate());
+		order.setCouponDiscountAmount(safeDiscountAmount(orderForm));
 
 		// 注文者の会員情報をOrderへ紐付ける。
 		// ここでは会員IDだけを持つUser Entityを作成して設定している。
@@ -472,23 +746,115 @@ public class ClientOrderRegistController {
 		return order;
 	}
 
+	private boolean setSelectedCoupon(
+			OrderForm orderForm, Integer couponId, Integer userId, Integer total) {
+		if (couponId == null) {
+			clearCoupon(orderForm);
+			return true;
+		}
+		UserCoupon coupon = userCouponRepository.findAvailableByIdAndUserId(
+				couponId, userId, currentTimestamp());
+		if (!isCouponUsable(coupon, total, currentTimestamp())) {
+			clearCoupon(orderForm);
+			return false;
+		}
+		applyCoupon(orderForm, coupon, total);
+		return true;
+	}
+
+	private boolean isCouponUsable(UserCoupon coupon, Integer total, Timestamp now) {
+		if (coupon == null || coupon.getCouponType() == null || coupon.getExpiresAt() == null) {
+			return false;
+		}
+		CouponType type = coupon.getCouponType();
+		return Integer.valueOf(ACTIVE_COUPON_TYPE).equals(type.getActiveFlag())
+				&& coupon.getExpiresAt().after(now)
+				&& total != null
+				&& total >= type.getMinimumOrderAmount();
+	}
+
+	private void applyCoupon(OrderForm orderForm, UserCoupon coupon, Integer total) {
+		CouponType type = coupon.getCouponType();
+		orderForm.setCouponId(coupon.getId());
+		orderForm.setCouponName(type.getName());
+		orderForm.setCouponDiscountRate(type.getDiscountRate());
+		orderForm.setCouponDiscountAmount(calculateCouponDiscount(total, type.getDiscountRate()));
+	}
+
+	private int calculateCouponDiscount(Integer total, Integer discountRate) {
+		if (total == null || discountRate == null || total <= 0 || discountRate <= 0) {
+			return 0;
+		}
+		return total * discountRate / 100;
+	}
+
+	private void clearCoupon(OrderForm orderForm) {
+		orderForm.setCouponId(null);
+		orderForm.setCouponName(null);
+		orderForm.setCouponDiscountRate(null);
+		orderForm.setCouponDiscountAmount(0);
+	}
+
+	private int safeDiscountAmount(OrderForm orderForm) {
+		return orderForm.getCouponDiscountAmount() == null ? 0 : orderForm.getCouponDiscountAmount();
+	}
+
+	private Integer calculateCurrentBasketTotal() {
+		int total = 0;
+		List<BasketBean> basketBeans = getBasketBeans();
+		if (basketBeans == null) {
+			return total;
+		}
+		for (BasketBean basketBean : basketBeans) {
+			Item item = itemRepository.findByIdAndDeleteFlag(basketBean.getId(), Constant.NOT_DELETED);
+			if (item != null && item.getPrice() != null && basketBean.getOrderNum() != null
+					&& basketBean.getOrderNum() > 0) {
+				total += item.getPrice() * basketBean.getOrderNum();
+			}
+		}
+		return total;
+	}
+
+	private List<UserCouponBean> toCouponBeans(List<UserCoupon> coupons, Integer total) {
+		List<UserCouponBean> beans = new ArrayList<UserCouponBean>();
+		for (UserCoupon coupon : coupons) {
+			CouponType type = coupon.getCouponType();
+			UserCouponBean bean = new UserCouponBean();
+			bean.setId(coupon.getId());
+			bean.setName(type.getName());
+			bean.setDiscountRate(type.getDiscountRate());
+			bean.setMinimumOrderAmount(type.getMinimumOrderAmount());
+			bean.setAcquiredAt(formatCouponDate(coupon.getAcquiredAt()));
+			bean.setExpiresAt(formatCouponDate(coupon.getExpiresAt()));
+			boolean available = total >= type.getMinimumOrderAmount();
+			bean.setAvailable(available);
+			if (!available) {
+				bean.setUnavailableReason("ご注文金額が最低利用金額に達していません。");
+			}
+			beans.add(bean);
+		}
+		return beans;
+	}
+
+	private String formatCouponDate(Timestamp timestamp) {
+		return timestamp == null ? "" : timestamp.toLocalDateTime().format(COUPON_DATE_FORMAT);
+	}
+
+	private Timestamp currentTimestamp() {
+		return Timestamp.valueOf(LocalDateTime.now(JAPAN_ZONE));
+	}
+
 	private void clearInvalidAddressFields(OrderForm form, BindingResult result) {
 		Set<String> invalidFields = new HashSet<String>();
 		for (FieldError fieldError : result.getFieldErrors()) {
 			invalidFields.add(fieldError.getField());
 		}
 
-		if (invalidFields.contains("postalCode")) {
-			form.setPostalCode("");
-		}
-		if (invalidFields.contains("address")) {
-			form.setAddress("");
-		}
-		if (invalidFields.contains("name")) {
-			form.setName("");
-		}
 		if (invalidFields.contains("phoneNumber")) {
 			form.setPhoneNumber("");
+		}
+		if (invalidFields.contains("deliveryDate")) {
+			form.setDeliveryDate("");
 		}
 	}
 

@@ -1,6 +1,7 @@
 package jp.co.sss.shop.entity;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -80,6 +81,24 @@ public class User {
 	 */
 	@Column(insertable = false)
 	private Date insertDate;
+
+	/**
+	 * ログイン失敗回数
+	 */
+	@Column(name = "login_failure_count")
+	private Integer loginFailureCount = 0;
+
+	/**
+	 * ロック解除時刻
+	 */
+	@Column(name = "lock_release_time")
+	private Timestamp lockReleaseTime;
+
+	/**
+	 * ポイント
+	 */
+	@Column
+	private Integer point = 0;
 
 	/**
 	 * 会員IDの取得
@@ -239,5 +258,53 @@ public class User {
 	 */
 	public void setInsertDate(Date insertDate) {
 		this.insertDate = insertDate;
+	}
+
+	/**
+	 * ログイン失敗回数の取得
+	 * @return ログイン失敗回数
+	 */
+	public Integer getLoginFailureCount() {
+		return loginFailureCount;
+	}
+
+	/**
+	 * ログイン失敗回数のセット
+	 * @param loginFailureCount ログイン失敗回数
+	 */
+	public void setLoginFailureCount(Integer loginFailureCount) {
+		this.loginFailureCount = loginFailureCount;
+	}
+
+	/**
+	 * ロック解除時刻の取得
+	 * @return ロック解除時刻
+	 */
+	public Timestamp getLockReleaseTime() {
+		return lockReleaseTime;
+	}
+
+	/**
+	 * ロック解除時刻のセット
+	 * @param lockReleaseTime ロック解除時刻
+	 */
+	public void setLockReleaseTime(Timestamp lockReleaseTime) {
+		this.lockReleaseTime = lockReleaseTime;
+	}
+
+	/**
+	 * ポイントの取得
+	 * @return ポイント
+	 */
+	public Integer getPoint() {
+		return point;
+	}
+
+	/**
+	 * ポイントのセット
+	 * @param point ポイント
+	 */
+	public void setPoint(Integer point) {
+		this.point = point;
 	}
 }

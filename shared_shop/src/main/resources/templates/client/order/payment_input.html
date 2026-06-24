@@ -57,6 +57,55 @@
 				</li>
 			</ul>
 
+			<section class="coupon_payment_area">
+				<h3>クーポンを利用する</h3>
+				<p class="coupon_error" th:if="${couponError != null}" th:text="${couponError}"></p>
+				<div class="payment_total_row">
+					<span>商品合計</span>
+					<strong id="orderTotal" th:attr="data-total=${total}"
+						th:text="|${#numbers.formatInteger(total, 1, 'COMMA')}円|"></strong>
+				</div>
+				<label for="couponId">利用するクーポン</label>
+				<select id="couponId" name="couponId" onchange="updatePreview()">
+					<option value="" data-rate="0">クーポンを利用しない</option>
+					<option th:each="coupon : ${couponBeans}"
+						th:value="${coupon.id}"
+						th:attr="data-rate=${coupon.discountRate}"
+						th:disabled="${!coupon.available}"
+						th:selected="${selectedCouponId != null and selectedCouponId == coupon.id}"
+						th:text="|${coupon.name}（${#numbers.formatInteger(coupon.minimumOrderAmount, 1, 'COMMA')}円以上）${coupon.available ? '' : '― ご注文金額が不足しています'}|">
+					</option>
+				</select>
+				<p class="coupon_empty" th:if="${#lists.isEmpty(couponBeans)}" th:text="#{msg.coupon.payment.none}"></p>
+				<div class="coupon_preview" aria-live="polite">
+					<p><span>クーポン割引（節約額）</span><strong id="couponDiscount"
+						th:text="'-' + ${#numbers.formatInteger(couponDiscountAmount, 1, 'COMMA')} + '円'"></strong></p>
+					<p class="discounted_total"><span>割引後合計</span><strong id="discountedTotal"
+						th:text="${#numbers.formatInteger(discountedTotal, 1, 'COMMA')} + '円'"></strong></p>
+				</div>
+			</section>
+
+			<section class="point_payment_area">
+				<h3>ポイントを利用する</h3>
+				<p class="point_error" th:if="${pointError != null}" th:text="${pointError}"></p>
+				<div class="point_info">
+					<span>保有ポイント：</span>
+					<strong id="holdPoint" th:attr="data-point=${point}" th:text="|${point}pt|"></strong>
+				</div>
+				<div th:if="${point >= 100}">
+					<label for="usePoint">利用ポイント</label>
+					<input type="number" id="usePoint" name="usePoint" th:value="${usePoint}" min="0" th:max="${point}" oninput="updatePreview()" />
+					<div class="point_preview" aria-live="polite">
+						<p class="total_after_point"><span>お支払い金額</span><strong id="totalAfterPoint"
+							th:text="|${#numbers.formatInteger(discountedTotal - usePoint, 1, 'COMMA')}円|"></strong></p>
+					</div>
+				</div>
+				<div th:unless="${point >= 100}">
+					<p>ポイントは100ポイント以上から利用可能です。</p>
+					<input type="hidden" name="usePoint" value="0" />
+				</div>
+			</section>
+
 			<input type="submit" class="send_button" value="次へ" />
 
 		</form>
@@ -64,6 +113,25 @@
 			<input type="submit" class="back_button" value="戻る" />
 		</form>
 	</div>
+	<script>
+		function updatePreview() {
+			const total = Number(document.getElementById('orderTotal').dataset.total);
+			const select = document.getElementById('couponId');
+			const rate = Number(select.options[select.selectedIndex].dataset.rate || 0);
+			const discount = Math.floor(total * rate / 100);
+			const discountedTotal = total - discount;
+
+			document.getElementById('couponDiscount').textContent = '-' + discount.toLocaleString('ja-JP') + '円';
+			document.getElementById('discountedTotal').textContent = discountedTotal.toLocaleString('ja-JP') + '円';
+
+			const usePointInput = document.getElementById('usePoint');
+			if (usePointInput) {
+				const usePoint = Number(usePointInput.value || 0);
+				const totalAfterPoint = Math.max(0, discountedTotal - usePoint);
+				document.getElementById('totalAfterPoint').textContent = totalAfterPoint.toLocaleString('ja-JP') + '円';
+			}
+		}
+	</script>
 </body>
 
 </html>
