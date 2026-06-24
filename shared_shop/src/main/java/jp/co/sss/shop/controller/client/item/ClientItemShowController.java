@@ -266,6 +266,7 @@ public class ClientItemShowController {
 				Constant.NOT_DELETED,
 				PageRequest.of(0, RELATED_ITEM_LIMIT));
 		List<ItemBean> relatedItemBeanList = beanTools.copyEntityListToItemBeanList(relatedItemList);
+		setReviewStats(relatedItemBeanList);
 		model.addAttribute("item", itemBean);
 		model.addAttribute("relatedItems", relatedItemBeanList);
 		model.addAttribute("recentlyViewedItems", Collections.emptyList());
@@ -301,6 +302,7 @@ public class ClientItemShowController {
 						PageRequest.of(0, 4));
 				List<ItemBean> recentlyViewedItemBeans = beanTools
 						.copyEntityListToItemBeanList(recentlyViewedItems);
+				setReviewStats(recentlyViewedItemBeans);
 				model.addAttribute("recentlyViewedItems", recentlyViewedItemBeans);
 			} catch (DataAccessException e) {
 				// 閲覧履歴の障害で商品詳細と関連商品まで表示不能にしない

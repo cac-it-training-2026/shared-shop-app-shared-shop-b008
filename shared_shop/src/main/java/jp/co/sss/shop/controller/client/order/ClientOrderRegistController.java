@@ -68,6 +68,10 @@ public class ClientOrderRegistController {
 	 */
 	private static final String ORDER_FORM = "orderForm";
 
+	private static final String ORDER_ADDRESS_ERROR = "orderAddressError";
+
+	private static final int DELIVERY_ADDRESS_LIMIT = 3;
+
 	private static final String[] ORDER_FORM_FIELD_ORDER = {
 			"postalCode", "address", "name", "phoneNumber", "deliveryDate"
 	};
@@ -184,11 +188,13 @@ public class ClientOrderRegistController {
 			if (address1 != null) {
 				orderForm.setDeliveryAddressId(address1.getId());
 				BeanUtils.copyProperties(address1, orderForm);
+				orderForm.setId(loginUser.getId());
 			} else {
 				// お届け先1がない場合は、リストの最初の要素を選択
 				DeliveryAddress firstAddress = addresses.get(0);
 				orderForm.setDeliveryAddressId(firstAddress.getId());
 				BeanUtils.copyProperties(firstAddress, orderForm);
+				orderForm.setId(loginUser.getId());
 			}
 
 			session.setAttribute(ORDER_FORM, orderForm);
@@ -228,6 +234,13 @@ public class ClientOrderRegistController {
 
 		List<DeliveryAddress> addresses = deliveryAddressRepository.findByUserIdOrderByAddressNo(loginUser.getId());
 		model.addAttribute("deliveryAddresses", addresses);
+		model.addAttribute("canAddDeliveryAddress", addresses.size() < DELIVERY_ADDRESS_LIMIT);
+		restoreOrderFormBindingResult(model);
+		String orderAddressError = (String) session.getAttribute(ORDER_ADDRESS_ERROR);
+		if (orderAddressError != null) {
+			model.addAttribute(ORDER_ADDRESS_ERROR, orderAddressError);
+			session.removeAttribute(ORDER_ADDRESS_ERROR);
+		}
 		model.addAttribute(ORDER_FORM, orderForm);
 		return "client/order/address_selection";
 	}
@@ -239,7 +252,7 @@ public class ClientOrderRegistController {
 	 * @return 支払方法選択画面表示処理へリダイレクト
 	 */
 	@RequestMapping(path = "/client/order/address/select", method = RequestMethod.POST)
-	public String addressSelectCheck(@RequestParam Integer deliveryAddressId) {
+	public String addressSelectCheck(@RequestParam Integer deliveryAddressId, @ModelAttribute OrderForm form) {
 		UserBean loginUser = (UserBean) session.getAttribute("user");
 		OrderForm orderForm = (OrderForm) session.getAttribute(ORDER_FORM);
 		if (loginUser == null || orderForm == null) {
@@ -251,9 +264,19 @@ public class ClientOrderRegistController {
 			return "redirect:/syserror";
 		}
 
+		orderForm.setDeliveryAddressId(deliveryAddressId);
+		orderForm.setDeliveryDate(form.getDeliveryDate());
+		BindingResult result = new BeanPropertyBindingResult(orderForm, ORDER_FORM);
+		validateDeliveryDate(orderForm, result);
+		if (result.hasErrors()) {
+			clearInvalidAddressFields(orderForm, result);
+			session.setAttribute(ORDER_FORM, orderForm);
+			session.setAttribute("result", createClearedRejectedValueResult(orderForm, result));
+			return "redirect:/client/order/address/select";
+		}
+
 		DeliveryAddress address = opt.get();
-		BeanUtils.copyProperties(address, orderForm);
-		orderForm.setDeliveryAddressId(address.getId());
+		copyDeliveryAddressToOrderForm(address, orderForm, loginUser.getId());
 
 		session.setAttribute(ORDER_FORM, orderForm);
 		return "redirect:/client/order/payment/input";
@@ -269,45 +292,76 @@ public class ClientOrderRegistController {
 	 */
 	@RequestMapping(path = "/client/order/address/input", method = RequestMethod.GET)
 	public String addressInput(Model model) {
+		UserBean loginUser = (UserBean) session.getAttribute("user");
 		OrderForm orderForm = (OrderForm) session.getAttribute(ORDER_FORM);
-		if (orderForm == null) {
+		if (loginUser == null || orderForm == null) {
 			return "redirect:/syserror";
+		}
+		long addressCount = deliveryAddressRepository.countByUserId(loginUser.getId());
+		if (addressCount >= DELIVERY_ADDRESS_LIMIT) {
+			session.setAttribute(ORDER_ADDRESS_ERROR, "お届け先は最大3件まで登録できます。登録済みのお届け先を選択してください。");
+			return "redirect:/client/order/address/select";
 		}
 
 		// POSTの入力チェックでエラーが発生した場合、PRG(Post-Redirect-Get)形式でこのGETメソッドへ戻ってくる。
 		// Redirectを挟むと通常のリクエストスコープのBindingResultは消えてしまうため、
 		// addressInputCheckメソッド側で一時的にセッションへ退避したエラー情報をここで取り出す。
-		BindingResult result = (BindingResult) session.getAttribute("result");
-		if (result != null) {
-			
-			// Thymeleaf/Springのフォームエラー表示が正しく動作するように、
-			// BindingResultを「org.springframework.validation.BindingResult.フォーム名」というキーでModelへ戻す。
-			// ここでは画面側のForm名がorderFormであるため、この固定形式のキーを使用している。
-			model.addAttribute("org.springframework.validation.BindingResult.orderForm", result);
-
-			// 一度Modelへ戻したエラー情報は再利用しない。
-			// 削除しないと、次回正常に画面を開いた場合でも古いエラーが表示される可能性がある。
-			session.removeAttribute("result");
+		if (!restoreOrderFormBindingResult(model)) {
+			User user = userRepository.findByIdAndDeleteFlag(loginUser.getId(), Constant.NOT_DELETED);
+			if (user == null) {
+				return "redirect:/syserror";
+			}
+			OrderForm newAddressForm = new OrderForm();
+			BeanUtils.copyProperties(user, newAddressForm);
+			newAddressForm.setId(loginUser.getId());
+			newAddressForm.setPayMethod(orderForm.getPayMethod());
+			newAddressForm.setDeliveryDate(orderForm.getDeliveryDate());
+			orderForm = newAddressForm;
+			session.setAttribute(ORDER_FORM, orderForm);
 		}
 
 		// 画面の入力欄に現在の注文フォーム情報を表示するため、OrderFormをModelへ設定する。
+		model.addAttribute("isAddressEdit", false);
 		model.addAttribute(ORDER_FORM, orderForm);
 		return "client/order/address_input";
 	}
 
+	@RequestMapping(path = "/client/order/address/update/input", method = RequestMethod.GET)
+	public String addressUpdateInput(@RequestParam Integer deliveryAddressId, Model model) {
+		UserBean loginUser = (UserBean) session.getAttribute("user");
+		OrderForm currentOrderForm = (OrderForm) session.getAttribute(ORDER_FORM);
+		if (loginUser == null || currentOrderForm == null) {
+			return "redirect:/syserror";
+		}
+
+		Optional<DeliveryAddress> opt = deliveryAddressRepository.findByIdAndUserId(deliveryAddressId, loginUser.getId());
+		if (opt.isEmpty()) {
+			return "redirect:/syserror";
+		}
+
+		OrderForm editForm = new OrderForm();
+		editForm.setPayMethod(currentOrderForm.getPayMethod());
+		editForm.setDeliveryDate(currentOrderForm.getDeliveryDate());
+		copyDeliveryAddressToOrderForm(opt.get(), editForm, loginUser.getId());
+		model.addAttribute("isAddressEdit", true);
+		model.addAttribute(ORDER_FORM, editForm);
+		return "client/order/address_input";
+	}
+
 	/**
-	 * 届け先入力値をチェックし、支払方法選択画面へ遷移します。
+	 * 届け先入力値をチェックし、保存済み届け先へ追加します。
 	 *
 	 * @author シュエ ジーハン
 	 * @param form 注文入力フォーム
 	 * @param result 入力チェック結果
-	 * @return 入力エラーあり: "redirect:/client/order/address/input"
-	 * 					なし: "redirect:/client/order/payment/input"
+	 * @return 入力エラーあり: "client/order/address/input"
+	 * 					なし: "redirect:/client/order/address/select"
 	 */
-	@RequestMapping(path = "/client/order/payment/input", method = RequestMethod.POST)
-	public String addressInputCheck(@Valid @ModelAttribute OrderForm form, BindingResult result) {
+	@RequestMapping(path = "/client/order/address/regist", method = RequestMethod.POST)
+	public String addressInputCheck(@Valid @ModelAttribute OrderForm form, BindingResult result, Model model) {
+		UserBean loginUser = (UserBean) session.getAttribute("user");
 		OrderForm lastOrderForm = (OrderForm) session.getAttribute(ORDER_FORM);
-		if (lastOrderForm == null) {
+		if (loginUser == null || lastOrderForm == null) {
 			return "redirect:/syserror";
 		}
 		
@@ -321,45 +375,60 @@ public class ClientOrderRegistController {
 			form.setPayMethod(lastOrderForm.getPayMethod());
 		}
 
-		// 配送希望日のバリデーション
-		if (form.getDeliveryDate() != null && !form.getDeliveryDate().isEmpty()) {
-			try {
-				java.time.LocalDate deliveryDate = java.time.LocalDate.parse(form.getDeliveryDate());
-				java.time.LocalDate today = java.time.LocalDate.now();
-				java.time.LocalDate minDate = today.plusDays(3);
-				java.time.LocalDate maxDate = today.plusDays(14);
+		if (result.hasErrors()) {
+			clearInvalidAddressFields(form, result);
+			model.addAttribute("isAddressEdit", false);
+			model.addAttribute(ORDER_FORM, form);
+			return "client/order/address_input";
+		}
 
-				if (deliveryDate.isBefore(minDate) || deliveryDate.isAfter(maxDate)) {
-					result.rejectValue("deliveryDate", "orderForm.deliveryDate.invalid");
-				}
-			} catch (java.time.format.DateTimeParseException e) {
-				// 形式エラーは @Pattern でチェックしているため、ここでは何もしない、
-				// または確実にエラーにする
-				if (!result.hasFieldErrors("deliveryDate")) {
-					result.rejectValue("deliveryDate", "orderForm.deliveryDate.invalid_format");
-				}
-			}
+		if (deliveryAddressRepository.countByUserId(loginUser.getId()) >= DELIVERY_ADDRESS_LIMIT) {
+			session.setAttribute(ORDER_ADDRESS_ERROR, "お届け先は最大3件まで登録できます。登録済みのお届け先を選択してください。");
+			return "redirect:/client/order/address/select";
+		}
+
+		User user = userRepository.findByIdAndDeleteFlag(loginUser.getId(), Constant.NOT_DELETED);
+		if (user == null) {
+			return "redirect:/syserror";
+		}
+		DeliveryAddress address = new DeliveryAddress();
+		address.setUser(user);
+		address.setAddressNo(nextAddressNo(loginUser.getId()));
+		copyOrderFormToDeliveryAddress(form, address);
+		deliveryAddressRepository.save(address);
+
+		copyDeliveryAddressToOrderForm(address, lastOrderForm, loginUser.getId());
+		session.setAttribute(ORDER_FORM, lastOrderForm);
+		return "redirect:/client/order/address/select";
+	}
+
+	@RequestMapping(path = "/client/order/address/update", method = RequestMethod.POST)
+	public String addressUpdateCheck(@Valid @ModelAttribute OrderForm form, BindingResult result, Model model) {
+		UserBean loginUser = (UserBean) session.getAttribute("user");
+		OrderForm currentOrderForm = (OrderForm) session.getAttribute(ORDER_FORM);
+		if (loginUser == null || currentOrderForm == null || form.getDeliveryAddressId() == null) {
+			return "redirect:/syserror";
 		}
 
 		if (result.hasErrors()) {
 			clearInvalidAddressFields(form, result);
-			session.setAttribute(ORDER_FORM, form);
-			
-			// 入力エラーがある場合は、エラー情報をセッションへ一時退避する。
-			// Redirect先のGETメソッド(addressInput)でこのBindingResultをModelへ戻すことで、
-			// 入力画面にエラーメッセージを表示できる。
-			session.setAttribute("result", createClearedRejectedValueResult(form, result));
-			return "redirect:/client/order/address/input";
+			model.addAttribute("isAddressEdit", true);
+			model.addAttribute(ORDER_FORM, form);
+			return "client/order/address_input";
 		}
-		
-		// 入力チェック結果に関係なく、ユーザーが入力した最新の届け先情報を一度セッションへ保存する。
-		// これにより、エラーで入力画面に戻った場合でも、入力済みの値を画面に再表示できる。
 
-		// 新規入力の場合は deliveryAddressId をクリアする
-		form.setDeliveryAddressId(null);
+		Optional<DeliveryAddress> opt = deliveryAddressRepository.findByIdAndUserId(
+				form.getDeliveryAddressId(), loginUser.getId());
+		if (opt.isEmpty()) {
+			return "redirect:/syserror";
+		}
+		DeliveryAddress address = opt.get();
+		copyOrderFormToDeliveryAddress(form, address);
+		deliveryAddressRepository.save(address);
 
-		session.setAttribute(ORDER_FORM, form);
-		return "redirect:/client/order/payment/input";
+		copyDeliveryAddressToOrderForm(address, currentOrderForm, loginUser.getId());
+		session.setAttribute(ORDER_FORM, currentOrderForm);
+		return "redirect:/client/order/address/select";
 	}
 
 	/**
@@ -581,8 +650,12 @@ public class ClientOrderRegistController {
 	@RequestMapping(path = "/client/order/payment/back", method = RequestMethod.POST)
 	public String paymentBack() {
 		
-		// 設計書の戻り先に従い、届け先入力画面表示処理へリダイレクトする。
-		return "redirect:/client/order/address/input";
+		return "redirect:/client/order/address/select";
+	}
+
+	@RequestMapping(path = "/client/order/check/back", method = RequestMethod.POST)
+	public String checkBack() {
+		return "redirect:/client/order/payment/input";
 	}
 
 	/**
@@ -842,6 +915,69 @@ public class ClientOrderRegistController {
 
 	private Timestamp currentTimestamp() {
 		return Timestamp.valueOf(LocalDateTime.now(JAPAN_ZONE));
+	}
+
+	private boolean restoreOrderFormBindingResult(Model model) {
+		BindingResult result = (BindingResult) session.getAttribute("result");
+		if (result == null) {
+			return false;
+		}
+		model.addAttribute("org.springframework.validation.BindingResult.orderForm", result);
+		session.removeAttribute("result");
+		return true;
+	}
+
+	private void validateDeliveryDate(OrderForm form, BindingResult result) {
+		if (form.getDeliveryDate() == null || form.getDeliveryDate().isEmpty()) {
+			return;
+		}
+		if (!form.getDeliveryDate().matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}$")) {
+			result.rejectValue("deliveryDate", "orderForm.deliveryDate.invalid_format");
+			return;
+		}
+		try {
+			java.time.LocalDate deliveryDate = java.time.LocalDate.parse(form.getDeliveryDate());
+			java.time.LocalDate today = java.time.LocalDate.now();
+			java.time.LocalDate minDate = today.plusDays(3);
+			java.time.LocalDate maxDate = today.plusDays(14);
+			if (deliveryDate.isBefore(minDate) || deliveryDate.isAfter(maxDate)) {
+				result.rejectValue("deliveryDate", "orderForm.deliveryDate.invalid");
+			}
+		} catch (java.time.format.DateTimeParseException e) {
+			result.rejectValue("deliveryDate", "orderForm.deliveryDate.invalid_format");
+		}
+	}
+
+	private void copyDeliveryAddressToOrderForm(DeliveryAddress address, OrderForm orderForm, Integer userId) {
+		String deliveryDate = orderForm.getDeliveryDate();
+		Integer payMethod = orderForm.getPayMethod();
+		Integer couponId = orderForm.getCouponId();
+		Integer usePoint = orderForm.getUsePoint();
+		BeanUtils.copyProperties(address, orderForm);
+		orderForm.setId(userId);
+		orderForm.setDeliveryAddressId(address.getId());
+		orderForm.setDeliveryDate(deliveryDate);
+		orderForm.setPayMethod(payMethod);
+		orderForm.setCouponId(couponId);
+		orderForm.setUsePoint(usePoint);
+	}
+
+	private void copyOrderFormToDeliveryAddress(OrderForm form, DeliveryAddress address) {
+		address.setPostalCode(form.getPostalCode());
+		address.setAddress(form.getAddress());
+		address.setName(form.getName());
+		address.setPhoneNumber(form.getPhoneNumber());
+	}
+
+	private Integer nextAddressNo(Integer userId) {
+		List<DeliveryAddress> addresses = deliveryAddressRepository.findByUserIdOrderByAddressNo(userId);
+		int maxAddressNo = 0;
+		for (DeliveryAddress address : addresses) {
+			if (address.getAddressNo() != null && address.getAddressNo() > maxAddressNo) {
+				maxAddressNo = address.getAddressNo();
+			}
+		}
+		return maxAddressNo + 1;
 	}
 
 	private void clearInvalidAddressFields(OrderForm form, BindingResult result) {

@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/shared-shop-app-shared-shop-b008.iml" filepath="$PROJECT_DIR$/.idea/shared-shop-app-shared-shop-b008.iml" />
-      <module fileurl="file://$PROJECT_DIR$/shared_shop/shared_shop_name.iml" filepath="$PROJECT_DIR$/shared_shop/shared_shop_name.iml" />
     </modules>
   </component>
 </project>

@@ -4158,3 +4158,283 @@ body.admin .review_rating_status {
 		margin-left: 0;
 	}
 }
+
+/* ---- Final product card overrides ---- */
+body.user .main .product_card_list,
+body.admin .main .product_card_list {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: 22px;
+	margin-top: 22px;
+}
+
+body.user .main .related_item_list.product_card_list,
+body.admin .main .related_item_list.product_card_list {
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+body.user .main .product_card_list .product_card,
+body.admin .main .product_card_list .product_card {
+	width: auto;
+	height: auto;
+	min-width: 0;
+	margin: 0;
+	overflow: hidden;
+}
+
+body.user .main .product_card_list .product_card:nth-of-type(odd),
+body.admin .main .product_card_list .product_card:nth-of-type(odd) {
+	margin-right: 0;
+}
+
+body.user .main .product_card_link,
+body.admin .main .product_card_link {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	color: inherit;
+	text-decoration: none;
+}
+
+body.user .main .product_card_image,
+body.admin .main .product_card_image {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	aspect-ratio: 1 / 1;
+	padding: 14px;
+	background:
+		linear-gradient(180deg, rgba(255, 253, 244, 0.95), rgba(247, 239, 214, 0.88));
+	box-sizing: border-box;
+	overflow: hidden;
+}
+
+body.user .main .product_card_image img,
+body.admin .main .product_card_image img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	max-width: 100%;
+	max-height: 100%;
+	margin: 0;
+	object-fit: contain;
+	position: static;
+	transition: transform 180ms ease;
+}
+
+body.user .main .product_card:hover .product_card_image img,
+body.admin .main .product_card:hover .product_card_image img {
+	transform: scale(1.025);
+}
+
+body.user .main .product_card_body,
+body.admin .main .product_card_body {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	flex: 1;
+	padding: 14px 16px 16px;
+	border-top: 1px solid rgba(183, 168, 117, 0.34);
+	background: rgba(255, 250, 235, 0.92);
+}
+
+body.user .main .product_card .product_card_name,
+body.admin .main .product_card .product_card_name {
+	display: -webkit-box;
+	position: static;
+	top: auto;
+	left: auto;
+	width: auto;
+	min-height: 2.8em;
+	padding: 0 0 8px;
+	background: transparent;
+	z-index: auto;
+	overflow: hidden;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	color: var(--witch-green-deep);
+	font-size: 1rem;
+	line-height: 1.4;
+	overflow-wrap: anywhere;
+}
+
+body.user .main .product_card .product_card_review,
+body.admin .main .product_card .product_card_review {
+	margin-top: 0;
+	min-height: 1.3em;
+}
+
+body.user .main .product_card .product_card_price,
+body.admin .main .product_card .product_card_price {
+	margin-top: auto;
+	color: var(--witch-text);
+	font-size: 1.08rem;
+	font-weight: 800;
+}
+
+body.user .main .recently_viewed_items,
+body.admin .main .recently_viewed_items {
+	margin-top: 64px;
+}
+
+body.user .main .title,
+body.admin .main .title,
+body.user .content .title,
+body.admin .content .title,
+body.user .page_title,
+body.admin .page_title {
+	width: min(300px, 74%);
+	margin-bottom: 22px;
+	padding: 10px 22px;
+	font-size: 1.48rem;
+}
+
+body.user .main .related_items_title,
+body.admin .main .related_items_title,
+body.user .main .review_area > .title,
+body.admin .main .review_area > .title {
+	width: min(300px, 74%);
+	margin: 0 auto 18px;
+	padding: 10px 22px;
+	border: 1px solid #9a8f56;
+	border-radius: 8px;
+	background: linear-gradient(180deg, var(--witch-green), var(--witch-green-deep));
+	box-shadow:
+		inset 0 0 0 2px rgba(225, 208, 120, 0.28),
+		0 4px 8px rgba(40, 30, 10, 0.18);
+	color: #fff8df;
+	font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+	font-size: 1.48rem;
+	font-weight: 700;
+	text-align: center;
+	text-shadow: 0 1px 1px rgba(20, 30, 12, 0.7);
+}
+
+body.user .main .review_area > .title,
+body.admin .main .review_area > .title {
+	color: #fff8df;
+}
+
+@media screen and (max-width: 768px) {
+	body.user .main .related_item_list.product_card_list,
+	body.admin .main .related_item_list.product_card_list {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media screen and (max-width: 520px) {
+	body.user .main .product_card_list,
+	body.admin .main .product_card_list,
+	body.user .main .related_item_list.product_card_list,
+	body.admin .main .related_item_list.product_card_list {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* Order address flow refinements */
+.address_select_row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+}
+
+.address_select_row label {
+	flex: 1;
+}
+
+.address_edit_button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 64px;
+	padding: 6px 12px;
+	border: 1px solid #b49f56;
+	border-radius: 6px;
+	background: #fff8dc;
+	color: #244c2b;
+	font-weight: 700;
+	text-decoration: none;
+}
+
+.order_address_message,
+.point_error_top {
+	width: min(720px, 92%);
+	margin: 12px auto 18px;
+	padding: 12px 16px;
+	border: 2px solid #b44b32;
+	border-radius: 8px;
+	background: #fff3ed;
+	color: #a12f1c;
+	font-weight: 800;
+	text-align: center;
+}
+
+.order_delivery_date_area {
+	margin: 22px 0;
+	padding: 16px;
+	border: 1px solid #d8c984;
+	border-radius: 8px;
+	background: rgba(255, 252, 232, 0.8);
+}
+
+.order_delivery_date_area input[type="date"] {
+	max-width: 220px;
+}
+
+/* Client order list status readability */
+body.user .list_table.order th:nth-child(2),
+body.user .list_table.order td.order_status_cell {
+	width: 92px;
+	min-width: 92px;
+	white-space: nowrap;
+	overflow-wrap: normal;
+	word-break: keep-all;
+}
+
+body.user .list_table.order td.order_status_cell {
+	padding-left: 8px;
+	padding-right: 8px;
+}
+
+.order_status_badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 68px;
+	padding: 4px 8px;
+	border-radius: 999px;
+	font-size: 0.92rem;
+	font-weight: 800;
+	line-height: 1;
+	white-space: nowrap;
+}
+
+.order_status_active {
+	border: 1px solid rgba(70, 115, 49, 0.38);
+	background: #edf5dc;
+	color: #2f5b2c;
+}
+
+body.user .list_table.order tr.order_canceled_row td {
+	background: rgba(178, 83, 63, 0.13);
+	color: #6f5f5a;
+}
+
+body.user .list_table.order tr.order_canceled_row td:first-child {
+	border-left: 5px solid #b2533f;
+}
+
+body.user .list_table.order tr.order_canceled_row a {
+	color: #7d3b2e;
+}
+
+body.user .list_table.order tr.order_canceled_row:hover td {
+	background: rgba(178, 83, 63, 0.2);
+}
+
+.order_status_canceled {
+	border: 1px solid rgba(178, 83, 63, 0.42);
+	background: #f7ddd6;
+	color: #93402f;
+}

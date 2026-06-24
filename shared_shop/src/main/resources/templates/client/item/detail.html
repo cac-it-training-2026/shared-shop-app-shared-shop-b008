@@ -92,42 +92,63 @@
 	<section class="related_items"
 		th:if="${relatedItems != null and !#lists.isEmpty(relatedItems)}">
 		<h3 class="related_items_title" th:text="#{title.related.items}"></h3>
-		<div class="related_item_list">
-			<article class="related_item" th:each="relatedItem : ${relatedItems}">
-				<a class="related_item_image"
-					th:href="@{/client/item/detail/{id}(id=${relatedItem.id})}">
-					<img th:if="${relatedItem.image != null and !#strings.isEmpty(relatedItem.image)}"
-						th:src="@{/images/{image}(image=${relatedItem.image})}"
-						th:alt="${relatedItem.name}">
-					<img th:if="${relatedItem.image == null or #strings.isEmpty(relatedItem.image)}"
-						th:src="@{/images/common/no_image.jpg}"
-						th:alt="${relatedItem.name}">
+		<div class="related_item_list product_card_list">
+			<article class="related_item product_card" th:each="relatedItem : ${relatedItems}">
+				<a class="product_card_link" th:href="@{/client/item/detail/{id}(id=${relatedItem.id})}">
+					<span class="product_card_image">
+						<img th:if="${relatedItem.image != null and !#strings.isEmpty(relatedItem.image)}"
+							th:src="@{/images/{image}(image=${relatedItem.image})}"
+							th:alt="${relatedItem.name}">
+						<img th:if="${relatedItem.image == null or #strings.isEmpty(relatedItem.image)}"
+							th:src="@{/images/common/no_image.jpg}"
+							th:alt="${relatedItem.name}">
+					</span>
+					<span class="product_card_body">
+						<span class="related_item_name product_card_name" th:text="${relatedItem.name}"></span>
+						<span class="item_review product_card_review">
+							<th:block th:if="${relatedItem.reviewCount > 0}">
+								<span class="star_rating">★</span>
+								<span class="rating_value" th:text="${#numbers.formatDecimal(relatedItem.avgRating, 1, 1)}"></span>
+								<span class="review_count" th:text="'(' + ${relatedItem.reviewCount} + ')'"></span>
+							</th:block>
+							<th:block th:unless="${relatedItem.reviewCount > 0}">
+								<span class="no_review">評価なし</span>
+							</th:block>
+						</span>
+						<span class="related_item_price product_card_price" th:text="'¥' + ${#numbers.formatDecimal(relatedItem.price, 1, 'COMMA', 0, 'POINT')}"></span>
+					</span>
 				</a>
-				<div class="related_item_info">
-					<a class="related_item_name"
-						th:href="@{/client/item/detail/{id}(id=${relatedItem.id})}"
-						th:text="${relatedItem.name}"></a>
-					<p class="related_item_price">
-						<span th:text="#{data.item.price}"></span>：
-						<span th:text="${relatedItem.price}"></span>
-					</p>
-				</div>
 			</article>
 		</div>
 	</section>
 	<!-- 最近見た商品 -->
-	<th:block th:if="${recentlyViewedItems != null and not #lists.isEmpty(recentlyViewedItems)}">
+	<section class="recently_viewed_items" th:if="${recentlyViewedItems != null and not #lists.isEmpty(recentlyViewedItems)}">
 		<h2 class="title">最近見た商品</h2>
-		<div class="item_list">
-			<div class="item" th:each="rvItem : ${recentlyViewedItems}">
-				<a th:href="@{/client/item/detail/{id}(id=${rvItem.id})}">
-					<img th:if="${rvItem.image != null}" th:src="@{/images/{image}(image=${rvItem.image})}" />
-					<img th:if="${rvItem.image == null}" th:src="@{/images/common/no_image.jpg}" />
-					<span class="item_name" th:text="${rvItem.name}"></span>
+		<div class="item_list product_card_list">
+			<article class="item product_card" th:each="rvItem : ${recentlyViewedItems}">
+				<a class="product_card_link" th:href="@{/client/item/detail/{id}(id=${rvItem.id})}">
+					<span class="product_card_image">
+						<img th:if="${rvItem.image != null}" th:src="@{/images/{image}(image=${rvItem.image})}" th:alt="${rvItem.name}" />
+						<img th:if="${rvItem.image == null}" th:src="@{/images/common/no_image.jpg}" th:alt="${rvItem.name}" />
+					</span>
+					<span class="product_card_body">
+						<span class="item_name product_card_name" th:text="${rvItem.name}"></span>
+						<span class="item_review product_card_review">
+							<th:block th:if="${rvItem.reviewCount > 0}">
+								<span class="star_rating">★</span>
+								<span class="rating_value" th:text="${#numbers.formatDecimal(rvItem.avgRating, 1, 1)}"></span>
+								<span class="review_count" th:text="'(' + ${rvItem.reviewCount} + ')'"></span>
+							</th:block>
+							<th:block th:unless="${rvItem.reviewCount > 0}">
+								<span class="no_review">評価なし</span>
+							</th:block>
+						</span>
+						<span class="item_price product_card_price" th:text="'¥' + ${#numbers.formatDecimal(rvItem.price, 1, 'COMMA', 0, 'POINT')}"></span>
+					</span>
 				</a>
-			</div>
+			</article>
 		</div>
-	</th:block>
+	</section>
 
 </body>
 
