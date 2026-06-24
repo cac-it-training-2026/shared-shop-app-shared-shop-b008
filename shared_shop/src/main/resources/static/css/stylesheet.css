@@ -717,3 +717,65 @@ p.link_center {
 }
 
 
+
+/* ---- 商品カード内情報(トップ画面) ---- */
+.item_info_top {
+    padding: 5px 10px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(255, 255, 255, 0.85);
+    z-index: 2;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.item .item_name {
+    position: static; /* absolute解除 */
+    padding: 0;
+    background: none;
+    width: auto;
+    font-size: 1.05em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.item_review {
+    font-size: 0.85em;
+    color: #555;
+    display: flex;
+    align-items: center;
+}
+
+.star_rating {
+    color: #ffa500; /* より鮮やかなオレンジ */
+    font-weight: bold;
+    margin-right: 4px;
+    font-size: 1.1em;
+}
+
+.rating_value {
+    font-weight: bold;
+    color: #333;
+}
+
+.review_count {
+    color: #777;
+    margin-left: 4px;
+    font-size: 0.9em;
+}
+
+.no_review {
+    color: #999;
+    font-size: 0.9em;
+}
+
+.item_price {
+    font-weight: bold;
+    color: #d32f2f; /* ECサイトらしい赤系の価格表示 */
+    font-size: 1.1em;
+}

@@ -66,7 +66,7 @@
 				<div class="review_header">
 					<span class="review_rating" th:text="${'★' + review.rating}"></span>
 					<span class="review_user" th:text="${review.userName}"></span>
-					<span class="review_date" th:text="${review.insertDate}"></span>
+					<span class="review_date" th:text="${#strings.substring(review.insertDate, 0, 10)}"></span>
 				</div>
 				<div class="review_comment">
 					<p th:text="${review.reviewComment}"></p>

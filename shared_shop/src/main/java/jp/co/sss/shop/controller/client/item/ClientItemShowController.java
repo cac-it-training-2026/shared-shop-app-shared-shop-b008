@@ -21,6 +21,8 @@ import jp.co.sss.shop.entity.Review;
 import jp.co.sss.shop.repository.CategoryRepository;
 import jp.co.sss.shop.repository.ItemRepository;
 import jp.co.sss.shop.repository.ReviewRepository;
+import java.util.Map;
+import java.util.stream.Collectors;
 import jp.co.sss.shop.service.BeanTools;
 import jp.co.sss.shop.util.Constant;
 
@@ -79,6 +81,24 @@ public class ClientItemShowController {
 
 		// エンティティ内の検索結果をJavaBeansにコピー
 		List<ItemBean> itemBeanList = beanTools.copyEntityListToItemBeanList(itemList);
+
+		// 各商品のレビュー統計情報を一括取得してセット
+		if (!itemBeanList.isEmpty()) {
+			List<Integer> itemIds = itemBeanList.stream().map(ItemBean::getId).collect(Collectors.toList());
+			List<Object[]> stats = reviewRepository.findReviewStatsByItemIds(itemIds);
+			Map<Integer, Object[]> statsMap = stats.stream().collect(Collectors.toMap(s -> (Integer) s[0], s -> s));
+
+			for (ItemBean itemBean : itemBeanList) {
+				Object[] stat = statsMap.get(itemBean.getId());
+				if (stat != null) {
+					itemBean.setAvgRating((Double) stat[1]);
+					itemBean.setReviewCount((Long) stat[2]);
+				} else {
+					itemBean.setAvgRating(0.0);
+					itemBean.setReviewCount(0L);
+				}
+			}
+		}
 
 		// 商品情報をViewへ渡す
 		model.addAttribute("items", itemBeanList);
