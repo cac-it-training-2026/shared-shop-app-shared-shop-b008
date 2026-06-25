@@ -156,6 +156,20 @@ a {
 	transition: transform 0.2s ease, color 0.2s ease, filter 0.2s ease;
 }
 
+.forest-button svg {
+	width: 20px;
+	height: 20px;
+	margin-right: 7px;
+	fill: currentColor;
+	flex: 0 0 auto;
+	filter: drop-shadow(0 1px 0 rgba(255, 250, 220, 0.65));
+}
+
+.github-button {
+	min-width: 128px;
+	gap: 0;
+}
+
 .site-nav a:hover,
 .site-nav a.is-active,
 .forest-button.primary,
