@@ -17,6 +17,8 @@ import jp.co.sss.shop.bean.OrderBean;
 import jp.co.sss.shop.bean.OrderItemBean;
 import jp.co.sss.shop.bean.UserBean;
 import jp.co.sss.shop.entity.Order;
+import jp.co.sss.shop.entity.OrderItem;
+import jp.co.sss.shop.repository.ItemRepository;
 import jp.co.sss.shop.repository.OrderRepository;
 import jp.co.sss.shop.service.BeanTools;
 import jp.co.sss.shop.service.PriceCalc;
@@ -36,6 +38,12 @@ public class ClientOrderShowController {
 	 */
 	@Autowired
 	OrderRepository orderRepository;
+
+	/**
+	 * 商品情報リポジトリ
+	 */
+	@Autowired
+	ItemRepository itemRepository;
 
 	/**
 	 * Entity、Form、Bean間のデータコピーサービス
@@ -148,9 +156,26 @@ public class ClientOrderShowController {
 		if (!ORDER_CANCELED.equals(order.getCancelFlag())) {
 			order.setCancelFlag(ORDER_CANCELED);
 			order.setCancelDate(new Date(System.currentTimeMillis()));
+			restoreItemStock(order);
 			orderRepository.save(order);
 		}
 		return "redirect:/client/order/cancel/complete";
+	}
+
+	private void restoreItemStock(Order order) {
+		if (order.getOrderItemsList() == null) {
+			return;
+		}
+		for (OrderItem orderItem : order.getOrderItemsList()) {
+			if (orderItem.getItem() == null || orderItem.getItem().getId() == null || orderItem.getQuantity() == null) {
+				continue;
+			}
+			itemRepository.findById(orderItem.getItem().getId()).ifPresent(item -> {
+				Integer currentStock = item.getStock() == null ? 0 : item.getStock();
+				item.setStock(currentStock + orderItem.getQuantity());
+				itemRepository.save(item);
+			});
+		}
 	}
 
 	@RequestMapping(path = "/client/order/cancel/complete", method = RequestMethod.GET)
