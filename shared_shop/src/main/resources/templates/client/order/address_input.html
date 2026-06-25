@@ -10,9 +10,10 @@
 
 <body class="user order_address_input">
 	<h2 th:class="title" th:text="#{title.order.address.input}"></h2>
-	<p th:class="input_message" th:text="#{msg.order.address.input}"></p>
+	<p th:class="input_message" th:text="${isAddressEdit} ? 'お届け先情報を編集してください。' : #{msg.order.address.input}"></p>
 	<div class="user_info_form_area">
-		<form th:action="@{/client/order/payment/input}" method="post" th:object="${orderForm}">
+		<form th:action="${isAddressEdit} ? @{/client/order/address/update} : @{/client/order/address/regist}"
+			method="post" th:object="${orderForm}">
 			<th:block th:if="${#fields.hasErrors()}">
 				<ul class="error_list">
 					<li th:each="err:${#fields.detailedErrors()}" th:text="${err.message}"></li>
@@ -37,20 +38,14 @@
 					<label><span class="input_title">[[#{orderForm.phoneNumber}]]</span></label>
 					<input type="text" th:field="*{phoneNumber}" />
 				</li>
-				<li>
-					<label><span class="input_title">[[#{data.delivery.date}]]</span></label>
-					<input type="date" th:field="*{deliveryDate}" />
-					<p th:text="#{msg.order.delivery.date.hint}"></p>
-					<ul th:if="${#fields.hasErrors('deliveryDate')}" class="error_list">
-						<li th:each="err : ${#fields.errors('deliveryDate')}" th:text="${err}"></li>
-					</ul>
-				</li>
 			</ul>
 			<input type="hidden" th:field="*{id}" />
 			<input type="hidden" th:field="*{payMethod}" />
-			<input type="submit" value="次へ" class="send_button" />
+			<input type="hidden" th:field="*{deliveryAddressId}" />
+			<input type="submit" th:value="${isAddressEdit} ? '更新してお届け先選択へ戻る' : '保存してお届け先選択へ戻る'"
+				class="send_button" />
 		</form>
-		<form th:action="@{/client/basket/list}" method="post">
+		<form th:action="@{/client/order/address/select}" method="get">
 			<input type="submit" value="戻る" class="back_button" />
 		</form>
 	</div>

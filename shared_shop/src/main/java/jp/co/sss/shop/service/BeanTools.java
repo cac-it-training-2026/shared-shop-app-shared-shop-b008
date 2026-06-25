@@ -114,6 +114,12 @@ public class BeanTools {
 		if (entity.getDeliveryDate() != null) {
 			bean.setDeliveryDate(entity.getDeliveryDate().toString());
 		}
+		if (entity.getCancelDate() != null) {
+			bean.setCancelDate(entity.getCancelDate().toString());
+		}
+
+		bean.setUsePoint(entity.getUsePoint());
+		bean.setEarnedPoint(entity.getEarnedPoint());
 
 		return bean;
 	}
@@ -209,6 +215,7 @@ public class BeanTools {
 		for (OrderItem orderItem : orderItemList) {
 			OrderItemBean orderItemBean = new OrderItemBean();
 
+			orderItemBean.setId(orderItem.getId());
 			orderItemBean.setName(orderItem.getItem().getName());
 			orderItemBean.setPrice(orderItem.getPrice());
 			orderItemBean.setOrderNum(orderItem.getQuantity());

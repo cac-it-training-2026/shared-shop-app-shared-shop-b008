@@ -31,7 +31,9 @@ import jp.co.sss.shop.entity.Category;
 import jp.co.sss.shop.entity.Item;
 import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.entity.ViewHistory;
+import jp.co.sss.shop.repository.FavoriteRepository;
 import jp.co.sss.shop.repository.ItemRepository;
+import jp.co.sss.shop.repository.ReviewRepository;
 import jp.co.sss.shop.repository.ViewHistoryRepository;
 import jp.co.sss.shop.service.BeanTools;
 import jp.co.sss.shop.util.Constant;
@@ -46,6 +48,12 @@ private ItemRepository itemRepository;
 
 @Mock
 private ViewHistoryRepository viewHistoryRepository;
+
+@Mock
+private FavoriteRepository favoriteRepository;
+
+@Mock
+private ReviewRepository reviewRepository;
 
 @Mock
 private BeanTools beanTools;
@@ -73,6 +81,7 @@ loginUser.setId(10);
 session.setAttribute("user", loginUser);
 
 when(itemRepository.findByIdAndDeleteFlag(1, Constant.NOT_DELETED)).thenReturn(item);
+when(favoriteRepository.existsByUserIdAndItemId(anyInt(), anyInt())).thenReturn(false);
 when(viewHistoryRepository.findByUserAndItem(any(User.class), eq(item))).thenReturn(null);
 when(viewHistoryRepository.findItemsByUser(any(User.class), eq(item), eq(PageRequest.of(0, 4))))
 .thenReturn(recentItems);
@@ -94,6 +103,7 @@ void showItemDoesNotRecordHistoryWhenNotLoggedIn() {
 Item item = createItem(1, 3);
 
 when(itemRepository.findByIdAndDeleteFlag(1, Constant.NOT_DELETED)).thenReturn(item);
+when(favoriteRepository.existsByUserIdAndItemId(anyInt(), anyInt())).thenReturn(false);
 when(itemRepository.findRelatedItems(3, 1, Constant.NOT_DELETED, PageRequest.of(0, 4)))
 .thenReturn(Collections.emptyList());
 when(beanTools.copyEntityToItemBean(item)).thenReturn(new ItemBean());
@@ -119,6 +129,7 @@ loginUser.setId(10);
 session.setAttribute("user", loginUser);
 
 when(itemRepository.findByIdAndDeleteFlag(1, Constant.NOT_DELETED)).thenReturn(item);
+when(favoriteRepository.existsByUserIdAndItemId(anyInt(), anyInt())).thenReturn(false);
 when(itemRepository.findRelatedItems(3, 1, Constant.NOT_DELETED, PageRequest.of(0, 4)))
 .thenReturn(relatedItems);
 when(beanTools.copyEntityToItemBean(item)).thenReturn(new ItemBean());
@@ -139,6 +150,7 @@ Item item = createItem(10, 3);
 ItemBean itemBean = new ItemBean();
 
 when(itemRepository.findByIdAndDeleteFlag(10, Constant.NOT_DELETED)).thenReturn(item);
+when(favoriteRepository.existsByUserIdAndItemId(anyInt(), anyInt())).thenReturn(false);
 when(itemRepository.findRelatedItems(3, 10, Constant.NOT_DELETED, PageRequest.of(0, 4)))
 .thenReturn(Collections.emptyList());
 when(beanTools.copyEntityToItemBean(item)).thenReturn(itemBean);

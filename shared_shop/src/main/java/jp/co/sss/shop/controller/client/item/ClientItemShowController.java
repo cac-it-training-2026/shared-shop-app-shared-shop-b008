@@ -2,8 +2,11 @@ package jp.co.sss.shop.controller.client.item;
 
 import java.net.URI;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,12 +23,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jp.co.sss.shop.bean.ItemBean;
+import jp.co.sss.shop.bean.ReviewBean;
 import jp.co.sss.shop.bean.UserBean;
 import jp.co.sss.shop.entity.Item;
+import jp.co.sss.shop.entity.Review;
 import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.entity.ViewHistory;
 import jp.co.sss.shop.repository.CategoryRepository;
+import jp.co.sss.shop.repository.FavoriteRepository;
 import jp.co.sss.shop.repository.ItemRepository;
+import jp.co.sss.shop.repository.ReviewRepository;
 import jp.co.sss.shop.repository.ViewHistoryRepository;
 import jp.co.sss.shop.service.BeanTools;
 import jp.co.sss.shop.util.Constant;
@@ -66,6 +73,9 @@ public class ClientItemShowController {
 	@Autowired
 	BeanTools beanTools;
 
+	@Autowired
+	ReviewRepository reviewRepository;
+
 	// ===== 担当: 切通 隆晟 / トップ画面（売れ筋順改修） =====
 	/**
 	 * トップ画面 表示処理
@@ -92,6 +102,7 @@ public class ClientItemShowController {
 
 		// エンティティ内の検索結果をJavaBeansにコピー
 		List<ItemBean> itemBeanList = beanTools.copyEntityListToItemBeanList(itemList);
+		setReviewStats(itemBeanList);
 
 		// 商品情報をViewへ渡す
 		model.addAttribute("items", itemBeanList);
@@ -173,6 +184,7 @@ public class ClientItemShowController {
 
 		// 商品情報を画面表示用Beanにコピーする。
 		List<ItemBean> itemBeanList = beanTools.copyEntityListToItemBeanList(itemList);
+		setReviewStats(itemBeanList);
 
 		model.addAttribute("items", itemBeanList);
 		model.addAttribute("sortType", sortType);
@@ -219,6 +231,12 @@ public class ClientItemShowController {
 	ViewHistoryRepository viewHistoryRepository;
 
 	/**
+	 * お気に入り情報
+	 */
+	@Autowired
+	FavoriteRepository favoriteRepository;
+
+	/**
 	 * 詳細表示処理
 	 *
 	 * @param id      表示対象ID
@@ -227,7 +245,11 @@ public class ClientItemShowController {
 	 * @return "client/item/detail" 詳細画面 表示
 	 */
 	@RequestMapping(path = "/client/item/detail/{id}")
-	public String showItem(@PathVariable int id, HttpSession session, Model model) {
+	public String showItem(
+			@PathVariable int id,
+			@RequestParam(name = "reviewSortType", defaultValue = "1") Integer reviewSortType,
+			HttpSession session,
+			Model model) {
 
 		// 商品IDに該当する商品情報を取得する
 		Item item = itemRepository.findByIdAndDeleteFlag(id, Constant.NOT_DELETED);
@@ -237,19 +259,26 @@ public class ClientItemShowController {
 
 		// 商品情報と関連商品を先にModelへ格納し、閲覧履歴処理と責務を分離する
 		ItemBean itemBean = beanTools.copyEntityToItemBean(item);
+		setReviewStats(Collections.singletonList(itemBean));
 		List<Item> relatedItemList = itemRepository.findRelatedItems(
 				item.getCategory().getId(),
 				item.getId(),
 				Constant.NOT_DELETED,
 				PageRequest.of(0, RELATED_ITEM_LIMIT));
 		List<ItemBean> relatedItemBeanList = beanTools.copyEntityListToItemBeanList(relatedItemList);
+		setReviewStats(relatedItemBeanList);
 		model.addAttribute("item", itemBean);
 		model.addAttribute("relatedItems", relatedItemBeanList);
 		model.addAttribute("recentlyViewedItems", Collections.emptyList());
+		model.addAttribute("isFavorite", false);
 
 		// ログイン済みの場合、閲覧履歴を保存
 		UserBean userBean = (UserBean) session.getAttribute("user");
 		if (userBean != null) {
+			// お気に入り状態の判定
+			boolean isFavorite = favoriteRepository.existsByUserIdAndItemId(userBean.getId(), id);
+			model.addAttribute("isFavorite", isFavorite);
+
 			try {
 				User user = new User();
 				user.setId(userBean.getId());
@@ -273,6 +302,7 @@ public class ClientItemShowController {
 						PageRequest.of(0, 4));
 				List<ItemBean> recentlyViewedItemBeans = beanTools
 						.copyEntityListToItemBeanList(recentlyViewedItems);
+				setReviewStats(recentlyViewedItemBeans);
 				model.addAttribute("recentlyViewedItems", recentlyViewedItemBeans);
 			} catch (DataAccessException e) {
 				// 閲覧履歴の障害で商品詳細と関連商品まで表示不能にしない
@@ -280,6 +310,78 @@ public class ClientItemShowController {
 			}
 		}
 
+		model.addAttribute("reviews", createReviewBeans(id, reviewSortType));
+		model.addAttribute("reviewSortType", reviewSortType);
+
 		return "client/item/detail";
+	}
+
+	public String showItem(@PathVariable int id, HttpSession session, Model model) {
+		return showItem(id, SORT_LATEST, session, model);
+	}
+
+	private void setReviewStats(List<ItemBean> itemBeanList) {
+		if (itemBeanList == null || itemBeanList.isEmpty()) {
+			return;
+		}
+
+		List<Integer> itemIds = itemBeanList.stream()
+				.map(ItemBean::getId)
+				.collect(Collectors.toList());
+		List<Object[]> stats;
+		try {
+			stats = reviewRepository.findReviewStatsByItemIds(itemIds);
+		} catch (DataAccessException e) {
+			logger.error("レビュー統計の取得に失敗しました。", e);
+			stats = Collections.emptyList();
+		}
+		if (stats == null) {
+			stats = Collections.emptyList();
+		}
+		Map<Integer, Object[]> statsMap = stats.stream()
+				.collect(Collectors.toMap(stat -> (Integer) stat[0], stat -> stat));
+
+		for (ItemBean itemBean : itemBeanList) {
+			Object[] stat = statsMap.get(itemBean.getId());
+			if (stat == null) {
+				itemBean.setAvgRating(0.0);
+				itemBean.setReviewCount(0L);
+			} else {
+				itemBean.setAvgRating((Double) stat[1]);
+				itemBean.setReviewCount((Long) stat[2]);
+			}
+		}
+	}
+
+	private List<ReviewBean> createReviewBeans(Integer itemId, Integer reviewSortType) {
+		List<Review> reviewList;
+		try {
+			if (Integer.valueOf(2).equals(reviewSortType)) {
+				reviewList = reviewRepository.findByItemIdOrderByRatingDescInsertDateDesc(itemId);
+			} else if (Integer.valueOf(3).equals(reviewSortType)) {
+				reviewList = reviewRepository.findByItemIdOrderByRatingAscInsertDateDesc(itemId);
+			} else {
+				reviewList = reviewRepository.findByItemIdOrderByInsertDateDesc(itemId);
+			}
+		} catch (DataAccessException e) {
+			logger.error("レビュー一覧の取得に失敗しました。商品ID: {}", itemId, e);
+			reviewList = Collections.emptyList();
+		}
+		if (reviewList == null) {
+			reviewList = Collections.emptyList();
+		}
+
+		List<ReviewBean> reviewBeanList = new ArrayList<ReviewBean>();
+		for (Review review : reviewList) {
+			ReviewBean reviewBean = new ReviewBean();
+			reviewBean.setId(review.getId());
+			reviewBean.setUserName(review.getUser().getName());
+			reviewBean.setRating(review.getRating());
+			reviewBean.setReviewComment(review.getReviewComment());
+			reviewBean.setInsertDate(review.getInsertDate().toString());
+			reviewBean.setUserId(review.getUser().getId());
+			reviewBeanList.add(reviewBean);
+		}
+		return reviewBeanList;
 	}
 }

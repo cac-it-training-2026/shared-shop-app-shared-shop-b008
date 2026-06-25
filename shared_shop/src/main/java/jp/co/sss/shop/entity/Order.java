@@ -73,6 +73,43 @@ public class Order {
 	private Date deliveryDate;
 
 	/**
+	 * 注文取消フラグ
+	 */
+	@Column
+	private Integer cancelFlag = 0;
+
+	/**
+	 * 注文取消日
+	 */
+	@Column
+	private Date cancelDate;
+
+	/** 利用したクーポン種別 */
+	@ManyToOne
+	@JoinColumn(name = "coupon_type_id", referencedColumnName = "id")
+	private CouponType couponType;
+
+	/** 注文時点のクーポン名称 */
+	@Column
+	private String couponName;
+
+	/** 注文時点のクーポン割引率 */
+	@Column
+	private Integer couponDiscountRate;
+
+	/** 注文時点のクーポン割引額 */
+	@Column
+	private Integer couponDiscountAmount;
+
+	/** 利用ポイント */
+	@Column
+	private Integer usePoint = 0;
+
+	/** 付与ポイント */
+	@Column
+	private Integer earnedPoint = 0;
+
+	/**
 	 * 会員情報
 	 */
 	@ManyToOne
@@ -211,6 +248,70 @@ public class Order {
 	 */
 	public void setDeliveryDate(Date deliveryDate) {
 		this.deliveryDate = deliveryDate;
+	}
+
+	public Integer getCancelFlag() {
+		return cancelFlag;
+	}
+
+	public void setCancelFlag(Integer cancelFlag) {
+		this.cancelFlag = cancelFlag;
+	}
+
+	public Date getCancelDate() {
+		return cancelDate;
+	}
+
+	public void setCancelDate(Date cancelDate) {
+		this.cancelDate = cancelDate;
+	}
+
+	public CouponType getCouponType() {
+		return couponType;
+	}
+
+	public void setCouponType(CouponType couponType) {
+		this.couponType = couponType;
+	}
+
+	public String getCouponName() {
+		return couponName;
+	}
+
+	public void setCouponName(String couponName) {
+		this.couponName = couponName;
+	}
+
+	public Integer getCouponDiscountRate() {
+		return couponDiscountRate;
+	}
+
+	public void setCouponDiscountRate(Integer couponDiscountRate) {
+		this.couponDiscountRate = couponDiscountRate;
+	}
+
+	public Integer getCouponDiscountAmount() {
+		return couponDiscountAmount;
+	}
+
+	public void setCouponDiscountAmount(Integer couponDiscountAmount) {
+		this.couponDiscountAmount = couponDiscountAmount;
+	}
+
+	public Integer getUsePoint() {
+		return usePoint;
+	}
+
+	public void setUsePoint(Integer usePoint) {
+		this.usePoint = usePoint;
+	}
+
+	public Integer getEarnedPoint() {
+		return earnedPoint;
+	}
+
+	public void setEarnedPoint(Integer earnedPoint) {
+		this.earnedPoint = earnedPoint;
 	}
 
 	/**

@@ -149,6 +149,7 @@ public class URLCheck {
 						|| requestURL.indexOf("/client/basket") != -1
 						|| requestURL.indexOf("/client/order/address") != -1
 						|| requestURL.indexOf("/client/order/payment/input") != -1
+						|| requestURL.indexOf("/client/order/payment/back") != -1
 						|| requestURL.indexOf("/order/list") != -1
 						|| requestURL.indexOf("/client/order/check") != -1
 						|| requestURL.indexOf("/order/detail") != -1
@@ -156,7 +157,9 @@ public class URLCheck {
 						|| requestURL.indexOf("/client/user/detail") != -1
 						|| requestURL.indexOf("/client/user/regist") != -1
 						|| requestURL.indexOf("/client/user/update") != -1
-						|| requestURL.indexOf("/client/user/delete") != -1)) {
+						|| requestURL.indexOf("/client/user/delete") != -1
+						|| requestURL.indexOf("/client/coupon") != -1
+						|| requestURL.indexOf("/client/review") != -1)) {
 
 			// URLのリクエスト先がフィルタ実行対象である場合
 			isCheckURLOK = true;
