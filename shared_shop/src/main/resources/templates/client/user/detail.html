@@ -8,6 +8,7 @@
 </head>
 
 <body class="user user_detail">
+	<div class="user_detail_page">
 	<h2 th:class="title" th:text="#{user}+#{title.detail}"></h2>
 
 	<div class="info_form_area">
@@ -60,8 +61,15 @@
 			<div th:if="${#lists.isEmpty(deliveryAddresses)}">
 				<p>登録済みのお届け先はありません。</p>
 			</div>
-			<div th:if="${!#lists.isEmpty(deliveryAddresses)}">
+			<div class="delivery_address_table_frame" th:if="${!#lists.isEmpty(deliveryAddresses)}">
 				<table class="list_table delivery_address_list">
+					<colgroup>
+						<col class="delivery_col_no" />
+						<col class="delivery_col_name" />
+						<col class="delivery_col_postal" />
+						<col class="delivery_col_address" />
+						<col class="delivery_col_phone" />
+					</colgroup>
 					<thead>
 						<tr>
 							<th>番号</th>
@@ -128,6 +136,7 @@
 				</div>
 			</div>
 		</div>
+	</div>
 	</div>
 </body>
 
